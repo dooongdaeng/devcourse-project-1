@@ -1,6 +1,6 @@
 package com.back.global.app;
 
-import com.back.global.standard.util.Ut;
+import com.back.standard.util.Ut;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;

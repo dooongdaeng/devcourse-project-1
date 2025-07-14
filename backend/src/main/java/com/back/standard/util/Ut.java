@@ -1,4 +1,4 @@
-package com.back.global.standard.util;
+package com.back.standard.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
