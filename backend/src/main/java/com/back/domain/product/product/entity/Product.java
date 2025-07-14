@@ -18,8 +18,6 @@ public class Product extends BaseEntity {
     @Column(length = 100)
     private String description;
 
-    private int orderCount;
-
     @Column(columnDefinition = "TEXT")
     private String image;
 
