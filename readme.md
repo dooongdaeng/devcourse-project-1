@@ -9,8 +9,8 @@
 
 |팀원|역할|Github|
 |--|--|--|
-|김태형(팀장)|||
-|김영건|||
-|방은찬|||
-|배희강|||
-|최승욱|||
+|김태형(팀장)||[@dooongdaeng](https://github.com/dooongdaeng)|
+|김영건||[@johnbosco0414](https://github.com/johnbosco0414)|
+|방은찬||[@eunchan96](https://github.com/eunchan96)|
+|배희강||[@HeegangBae](https://github.com/HeegangBae)|
+|최승욱||[@seungwookc97](https://github.com/seungwookc97)|
