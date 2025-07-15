@@ -49,10 +49,10 @@ public class BaseInitData {
     private void initUsers() {
         if (userService.count() > 0) return;
 
-        userService.create("user1", "1234", "user1@test.com", List.of("ROLE_USER"));
-        userService.create("user2", "1234", "user2@test.com", List.of("ROLE_USER"));
-        userService.create("user3", "1234", "user3@test.com", List.of("ROLE_USER"));
-        userService.create("user4", "1234", "user4@test.com", List.of("ROLE_USER"));
-        userService.create("admin", "1234", "admin@test.com", List.of("ROLE_ADMIN"));
+        userService.create("user1", "1234", "user1@test.com", List.of("ROLE_USER"), "서울시 강남구");
+        userService.create("user2", "1234", "user2@test.com", List.of("ROLE_USER"), "서울시 서초구");
+        userService.create("user3", "1234", "user3@test.com", List.of("ROLE_USER"), "서울시 종로구");
+        userService.create("user4", "1234", "user4@test.com", List.of("ROLE_USER"), "서울시 마포구");
+        userService.create("admin", "1234", "admin@test.com", List.of("ROLE_ADMIN"), "서울시 중구");
     }
 }
