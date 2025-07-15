@@ -32,6 +32,16 @@ public class UserService {
         return user;
     }
 
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    public void checkPassword(User user, String rawPassword) {
+        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
+            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+        }
+    }
+
     public Optional<User> findById(int id) {
         return userRepository.findById(id);
     }
