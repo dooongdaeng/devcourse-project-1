@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -47,5 +48,15 @@ public class Product extends BaseEntity {
         this.price = price;
         this.description = description;
         this.stock = stock;
+    }
+
+    public Optional<ProductImage> findProductImageById(int id) {
+        return productImages.stream()
+                .filter(productImage -> productImage.getId() == id)
+                .findFirst();
+    }
+
+    public void deleteProductImage(ProductImage productImage) {
+        productImages.remove(productImage);
     }
 }
