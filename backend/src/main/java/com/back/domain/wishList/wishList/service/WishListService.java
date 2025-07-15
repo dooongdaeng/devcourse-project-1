@@ -47,7 +47,6 @@ public class WishListService {
     
     public boolean existsWishList(int currentUserId, int productId) {
         return wishListRepository.existsByUserIdAndProductId(currentUserId, productId);
-
     }
 
     public List<WishList> getWishListsByUserId(int userId) {
