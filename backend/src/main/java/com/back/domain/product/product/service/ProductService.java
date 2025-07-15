@@ -1,4 +1,4 @@
-package com.back.domain.product.product.controller.service;
+package com.back.domain.product.product.service;
 
 import com.back.domain.product.product.entity.Product;
 import com.back.domain.product.product.repository.ProductRepository;
@@ -24,5 +24,9 @@ public class ProductService {
 
     public Optional<Product> findById(int productId) {
         return productRepository.findById(productId);
+    }
+
+    public Long count() {
+        return productRepository.count();
     }
 }

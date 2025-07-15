@@ -1,6 +1,6 @@
 package com.back.domain.product.product.controller;
 
-import com.back.domain.product.product.controller.service.ProductService;
+import com.back.domain.product.product.service.ProductService;
 import com.back.domain.product.product.entity.Product;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;

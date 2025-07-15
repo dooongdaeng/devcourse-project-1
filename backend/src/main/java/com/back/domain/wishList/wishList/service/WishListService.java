@@ -1,6 +1,6 @@
 package com.back.domain.wishList.wishList.service;
 
-import com.back.domain.product.product.controller.service.ProductService;
+import com.back.domain.product.product.service.ProductService;
 import com.back.domain.product.product.entity.Product;
 import com.back.domain.user.user.entity.User;
 import com.back.domain.user.user.service.UserService;
