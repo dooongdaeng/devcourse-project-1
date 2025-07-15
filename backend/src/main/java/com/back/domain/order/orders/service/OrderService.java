@@ -13,7 +13,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
 
 
-    public Orders write(int orderCount, int totalPrice, String paymentMethod, String paymentStatus) {
+    public Orders create(int orderCount, int totalPrice, String paymentMethod, String paymentStatus) {
         Orders order = new Orders(orderCount, totalPrice, paymentMethod, paymentStatus);
 
         return orderRepository.save(order);

@@ -39,7 +39,7 @@ public class ApiV1OrderController {
             @Valid @RequestBody OrderCreateReqBody reqBody
     ) {
 
-        Orders order = orderService.write(
+        Orders order = orderService.create(
                 reqBody.orderCount(),
                 reqBody.totalPrice(),
                 reqBody.paymentMethod(),
