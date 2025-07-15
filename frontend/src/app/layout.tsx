@@ -4,7 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,6 +23,7 @@ export default function RootLayout({
 }>) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     const checkLoginStatus = () => {
@@ -50,6 +51,7 @@ export default function RootLayout({
     if (typeof window !== 'undefined') {
       localStorage.removeItem('isLoggedIn');
     }
+    router.push('/');
   };
   return (
     <html lang="en">
