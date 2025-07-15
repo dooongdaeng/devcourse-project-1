@@ -1,4 +1,4 @@
-package com.back.domain.wishList;
+package com.back.domain.wishList.wishList.entity;
 
 import com.back.domain.product.product.entity.Product;
 import com.back.domain.user.user.entity.User;
