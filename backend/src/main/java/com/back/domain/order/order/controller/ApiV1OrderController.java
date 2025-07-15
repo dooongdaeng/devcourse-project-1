@@ -4,6 +4,7 @@ package com.back.domain.order.order.controller;
 import com.back.domain.order.order.dto.OrderDto;
 import com.back.domain.order.order.entity.Order;
 import com.back.domain.order.order.service.OrderService;
+import com.back.domain.user.user.entity.User;
 import com.back.global.rq.Rq;
 import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,7 +28,9 @@ public class ApiV1OrderController {
     record OrderCreateReqBody(
             int orderCount,
             int totalPrice,
-            String paymentMethod
+            String paymentMethod,
+            String paymentStatus,
+            User user
     ) {
     }
 
@@ -47,10 +50,11 @@ public class ApiV1OrderController {
         int userId = rq.getLoginedUserId();
 
         Order order = orderService.write(
-                userId,
                 reqBody.orderCount(),
                 reqBody.totalPrice(),
-                reqBody.paymentMethod()
+                reqBody.paymentMethod(),
+                reqBody.paymentStatus(),
+                reqBody.user()
         );
 
         return new RsData<>(
