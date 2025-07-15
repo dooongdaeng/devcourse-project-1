@@ -1,6 +1,5 @@
 package com.back.domain.user.user.controller;
 
-import com.back.domain.user.user.dto.UserWithUsernameDto;
 import com.back.domain.user.user.entity.User;
 import com.back.domain.user.user.service.UserService;
 import lombok.RequiredArgsConstructor;
