@@ -1,22 +1,28 @@
 package com.back.domain.user.user.dto;
 
 import com.back.domain.user.user.entity.User;
-import org.springframework.lang.NonNull;
+import lombok.NonNull;
 
-public record UserDto(
+import java.time.LocalDateTime;
+
+public record AdminUserDto(
         @NonNull int id,
         @NonNull String username,
         @NonNull String nickname,
         @NonNull String email,
-        @NonNull String address
+        @NonNull LocalDateTime createDate,
+        @NonNull LocalDateTime modifyDate,
+        @NonNull String role
 ) {
-    public UserDto(User user) {
+    public AdminUserDto(User user) {
         this(
                 user.getId(),
                 user.getUsername(),
                 user.getNickname(),
                 user.getEmail(),
-                user.getAddress()
+                user.getCreateDate(),
+                user.getModifyDate(),
+                user.getRole()
         );
     }
 }
