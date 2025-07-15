@@ -3,11 +3,13 @@ package com.back.domain.user.user.entity;
 import com.back.global.jpa.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "users") // 예약어 충돌 방지
 @Getter
 @NoArgsConstructor
 public class User extends BaseEntity {
