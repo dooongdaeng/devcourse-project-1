@@ -71,4 +71,33 @@ public class ApiV1OrderControllerTest {
 
     }
 
+    @Test
+    @DisplayName("주문 단건 조회 테스트")
+    @WithMockUser
+    void t2() throws Exception{
+        int id = 1;
+
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/v1/orders/" + id)
+                )
+                .andDo(print());
+
+        Orders order = orderService.findLatest().get();
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1OrderController.class))
+                .andExpect(handler().methodName("getItem"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(order.getId()))
+                .andExpect(jsonPath("$.createDate").value(Matchers.startsWith(order.getCreateDate().toString().substring(0, 20))))
+                .andExpect(jsonPath("$.modifyDate").value(Matchers.startsWith(order.getModifyDate().toString().substring(0, 20))))
+                .andExpect(jsonPath("$.orderCount").value(order.getOrderCount()))
+                .andExpect(jsonPath("$.totalPrice").value(order.getTotalPrice()))
+                .andExpect(jsonPath("$.paymentMethod").value(order.getPaymentMethod()))
+                .andExpect(jsonPath("$.paymentStatus").value(order.getPaymentStatus()));
+
+    }
+
+
 }

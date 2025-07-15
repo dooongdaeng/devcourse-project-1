@@ -9,6 +9,8 @@ import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,9 +27,15 @@ public class ApiV1OrderController {
     private final Rq rq;
 
     record OrderCreateReqBody(
+            @NotBlank
             int orderCount,
+            @NotBlank
             int totalPrice,
+            @NotBlank
+            @Size(min = 2, max = 100)
             String paymentMethod,
+            @NotBlank
+            @Size(min = 2, max = 100)
             String paymentStatus
     ) {
     }
@@ -52,5 +60,7 @@ public class ApiV1OrderController {
                 new OrderDto(order)
         );
     }
+
+
 
 }
