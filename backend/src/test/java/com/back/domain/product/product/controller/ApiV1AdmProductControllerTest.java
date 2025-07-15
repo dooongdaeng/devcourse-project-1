@@ -140,6 +140,58 @@ public class ApiV1AdmProductControllerTest {
                         price-Min-must be greater than or equal to 100
                         """.stripIndent().trim()));
     }
+    
+    @Test
+    @DisplayName("상품 등록 - without login")
+    public void t1_3() throws Exception {
+        ResultActions resultActions = mvc
+                .perform(
+                        post("/api/v1/adm/products")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                            "name": "상품 test",
+                                            "price": 0,
+                                            "description": "상품 test",
+                                            "stock": 10
+                                        }
+                                        """)
+                ).andDo(print());
+
+        resultActions
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.resultCode").value("401-1"))
+                .andExpect(jsonPath("$.msg").value("로그인 후 이용해주세요."));
+    }
+
+    @Test
+    @DisplayName("상품 등록 - without permission")
+    @WithMockUser(username = "user1", roles = {"USER"})
+    public void t1_4() throws Exception {
+        int actorId = userService.findByUsername("user1").get().getId();
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("loginedUserId", actorId);
+
+        ResultActions resultActions = mvc
+                .perform(
+                        post("/api/v1/adm/products")
+                                .session(session)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                            "name": "상품 test",
+                                            "price": 0,
+                                            "description": "상품 test",
+                                            "stock": 10
+                                        }
+                                        """)
+                ).andDo(print());
+
+        resultActions
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.resultCode").value("403-1"))
+                .andExpect(jsonPath("$.msg").value("관리자만 접근할 수 있습니다."));
+    }
 
     @Test
     @DisplayName("상품 삭제")

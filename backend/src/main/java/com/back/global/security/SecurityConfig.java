@@ -1,5 +1,7 @@
 package com.back.global.security;
 
+import com.back.global.rsData.RsData;
+import com.back.standard.util.Ut;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,7 +31,31 @@ public class SecurityConfig {
                                 .frameOptions(
                                         HeadersConfigurer.FrameOptionsConfig::sameOrigin
                                 )
-                ).csrf(AbstractHttpConfigurer::disable);
+                ).csrf(AbstractHttpConfigurer::disable).exceptionHandling(
+                        exceptionHandling -> exceptionHandling
+                                .authenticationEntryPoint(
+                                        (request, response, authException) -> {
+                                            response.setContentType("application/json;charset=UTF-8");
+                                            response.setStatus(401);
+                                            response.getWriter().write(
+                                                    Ut.json.toString(
+                                                            new RsData<Void>("401-1", "로그인 후 이용해주세요.")
+                                                    )
+                                            );
+                                        }
+                                )
+                                .accessDeniedHandler(
+                                        (request, response, accessDeniedException) -> {
+                                            response.setContentType("application/json;charset=UTF-8");
+                                            response.setStatus(403);
+                                            response.getWriter().write(
+                                                    Ut.json.toString(
+                                                            new RsData<Void>("403-1", "관리자만 접근할 수 있습니다.")
+                                                    )
+                                            );
+                                        }
+                                )
+                );
 
         return http.build();
     }
