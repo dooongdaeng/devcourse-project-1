@@ -94,4 +94,30 @@ public class ApiV1ProductControllerTest {
                     .andExpect(jsonPath("$[%d].stock".formatted(i)).value(product.getStock()));
         }
     }
+
+    @Test
+    @DisplayName("상품 단건 조회")
+    public void t3() throws Exception {
+        int id = 1;
+
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/v1/products/%d".formatted(id))
+                                .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print());
+
+        Product product = productService.findById(id).get();
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1ProductController.class))
+                .andExpect(handler().methodName("getItem"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(product.getId()))
+                .andExpect(jsonPath("$.createDate").value(Matchers.startsWith(product.getCreateDate().toString().substring(0, 20))))
+                .andExpect(jsonPath("$.modifyDate").value(Matchers.startsWith(product.getModifyDate().toString().substring(0, 20))))
+                .andExpect(jsonPath("$.name").value(product.getName()))
+                .andExpect(jsonPath("$.price").value(product.getPrice()))
+                .andExpect(jsonPath("$.description").value(product.getDescription()))
+                .andExpect(jsonPath("$.stock").value(product.getStock()));
+    }
 }

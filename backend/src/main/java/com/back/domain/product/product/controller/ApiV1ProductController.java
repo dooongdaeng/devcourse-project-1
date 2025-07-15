@@ -56,7 +56,7 @@ public class ApiV1ProductController {
 
 
     @GetMapping
-    @Transactional
+    @Transactional(readOnly = true)
     @Operation(summary = "다건 조회")
     public List<ProductDto> getItems() {
         List<Product> items = productService.findAll();
@@ -64,5 +64,13 @@ public class ApiV1ProductController {
         return items.stream()
                 .map(ProductDto::new)
                 .toList();
+    }
+
+    @GetMapping("/{id}")
+    @Transactional(readOnly = true)
+    @Operation(summary = "단건 조회")
+    public ProductDto getItem(@PathVariable int id) {
+        Product product = productService.findById(id).get();
+        return new ProductDto(product);
     }
 }
