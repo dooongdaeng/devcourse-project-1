@@ -2,6 +2,7 @@ package com.back.global.initData;
 
 import com.back.domain.product.product.entity.Product;
 import com.back.domain.product.product.service.ProductService;
+import com.back.domain.user.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
@@ -10,6 +11,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Configuration
 @RequiredArgsConstructor
 public class BaseInitData {
@@ -17,6 +20,7 @@ public class BaseInitData {
     @Lazy
     private BaseInitData self;
     private final ProductService productService;
+    private final UserService userService;
 
     @Bean
     ApplicationRunner baseInitDataApplicationRunner() {
@@ -40,5 +44,15 @@ public class BaseInitData {
 
         Product product4 = productService.create("상품4", 10000, "상품4입니다.", 100);
         product4.addProductImage("/images/coffee_4.jpg");
+    }
+
+    private void initUsers() {
+        if (userService.count() > 0) return;
+
+        userService.create("user1", "1234", "user1@test.com", List.of("ROLE_USER"));
+        userService.create("user2", "1234", "user2@test.com", List.of("ROLE_USER"));
+        userService.create("user3", "1234", "user3@test.com", List.of("ROLE_USER"));
+        userService.create("user4", "1234", "user4@test.com", List.of("ROLE_USER"));
+        userService.create("admin", "1234", "admin@test.com", List.of("ROLE_ADMIN"));
     }
 }
