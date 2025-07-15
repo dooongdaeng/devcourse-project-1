@@ -48,4 +48,8 @@ public class WishListService {
     public List<WishList> getWishListsByUserId(int userId) {
         return wishListRepository.findByUserIdOrderByCreated(userId);
     }
+
+    public boolean existsWishList(int currentUserId, int userId) {
+        return wishListRepository.existsByUserIdAndProductId(currentUserId, userId);
+    }
 }
