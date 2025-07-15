@@ -1,7 +1,9 @@
 package com.back.domain.order.orders.controller;
 
 
+import com.back.domain.order.orders.entity.Orders;
 import com.back.domain.order.orders.service.OrderService;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -51,10 +53,22 @@ public class ApiV1OrderControllerTest {
                 )
                 .andDo(print());
 
-//        Orders order = orderService.findLatest().get();
+        Orders order = orderService.findLatest().get();
 
         resultActions
-                .andExpect(status().isOk());
+                .andExpect(handler().handlerType(ApiV1OrderController.class))
+                .andExpect(handler().methodName("write"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.resultCode").value("201-1"))
+                .andExpect(jsonPath("$.msg").value("%d번 주문이 생성되었습니다.".formatted(order.getId())))
+                .andExpect(jsonPath("$.data.id").value(order.getId()))
+                .andExpect(jsonPath("$.data.createDate").value(Matchers.startsWith(order.getCreateDate().toString().substring(0, 20))))
+                .andExpect(jsonPath("$.data.modifyDate").value(Matchers.startsWith(order.getModifyDate().toString().substring(0, 20))))
+                .andExpect(jsonPath("$.data.orderCount").value(order.getOrderCount()))
+                .andExpect(jsonPath("$.data.totalPrice").value(order.getTotalPrice()))
+                .andExpect(jsonPath("$.data.paymentMethod").value(order.getPaymentMethod()))
+                .andExpect(jsonPath("$.data.paymentStatus").value(order.getPaymentStatus()));
+
     }
 
 }

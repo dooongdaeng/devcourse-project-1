@@ -48,7 +48,7 @@ public class ApiV1OrderController {
 
         return new RsData<>(
                 "201-1",
-                "주문이 생성되었습니다.",
+                "%d번 주문이 생성되었습니다.".formatted(order.getId()),
                 new OrderDto(order)
         );
     }
