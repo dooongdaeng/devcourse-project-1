@@ -5,6 +5,7 @@ import com.back.domain.order.orders.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,4 +24,11 @@ public class OrderService {
         return orderRepository.findFirstByOrderByIdDesc();
     }
 
+    public Optional<Orders> findById(int id) {
+        return orderRepository.findById(id);
+    }
+
+    public List<Orders> findAll() {
+        return orderRepository.findAll();
+    }
 }

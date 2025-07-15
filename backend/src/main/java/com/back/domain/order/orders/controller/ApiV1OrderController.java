@@ -9,12 +9,13 @@ import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -25,9 +26,15 @@ public class ApiV1OrderController {
     private final Rq rq;
 
     record OrderCreateReqBody(
+            @NotBlank
             int orderCount,
+            @NotBlank
             int totalPrice,
+            @NotBlank
+            @Size(min = 2, max = 100)
             String paymentMethod,
+            @NotBlank
+            @Size(min = 2, max = 100)
             String paymentStatus
     ) {
     }
@@ -48,9 +55,29 @@ public class ApiV1OrderController {
 
         return new RsData<>(
                 "201-1",
-                "주문이 생성되었습니다.",
+                "%d번 주문이 생성되었습니다.".formatted(order.getId()),
                 new OrderDto(order)
         );
     }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "주문 단건 조회")
+    public OrderDto getOrder(@PathVariable int id) {
+        Orders order = orderService.findById(id).get();
+
+        return new OrderDto(order);
+    }
+
+    @GetMapping
+    @Operation(summary = "주문 목록 조회")
+    public List<OrderDto> getOrders() {
+        List<Orders> orders = orderService.findAll();
+        List<OrderDto> orderDtos = orders.stream()
+                .map(OrderDto::new)
+                .toList();
+
+        return orderDtos;
+    }
+
 
 }
