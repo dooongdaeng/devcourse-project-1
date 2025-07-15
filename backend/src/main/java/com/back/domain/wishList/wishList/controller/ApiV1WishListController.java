@@ -1,0 +1,63 @@
+package com.back.domain.wishList.wishList.controller;
+
+import com.back.domain.wishList.wishList.dto.WishListDto;
+import com.back.domain.wishList.wishList.entity.WishList;
+import com.back.domain.wishList.wishList.service.WishListService;
+import com.back.global.rq.Rq;
+import com.back.global.rsData.RsData;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping("/api/v1/wish-lists")
+@RequiredArgsConstructor
+public class ApiV1WishListController {
+    private final WishListService wishListService;
+    private final Rq rq;
+
+    record WishListAddReqBody(
+            @NotNull Long productId
+    ){}
+
+    @GetMapping
+    public RsData<List<WishListDto>> getAllWishLists() {
+        Long currentUserId = rq.getCurrentUserId();
+
+        List<WishList> wishLists = wishListService.getWishListsByUserId(currentUserId);
+        List<WishListDto> wishListDtos = wishLists.stream().map(WishListDto::new).collect(Collectors.toList());
+
+        return new RsData<>("200", "위시리스트 조회 성공", wishListDtos);
+
+    }
+
+    @GetMapping("/check/{productId}")
+    public RsData<List<WishListDto>> getWishListsByUserId(Long userId) {
+        List<WishList> wishLists = wishListService.getWishListsByUserId(userId);
+        List<WishListDto> wishListDtos = wishLists.stream().map(WishListDto::new).collect(Collectors.toList());
+
+        return new RsData<>("200", "위시리스트 조회 성공", wishListDtos);
+    }
+
+    @PostMapping
+    public RsData<WishListDto> addWishList(@Valid @RequestBody WishListAddReqBody reqBody) {
+        Long currentUserId = rq.getCurrentUserId();
+
+        WishList wishList = wishListService.addWishList(currentUserId, reqBody.productId);
+
+        return new RsData<>("201", "위시리스트에 추가했습니다.", new WishListDto(wishList));
+    }
+
+    @DeleteMapping("/{productId}")
+    public RsData<Void> removeWishList(@PathVariable Long productId) {
+        Long currentUserId = rq.getCurrentUserId();
+
+        wishListService.removeWishList(currentUserId, productId);
+
+        return new RsData<>("200", "위시리스트에서 삭제했습니다.", null);
+    }
+}
