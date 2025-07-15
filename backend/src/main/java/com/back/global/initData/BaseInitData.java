@@ -29,16 +29,16 @@ public class BaseInitData {
     public void work1(){
         if (productService.count() > 0) return;
 
-        Product product1 = new Product("상품1", 10000, "상품1입니다.", 100);
+        Product product1 = productService.create("상품1", 10000, "상품1입니다.", 100);
         product1.addProductImage("/images/coffee_1.jpg");
 
-        Product product2 = new Product("상품2", 10000, "상품2입니다.", 100);
+        Product product2 = productService.create("상품2", 10000, "상품2입니다.", 100);
         product2.addProductImage("/images/coffee_2.jpg");
 
-        Product product3 = new Product("상품3", 10000, "상품3입니다.", 100);
+        Product product3 = productService.create("상품3", 10000, "상품3입니다.", 100);
         product3.addProductImage("/images/coffee_3.jpg");
 
-        Product product4 = new Product("상품4", 10000, "상품4입니다.", 100);
+        Product product4 = productService.create("상품4", 10000, "상품4입니다.", 100);
         product4.addProductImage("/images/coffee_4.jpg");
     }
 }
