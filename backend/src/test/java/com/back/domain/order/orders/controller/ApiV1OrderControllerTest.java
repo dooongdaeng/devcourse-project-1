@@ -54,7 +54,7 @@ public class ApiV1OrderControllerTest {
 //        Orders order = orderService.findLatest().get();
 
         resultActions
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
     }
 
 }
