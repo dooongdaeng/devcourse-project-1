@@ -14,7 +14,7 @@ export default function Signup() {
               type="email"
               id="email"
               name="email"
-              className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-700"
               placeholder="이메일을 입력하세요"
             />
           </div>
@@ -26,7 +26,7 @@ export default function Signup() {
               type="password"
               id="password"
               name="password"
-              className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-700"
               placeholder="비밀번호를 입력하세요"
             />
           </div>
@@ -38,7 +38,7 @@ export default function Signup() {
               type="password"
               id="confirmPassword"
               name="confirmPassword"
-              className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-700"
               placeholder="비밀번호를 다시 입력하세요"
             />
           </div>
@@ -50,7 +50,7 @@ export default function Signup() {
               type="text"
               id="postcode"
               name="postcode"
-              className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-700"
               placeholder="우편번호를 입력하세요"
             />
           </div>
@@ -62,7 +62,7 @@ export default function Signup() {
               type="text"
               id="address"
               name="address"
-              className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-700"
               placeholder="주소를 입력하세요"
             />
           </div>
