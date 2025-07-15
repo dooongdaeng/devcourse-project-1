@@ -24,19 +24,31 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <header>
-          <div className="flex justify-between items-center">Grids & Circles</div>
-          <ul className="flex gap-4">
-            <li>
-              <Link href="/">메인(제품소개포함)</Link>
-            </li>
-            <li>
-              <Link href="/order">주문</Link>
-            </li>
-            <li>
-              <Link href="/orderHistory">주문내역</Link>
-            </li>
-          </ul>
+        <header className="bg-gray-800 text-white p-4 shadow-md">
+          <div className="container mx-auto flex justify-between items-center">
+            <Link href="/" className="text-2xl font-bold">
+              Grids & Circles
+            </Link>
+            <nav>
+              <ul className="flex space-x-4">
+                <li>
+                  <Link href="/" className="hover:text-gray-300">
+                    메인(제품소개포함)
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/order" className="hover:text-gray-300">
+                    주문
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/orderHistory" className="hover:text-gray-300">
+                    주문내역
+                  </Link>
+                </li>
+              </ul>
+            </nav>
+          </div>
         </header>
         <main>{children}</main>
         <footer></footer>
