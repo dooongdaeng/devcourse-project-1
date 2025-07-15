@@ -29,4 +29,12 @@ public class Rq {
     public void logout() {
         req.getSession().invalidate();
     }
+
+    public int getCurrentUserId() {
+        Integer loginedUserId = getLoginedUserId();
+        if (loginedUserId == null) {
+            return null;
+        }
+        return loginedUserId.longValue();
+    }
 }

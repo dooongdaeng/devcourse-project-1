@@ -5,18 +5,18 @@ import com.back.domain.wishList.wishList.entity.WishList;
 import org.jspecify.annotations.NonNull;
 
 public record WishListDto (
-        @NonNull Long productId,
+        @NonNull Integer productId,
         String productName,
         String productImageUrl,
         Integer productPrice
 ) {
-    public WishListDto(Long productId) {
+    public WishListDto(Integer productId) {
         this(productId, null, null, null);
     }
 
     public WishListDto(WishList wishList) {
         this(
-                (long) wishList.getProduct().getId(), //
+                wishList.getProduct().getId(), //
                 wishList.getProduct().getName(),
                 getFirstImageUrl(wishList),
                 wishList.getProduct().getPrice()
