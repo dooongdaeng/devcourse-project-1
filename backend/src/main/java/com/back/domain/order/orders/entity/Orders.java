@@ -1,4 +1,4 @@
-package com.back.domain.order.order.entity;
+package com.back.domain.order.orders.entity;
 
 import com.back.domain.order.orderItem.entity.OrderItem;
 import com.back.global.jpa.entity.BaseEntity;
@@ -15,7 +15,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Order extends BaseEntity {
+public class Orders extends BaseEntity {
     private int orderCount;
     private int totalPrice;
     private String paymentMethod;
@@ -23,12 +23,14 @@ public class Order extends BaseEntity {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    public Order(int orderCount, int totalPrice, String paymentMethod, String paymentStatus) {
+
+
+    public Orders(int orderCount, int totalPrice, String paymentMethod, String paymentStatus) {
         this.orderCount = orderCount;
+
         this.totalPrice = totalPrice;
         this.paymentMethod = paymentMethod;
         this.paymentStatus = paymentStatus;
     }
-
 
 }

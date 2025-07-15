@@ -1,6 +1,6 @@
 package com.back.domain.order.orderItem.entity;
 
-import com.back.domain.order.order.entity.Order;
+import com.back.domain.order.orders.entity.Orders;
 import com.back.global.jpa.entity.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
@@ -18,7 +18,7 @@ public class OrderItem extends BaseEntity {
     private int productId;
 
     @ManyToOne
-    private Order order;
+    private Orders order;
 
     public OrderItem(Integer quantity, Integer unitPrice,
                      Integer totalPrice, Integer productId) {
