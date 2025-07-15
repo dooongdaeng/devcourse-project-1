@@ -26,9 +26,7 @@ public class ApiV1OrderController {
     private final Rq rq;
 
     record OrderCreateReqBody(
-            @NotBlank
             int orderCount,
-            @NotBlank
             int totalPrice,
             @NotBlank
             @Size(min = 2, max = 100)
@@ -80,4 +78,54 @@ public class ApiV1OrderController {
     }
 
 
+    record OrderUpdateReqBody(
+            int orderCount,
+            int totalPrice,
+            @NotBlank
+            @Size(min = 2, max = 100)
+            String paymentMethod,
+            @NotBlank
+            @Size(min = 2, max = 100)
+            String paymentStatus
+    ) {
+    }
+
+    @PutMapping("/{id}")
+    @Transactional
+    @Operation(summary = "주문 수정")
+    public RsData<OrderDto> update(
+            @PathVariable int id,
+            @Valid @RequestBody OrderUpdateReqBody reqBody
+    ) {
+        Orders order = orderService.findById(id).get();
+
+        orderService.update(
+                order,
+                reqBody.orderCount(),
+                reqBody.totalPrice(),
+                reqBody.paymentMethod(),
+                reqBody.paymentStatus()
+        );
+
+        return new RsData<>(
+                "200-1",
+                "%d번 주문이 수정되었습니다.".formatted(id)
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    @Operation(summary = "삭제")
+    public RsData<Void> delete(
+            @PathVariable int id
+    ) {
+        Orders order = orderService.findById(id).get();
+
+        orderService.delete(order);
+
+        return new RsData<>(
+                "200-1",
+                "%d번 주문이 삭제되었습니다.".formatted(id)
+        );
+    }
 }
