@@ -3,6 +3,7 @@ package com.back.domain.product.productImage.controller;
 import com.back.domain.product.product.entity.Product;
 import com.back.domain.product.product.service.ProductService;
 import com.back.domain.product.productImage.dto.ProductImageDto;
+import com.back.domain.product.productImage.entity.ProductImage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -30,5 +31,15 @@ public class ApiV1ProductImageController {
         return product.getProductImages().stream()
                 .map(ProductImageDto::new)
                 .toList();
+    }
+
+    @GetMapping("/{id}")
+    @Transactional(readOnly = true)
+    @Operation(summary = "단건 조회")
+    public ProductImageDto getItem(@PathVariable int productId, @PathVariable int id) {
+        Product product = productService.findById(productId).get();
+        ProductImage productImage = product.findProductImageById(id).get();
+
+        return new ProductImageDto(productImage);
     }
 }

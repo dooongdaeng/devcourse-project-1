@@ -58,4 +58,30 @@ public class ApiV1ProductImageControllerTest {
                     .andExpect(jsonPath("$[%d].productId".formatted(i)).value(productImage.getProduct().getId()));
         }
     }
+
+    @Test
+    @DisplayName("상품 이미지 단건조회")
+    public void t2() throws Exception {
+        int productId = 1;
+        int id = 1;
+
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/v1/products/%d/images/%d".formatted(productId, id))
+                                .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print());
+
+        Product product = productService.findById(productId).get();
+        ProductImage productImage = product.findProductImageById(id).get();
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1ProductImageController.class))
+                .andExpect(handler().methodName("getItem"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(productImage.getId()))
+                .andExpect(jsonPath("$.createDate").value(Matchers.startsWith(productImage.getCreateDate().toString().substring(0, 20))))
+                .andExpect(jsonPath("$.modifyDate").value(Matchers.startsWith(productImage.getModifyDate().toString().substring(0, 20))))
+                .andExpect(jsonPath("$.url").value(productImage.getUrl()))
+                .andExpect(jsonPath("$.productId").value(productImage.getProduct().getId()));
+    }
 }
