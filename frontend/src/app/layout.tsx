@@ -74,11 +74,18 @@ export default function RootLayout({
                   </Link>
                 </li>
                 {isLoggedIn && (
-                  <li>
-                    <Link href="/orderHistory" className="hover:text-gray-300">
-                      주문내역
-                    </Link>
-                  </li>
+                  <>
+                    <li>
+                      <Link href="/orderHistory" className="hover:text-gray-300">
+                        주문내역
+                      </Link>
+                    </li>
+                    <li>
+                      <Link href="/admin" className="hover:text-gray-300">
+                        관리자
+                      </Link>
+                    </li>
+                  </>
                 )}
                 <li>
                   {isLoggedIn ? (
