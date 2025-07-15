@@ -3,6 +3,9 @@ package com.back.domain.product.product.controller;
 import com.back.domain.product.product.dto.ProductDto;
 import com.back.domain.product.product.entity.Product;
 import com.back.domain.product.product.service.ProductService;
+import com.back.domain.user.user.entity.User;
+import com.back.global.exception.ServiceException;
+import com.back.global.rq.Rq;
 import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "ApiV1AdmProductController", description = "API 관리자용 상품 컨트롤러")
 public class ApiV1AdmProductController {
     private final ProductService productService;
+    private final Rq rq;
 
     record ProductCreateReqBody(
             @NotBlank
@@ -43,6 +47,11 @@ public class ApiV1AdmProductController {
     public RsData<ProductDto> create(
             @Valid @RequestBody ProductCreateReqBody reqBody
     ) {
+        User actor = rq.getActor();
+        if (!actor.getRole().equals("ROLE_ADMIN")) {
+            throw new ServiceException("403-1", "관리자만 접근할 수 있습니다.");
+        }
+
         Product product = productService.create(reqBody.name, reqBody.price, reqBody.description, reqBody.stock);
 
         return new RsData<>(
@@ -57,6 +66,11 @@ public class ApiV1AdmProductController {
     @Transactional
     @Operation(summary = "삭제")
     public RsData<Void> delete(@PathVariable int id) {
+        User actor = rq.getActor();
+        if (!actor.getRole().equals("ROLE_ADMIN")) {
+            throw new ServiceException("403-1", "관리자만 접근할 수 있습니다.");
+        }
+
         Product product = productService.findById(id).get();
         productService.delete(product);
 
@@ -90,6 +104,11 @@ public class ApiV1AdmProductController {
             @PathVariable int id,
             @Valid @RequestBody ProductUpdateReqBody reqBody
     ) {
+        User actor = rq.getActor();
+        if (!actor.getRole().equals("ROLE_ADMIN")) {
+            throw new ServiceException("403-1", "관리자만 접근할 수 있습니다.");
+        }
+
         Product product = productService.findById(id).get();
         productService.modify(product, reqBody.name, reqBody.price, reqBody.description, reqBody.stock);
 
