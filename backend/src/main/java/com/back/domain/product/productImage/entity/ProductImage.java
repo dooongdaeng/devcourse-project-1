@@ -22,4 +22,8 @@ public class ProductImage extends BaseEntity {
         this.url = url;
         this.product = product;
     }
+
+    public void modify(String url) {
+        this.url = url;
+    }
 }

@@ -78,4 +78,26 @@ public class ApiV1ProductImageController {
                 new ProductImageDto(productImage)
         );
     }
+
+
+    record ProductImageUpdateReqBody(String url) {}
+
+    @PutMapping("/{id}")
+    @Transactional
+    @Operation(summary = "수정")
+    public RsData<Void> update(
+            @PathVariable int productId,
+            @PathVariable int id,
+            @RequestBody ProductImageUpdateReqBody requestBody
+    ) {
+        Product product = productService.findById(productId).get();
+        ProductImage productImage = product.findProductImageById(id).get();
+
+        productService.modifyProductImage(productImage, requestBody.url);
+
+        return new RsData<>(
+                "200-1",
+                "%d번 상품 이미지가 수정되었습니다.".formatted(id)
+        );
+    }
 }

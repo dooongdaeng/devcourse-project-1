@@ -55,4 +55,8 @@ public class ProductService {
     public void flush() {
         productRepository.flush();
     }
+
+    public void modifyProductImage(ProductImage productImage, String url) {
+        productImage.modify(url);
+    }
 }
