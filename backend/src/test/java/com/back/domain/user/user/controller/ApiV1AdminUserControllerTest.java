@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -74,6 +75,8 @@ public class ApiV1AdminUserControllerTest {
     @DisplayName("권한 없이 관리자 API 접근 시 403")
     @WithMockUser(username = "user1", roles = {"USER"})
     void forbiddenWhenUserAccessAdmin() throws Exception {
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("loginedUserId", 1);
         mvc.perform(get("/api/v1/adm/users"))
                 .andExpect(status().isForbidden());
     }
