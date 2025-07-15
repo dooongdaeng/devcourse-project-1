@@ -4,6 +4,7 @@ import com.back.domain.product.product.controller.service.ProductService;
 import com.back.domain.product.product.entity.Product;
 import com.back.domain.user.user.entity.User;
 import com.back.domain.user.user.service.UserService;
+import com.back.domain.wishList.wishList.dto.WishListDto;
 import com.back.domain.wishList.wishList.entity.WishList;
 import com.back.domain.wishList.wishList.repository.WishListRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,16 +35,17 @@ public class WishListService {
     }
 
     @Transactional
-    public void removeWishList(int currentUserId, int productId) {
+    public WishListDto removeWishList(int currentUserId, int productId) {
         WishList wishList = wishListRepository.findByUserIdAndProductId(currentUserId, productId)
-                .orElseThrow(() -> new RuntimeException("위시리스트에 존재하지 않는 상품입니다."));
+                .orElseThrow(() -> new RuntimeException("해당 상품이 위시리스트에 없습니다."));
 
         wishListRepository.delete(wishList);
+
+        return new WishListDto(wishList);
     }
 
 
     public List<WishList> getWishListsByUserId(int userId) {
-        return wishListRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다."));
+        return wishListRepository.findByUserIdOrderByCreated(userId);
     }
 }

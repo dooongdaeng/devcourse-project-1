@@ -33,8 +33,8 @@ public class Rq {
     public int getCurrentUserId() {
         Integer loginedUserId = getLoginedUserId();
         if (loginedUserId == null) {
-            return null;
+            throw new IllegalStateException("로그인하지 않았습니다.");
         }
-        return loginedUserId.longValue();
+        return loginedUserId;
     }
 }
