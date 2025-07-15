@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -83,7 +84,7 @@ public class ApiV1OrderControllerTest {
                 )
                 .andDo(print());
 
-        Orders order = orderService.findLatest().get();
+        Orders order = orderService.findById(id).get();
 
         resultActions
                 .andExpect(handler().handlerType(ApiV1OrderController.class))

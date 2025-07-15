@@ -13,10 +13,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -59,6 +56,14 @@ public class ApiV1OrderController {
                 "%d번 주문이 생성되었습니다.".formatted(order.getId()),
                 new OrderDto(order)
         );
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "주문 단건 조회")
+    public OrderDto getOrder(@PathVariable int id) {
+        Orders order = orderService.findById(id).get();
+
+        return new OrderDto(order);
     }
 
 

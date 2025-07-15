@@ -23,4 +23,7 @@ public class OrderService {
         return orderRepository.findFirstByOrderByIdDesc();
     }
 
+    public Optional<Orders> findById(int id) {
+        return orderRepository.findById(id);
+    }
 }
