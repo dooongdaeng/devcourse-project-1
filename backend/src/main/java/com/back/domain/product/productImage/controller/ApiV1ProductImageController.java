@@ -4,14 +4,12 @@ import com.back.domain.product.product.entity.Product;
 import com.back.domain.product.product.service.ProductService;
 import com.back.domain.product.productImage.dto.ProductImageDto;
 import com.back.domain.product.productImage.entity.ProductImage;
+import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -41,5 +39,21 @@ public class ApiV1ProductImageController {
         ProductImage productImage = product.findProductImageById(id).get();
 
         return new ProductImageDto(productImage);
+    }
+
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    @Operation(summary = " 삭제")
+    public RsData<Void> delete(@PathVariable int productId, @PathVariable int id) {
+        Product product = productService.findById(productId).get();
+        ProductImage productImage = product.findProductImageById(id).get();
+
+        productService.deleteProductImage(product, productImage);
+
+        return new RsData<>(
+                "200-1",
+                "%d번 상품 이미지가 삭제되었습니다.".formatted(id)
+        );
     }
 }

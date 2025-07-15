@@ -55,4 +55,8 @@ public class Product extends BaseEntity {
                 .filter(productImage -> productImage.getId() == id)
                 .findFirst();
     }
+
+    public void deleteProductImage(ProductImage productImage) {
+        productImages.remove(productImage);
+    }
 }
