@@ -2,9 +2,14 @@ package com.back.domain.product.product.service;
 
 import com.back.domain.product.product.entity.Product;
 import com.back.domain.product.product.repository.ProductRepository;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,5 +33,17 @@ public class ProductService {
 
     public Long count() {
         return productRepository.count();
+    }
+
+    public List<Product> findAll() {
+        return productRepository.findAll();
+    }
+
+    public void delete(Product product) {
+        productRepository.delete(product);
+    }
+
+    public void modify(Product product, String name, int price, String description, int stock) {
+        product.modify(name, price, description, stock);
     }
 }

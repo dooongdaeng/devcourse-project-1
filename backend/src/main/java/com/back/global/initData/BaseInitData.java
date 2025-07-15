@@ -1,5 +1,6 @@
 package com.back.global.initData;
 
+import com.back.domain.order.orders.service.OrderService;
 import com.back.domain.product.product.entity.Product;
 import com.back.domain.product.product.service.ProductService;
 import com.back.domain.user.user.service.UserService;
@@ -26,6 +27,8 @@ public class BaseInitData {
     ApplicationRunner baseInitDataApplicationRunner() {
         return args -> {
             self.work1();
+            self.work2();
+            self.work3();
         };
     }
 
@@ -46,13 +49,26 @@ public class BaseInitData {
         product4.addProductImage("/images/coffee_4.jpg");
     }
 
-    private void initUsers() {
+    @Transactional
+    public void work2() {
         if (userService.count() > 0) return;
 
-        userService.create("user1", "1234", "user1@test.com", List.of("ROLE_USER"));
-        userService.create("user2", "1234", "user2@test.com", List.of("ROLE_USER"));
-        userService.create("user3", "1234", "user3@test.com", List.of("ROLE_USER"));
-        userService.create("user4", "1234", "user4@test.com", List.of("ROLE_USER"));
-        userService.create("admin", "1234", "admin@test.com", List.of("ROLE_ADMIN"));
+        userService.create("user1", "1234", "user1@test.com", List.of("ROLE_USER"), "서울시 강남구");
+        userService.create("user2", "1234", "user2@test.com", List.of("ROLE_USER"), "서울시 서초구");
+        userService.create("user3", "1234", "user3@test.com", List.of("ROLE_USER"), "서울시 종로구");
+        userService.create("user4", "1234", "user4@test.com", List.of("ROLE_USER"), "서울시 마포구");
+        userService.create("admin", "1234", "admin@test.com", List.of("ROLE_ADMIN"), "서울시 중구");
     }
+
+    public void work3() {
+        orderService.create(3, 45000, "card", "pending");
+        orderService.create(10, 12000, "card", "pending");
+        orderService.create(7, 80000, "bank_transfer", "completed");
+        orderService.create(2, 5000, "card", "completed");
+
+    }
+
+
+    @Autowired
+    private OrderService orderService;
 }

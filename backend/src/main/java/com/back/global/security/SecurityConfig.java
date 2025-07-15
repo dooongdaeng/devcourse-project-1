@@ -19,7 +19,7 @@ public class SecurityConfig {
                         auth -> auth
                                 .requestMatchers("/favicon.ico").permitAll()
                                 .requestMatchers("/h2-console/**").permitAll()
-                                .requestMatchers("/**").permitAll()
+                                .requestMatchers("/api/v1/adm/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 )
                 .headers(
