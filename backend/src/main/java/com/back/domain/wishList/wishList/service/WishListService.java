@@ -51,6 +51,6 @@ public class WishListService {
     }
 
     public List<WishList> getWishListsByUserId(int userId) {
-        return wishListRepository.findByUserIdOrderByCreated(userId);
+        return wishListRepository.findByUserIdOrderByCreateDateDesc(userId);
     }
 }
