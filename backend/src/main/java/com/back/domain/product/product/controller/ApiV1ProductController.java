@@ -73,4 +73,18 @@ public class ApiV1ProductController {
         Product product = productService.findById(id).get();
         return new ProductDto(product);
     }
+
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    @Operation(summary = " 삭제")
+    public RsData<Void> delete(@PathVariable int id) {
+        Product product = productService.findById(id).get();
+        productService.delete(product);
+
+        return new RsData<>(
+                "200-1",
+                "%d번 상품이 삭제되었습니다.".formatted(id)
+        );
+    }
 }
