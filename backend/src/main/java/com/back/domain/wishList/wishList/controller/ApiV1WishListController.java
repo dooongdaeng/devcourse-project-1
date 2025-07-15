@@ -31,14 +31,12 @@ public class ApiV1WishListController {
         List<WishListDto> wishListDtos = wishLists.stream().map(WishListDto::new).collect(Collectors.toList());
 
         return new RsData<>("200", "위시리스트 조회 성공", wishListDtos);
-
     }
 
     @GetMapping("/check/{productId}")
-    public RsData<Boolean> checkWishList(@PathVariable int userId) {
+    public RsData<Boolean> checkWishList(@PathVariable int productId) {
         int currentUserId = rq.getCurrentUserId();
-
-        boolean exists = wishListService.existsWishList(currentUserId, userId);
+        boolean exists = wishListService.existsWishList(currentUserId, productId);
 
         return new RsData<>("200", "위시리스트 조회 성공", exists);
     }
@@ -46,7 +44,6 @@ public class ApiV1WishListController {
     @PostMapping
     public RsData<WishListDto> addWishList(@Valid @RequestBody WishListAddReqBody reqBody) {
         int currentUserId = rq.getCurrentUserId();
-
         WishList wishList = wishListService.addToWishList(currentUserId, reqBody.productId);
 
         return new RsData<>("201", "위시리스트에 추가했습니다.", new WishListDto(wishList));
@@ -55,7 +52,6 @@ public class ApiV1WishListController {
     @DeleteMapping("/{productId}")
     public RsData<WishListDto> removeWishList(@PathVariable int productId) {
         int currentUserId = rq.getCurrentUserId();
-
         WishListDto removedWishList = wishListService.removeWishList(currentUserId, productId);
 
         return new RsData<>("200", "위시리스트에서 삭제했습니다.", removedWishList);

@@ -1,6 +1,14 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 export default function Login() {
+  const router = useRouter();
+
+  const handleLogin = () => {
+    localStorage.setItem('isLoggedIn', 'true');
+    router.push('/');
+  };
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4 md:p-24">
       <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
@@ -31,7 +39,8 @@ export default function Login() {
             />
           </div>
           <button
-            type="submit"
+            type="button"
+            onClick={handleLogin}
             className="w-full bg-gray-800 text-white py-3 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 cursor-pointer"
           >
             로그인

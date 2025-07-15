@@ -1,6 +1,7 @@
 package com.back.domain.product.product.controller;
 
-import com.back.domain.product.product.controller.service.ProductService;
+import com.back.domain.product.product.dto.ProductDto;
+import com.back.domain.product.product.service.ProductService;
 import com.back.domain.product.product.entity.Product;
 import com.back.global.rsData.RsData;
 import jakarta.validation.Valid;
@@ -38,7 +39,7 @@ public class ApiV1ProductController {
 
     @PostMapping
     @Transactional
-    public RsData<Product> create(
+    public RsData<ProductDto> create(
             @Valid @RequestBody ProductCreateReqBody reqBody
     ) {
         Product product = productService.create(reqBody.name, reqBody.price, reqBody.description, reqBody.stock);
@@ -46,7 +47,7 @@ public class ApiV1ProductController {
         return new RsData<>(
                 "201-1",
                 "%d번 상품이 등록되었습니다.".formatted(product.getId()),
-                product
+                new ProductDto(product)
         );
     }
 }

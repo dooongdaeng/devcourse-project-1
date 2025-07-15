@@ -50,4 +50,33 @@ public class UserService {
     public List<User> findAll() {
         return userRepository.findAll();
     }
+
+    public boolean isUsernameAvailable(String username) {
+        return !userRepository.existsByUsername(username);
+    }
+
+    public boolean isEmailAvailable(String email) {
+        return !userRepository.existsByEmail(email);
+    }
+
+    public User create(String username, String rawPassword, String email, List<String> roles) {
+        String encodedPassword = passwordEncoder.encode(rawPassword);
+
+        String role = roles.isEmpty() ? "ROLE_USER" : roles.get(0); // 가장 첫 번째 role 사용
+
+        User user = User.builder()
+                .username(username)
+                .password(encodedPassword)
+                .nickname(username)
+                .email(email)
+                .address("서울시 강남구")
+                .role(role)
+                .build();
+
+        return userRepository.save(user);
+    }
+
+    public long count() {
+        return userRepository.count();
+    }
 }

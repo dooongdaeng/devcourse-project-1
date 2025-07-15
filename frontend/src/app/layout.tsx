@@ -3,6 +3,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
+import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,6 +21,36 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const checkLoginStatus = () => {
+      if (typeof window !== 'undefined') {
+        const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        setIsLoggedIn(loggedIn);
+      }
+    };
+
+    checkLoginStatus(); // Initial check on mount
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', checkLoginStatus);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('storage', checkLoginStatus);
+      }
+    };
+  }, [pathname]);
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('isLoggedIn');
+    }
+  };
   return (
     <html lang="en">
       <body
@@ -41,21 +73,31 @@ export default function RootLayout({
                     주문
                   </Link>
                 </li>
+                {isLoggedIn && (
+                  <li>
+                    <Link href="/orderHistory" className="hover:text-gray-300">
+                      주문내역
+                    </Link>
+                  </li>
+                )}
                 <li>
-                  <Link href="/orderHistory" className="hover:text-gray-300">
-                    주문내역
-                  </Link>
+                  {isLoggedIn ? (
+                    <button onClick={handleLogout} className="hover:text-gray-300 cursor-pointer">
+                      로그아웃
+                    </button>
+                  ) : (
+                    <Link href="/login" className="hover:text-gray-300">
+                      로그인
+                    </Link>
+                  )}
                 </li>
-                <li>
-                  <Link href="/login" className="hover:text-gray-300">
-                    로그인
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/signup" className="hover:text-gray-300">
-                    회원가입
-                  </Link>
-                </li>
+                {!isLoggedIn && (
+                  <li>
+                    <Link href="/signup" className="hover:text-gray-300">
+                      회원가입
+                    </Link>
+                  </li>
+                )}
               </ul>
             </nav>
           </div>

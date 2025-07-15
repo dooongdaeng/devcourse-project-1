@@ -35,4 +35,10 @@ public class Product extends BaseEntity {
         this.description = description;
         this.stock = stock;
     }
+
+    public ProductImage addProductImage(String url) {
+        ProductImage productImage = new ProductImage(url, this);
+        productImages.add(productImage);
+        return productImage;
+    }
 }
