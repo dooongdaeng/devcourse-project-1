@@ -6,7 +6,6 @@ import com.back.domain.wishList.wishList.service.WishListService;
 import com.back.global.rq.Rq;
 import com.back.global.rsData.RsData;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,12 +20,12 @@ public class ApiV1WishListController {
     private final Rq rq;
 
     record WishListAddReqBody(
-            @NotNull Long productId
+            int productId
     ){}
 
     @GetMapping
     public RsData<List<WishListDto>> getAllWishLists() {
-        Long currentUserId = rq.getCurrentUserId();
+        int currentUserId = rq.getCurrentUserId();
 
         List<WishList> wishLists = wishListService.getWishListsByUserId(currentUserId);
         List<WishListDto> wishListDtos = wishLists.stream().map(WishListDto::new).collect(Collectors.toList());
@@ -36,7 +35,7 @@ public class ApiV1WishListController {
     }
 
     @GetMapping("/check/{productId}")
-    public RsData<List<WishListDto>> getWishListsByUserId(Long userId) {
+    public RsData<List<WishListDto>> getWishListsByUserId(int userId) {
         List<WishList> wishLists = wishListService.getWishListsByUserId(userId);
         List<WishListDto> wishListDtos = wishLists.stream().map(WishListDto::new).collect(Collectors.toList());
 
@@ -45,16 +44,16 @@ public class ApiV1WishListController {
 
     @PostMapping
     public RsData<WishListDto> addWishList(@Valid @RequestBody WishListAddReqBody reqBody) {
-        Long currentUserId = rq.getCurrentUserId();
+        int currentUserId = rq.getCurrentUserId();
 
-        WishList wishList = wishListService.addWishList(currentUserId, reqBody.productId);
+        WishList wishList = wishListService.addToWishList(currentUserId, reqBody.productId);
 
         return new RsData<>("201", "위시리스트에 추가했습니다.", new WishListDto(wishList));
     }
 
     @DeleteMapping("/{productId}")
-    public RsData<Void> removeWishList(@PathVariable Long productId) {
-        Long currentUserId = rq.getCurrentUserId();
+    public RsData<Void> removeWishList(@PathVariable int productId) {
+        int currentUserId = rq.getCurrentUserId();
 
         wishListService.removeWishList(currentUserId, productId);
 

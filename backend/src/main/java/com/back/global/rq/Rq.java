@@ -29,4 +29,12 @@ public class Rq {
     public void logout() {
         req.getSession().invalidate();
     }
+
+    public int getCurrentUserId() {
+        Integer loginedUserId = getLoginedUserId();
+        if (loginedUserId == null) {
+            throw new IllegalStateException("로그인하지 않았습니다.");
+        }
+        return loginedUserId;
+    }
 }
