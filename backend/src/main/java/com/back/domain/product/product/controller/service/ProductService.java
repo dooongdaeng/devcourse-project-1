@@ -21,4 +21,8 @@ public class ProductService {
         Product product = new Product(name, price, description, stock);
         return productRepository.save(product);
     }
+
+    public Optional<Product> findById(int productId) {
+        return productRepository.findById(productId);
+    }
 }

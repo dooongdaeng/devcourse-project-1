@@ -53,12 +53,12 @@ public class ApiV1ProductControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.resultCode").value("201-1"))
                 .andExpect(jsonPath("$.msg").value("%d번 상품이 등록되었습니다.".formatted(1)))
-                .andExpect(jsonPath("$.product.id").value(product.getId()))
-                .andExpect(jsonPath("$.product.createDate").value(Matchers.startsWith(product.getCreateDate().toString().substring(0, 20))))
-                .andExpect(jsonPath("$.product.modifyDate").value(Matchers.startsWith(product.getModifyDate().toString().substring(0, 20))))
-                .andExpect(jsonPath("$.product.name").value(product.getName()))
-                .andExpect(jsonPath("$.product.price").value(product.getPrice()))
-                .andExpect(jsonPath("$.product.description").value(product.getDescription()))
-                .andExpect(jsonPath("$.product.stock").value(product.getStock()));
+                .andExpect(jsonPath("$.data.id").value(product.getId()))
+                .andExpect(jsonPath("$.data.createDate").value(Matchers.startsWith(product.getCreateDate().toString().substring(0, 20))))
+                .andExpect(jsonPath("$.data.modifyDate").value(Matchers.startsWith(product.getModifyDate().toString().substring(0, 20))))
+                .andExpect(jsonPath("$.data.name").value(product.getName()))
+                .andExpect(jsonPath("$.data.price").value(product.getPrice()))
+                .andExpect(jsonPath("$.data.description").value(product.getDescription()))
+                .andExpect(jsonPath("$.data.stock").value(product.getStock()));
     }
 }
