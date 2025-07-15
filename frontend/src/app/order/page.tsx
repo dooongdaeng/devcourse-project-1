@@ -60,6 +60,44 @@ export default function Order() {
                 </div>
               </li>
             </ul>
+            {/* Wishlist Section */}
+            <div className="mt-8 w-full flex flex-col items-start">
+              <h5 className="text-2xl font-bold mb-4">찜목록</h5>
+              <ul className="w-full">
+                {/* Wishlist Item 1 */}
+                <li className="flex items-center mt-3 p-2 border-b border-gray-200">
+                  <div className="w-1/5 md:w-1/6 flex-shrink-0">
+                    <img className="w-14 h-14 object-cover rounded" src="https://i.imgur.com/HKOFQYa.jpeg" alt="Wishlist Product Image" />
+                  </div>
+                  <div className="flex-grow ml-4">
+                    <div className="text-sm text-gray-500">찜한 커피콩</div>
+                    <div className="font-semibold">Favorite Blend A</div>
+                  </div>
+                  <div className="text-center font-medium w-1/5 md:w-1/6">8000원</div>
+                  <div className="text-right w-1/5 md:w-1/6">
+                    <button className="px-3 py-1 border border-gray-800 text-gray-800 rounded hover:bg-gray-800 hover:text-white text-sm cursor-pointer">
+                      추가
+                    </button>
+                  </div>
+                </li>
+                {/* Wishlist Item 2 */}
+                <li className="flex items-center mt-3 p-2 border-b border-gray-200">
+                  <div className="w-1/5 md:w-1/6 flex-shrink-0">
+                    <img className="w-14 h-14 object-cover rounded" src="https://i.imgur.com/HKOFQYa.jpeg" alt="Wishlist Product Image" />
+                  </div>
+                  <div className="flex-grow ml-4">
+                    <div className="text-sm text-gray-500">찜한 커피콩</div>
+                    <div className="font-semibold">Favorite Blend B</div>
+                  </div>
+                  <div className="text-center font-medium w-1/5 md:w-1/6">9500원</div>
+                  <div className="text-right w-1/5 md:w-1/6">
+                    <button className="px-3 py-1 border border-gray-800 text-gray-800 rounded hover:bg-gray-800 hover:text-white text-sm cursor-pointer">
+                      추가
+                    </button>
+                  </div>
+                </li>
+              </ul>
+            </div>
           </div>
 
           {/* Summary Section */}
