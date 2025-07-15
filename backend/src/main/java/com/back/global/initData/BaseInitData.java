@@ -26,6 +26,7 @@ public class BaseInitData {
     ApplicationRunner baseInitDataApplicationRunner() {
         return args -> {
             self.work1();
+            self.work2();
         };
     }
 
@@ -46,7 +47,8 @@ public class BaseInitData {
         product4.addProductImage("/images/coffee_4.jpg");
     }
 
-    private void initUsers() {
+    @Transactional
+    public void work2() {
         if (userService.count() > 0) return;
 
         userService.create("user1", "1234", "user1@test.com", List.of("ROLE_USER"), "서울시 강남구");
