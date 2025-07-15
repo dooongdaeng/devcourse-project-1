@@ -120,4 +120,25 @@ public class ApiV1ProductControllerTest {
                 .andExpect(jsonPath("$.description").value(product.getDescription()))
                 .andExpect(jsonPath("$.stock").value(product.getStock()));
     }
+
+    @Test
+    @DisplayName("상품 단건 조회 - 404")
+    public void t4() throws Exception {
+        int id = Integer.MAX_VALUE;
+
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/v1/products/%d".formatted(id))
+                                .contentType(MediaType.APPLICATION_JSON)
+                ).andDo(print());
+
+        Product product = productService.findById(id).get();
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1ProductController.class))
+                .andExpect(handler().methodName("getItem"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.resultCode").value("404-1"))
+                .andExpect(jsonPath("$.msg").value("해당 데이터가 존재하지 않습니다."));
+    }
 }
