@@ -59,7 +59,7 @@ public class UserService {
         return !userRepository.existsByEmail(email);
     }
 
-    public User create(String username, String rawPassword, String email, List<String> roles) {
+    public User create(String username, String rawPassword, String email, List<String> roles, String address) {
         String encodedPassword = passwordEncoder.encode(rawPassword);
 
         String role = roles.isEmpty() ? "ROLE_USER" : roles.get(0); // 가장 첫 번째 role 사용
@@ -69,7 +69,7 @@ public class UserService {
                 .password(encodedPassword)
                 .nickname(username)
                 .email(email)
-                .address("서울시 강남구")
+                .address(address)
                 .role(role)
                 .build();
 
