@@ -9,10 +9,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -41,4 +38,28 @@ public class ApiV1UserController {
 
         return new RsData<>("201", "회원가입 완료", new UserDto(user));
     }
+
+    record UserLoginReqBody(
+            @NotBlank @Size(min = 2, max = 30) String username,
+            @NotBlank @Size(min = 2, max = 30) String password
+    ) {}
+
+    @PostMapping("/login")
+    public RsData<UserDto> login(@Valid @RequestBody UserLoginReqBody reqBody) {
+        User user = userService.findByUsername(reqBody.username())
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 아이디입니다."));
+
+        userService.checkPassword(user, reqBody.password());
+
+        rq.login(user.getId());
+
+        return new RsData<>("200", "로그인 성공", new UserDto(user));
+    }
+
+    @DeleteMapping("/logout")
+    public RsData<Void> logout() {
+        rq.logout();
+        return new RsData<>("200", "로그아웃 되었습니다.");
+    }
+
 }
