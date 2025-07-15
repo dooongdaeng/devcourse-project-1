@@ -26,9 +26,7 @@ public class ApiV1OrderController {
     private final Rq rq;
 
     record OrderCreateReqBody(
-            @NotBlank
             int orderCount,
-            @NotBlank
             int totalPrice,
             @NotBlank
             @Size(min = 2, max = 100)
