@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -212,5 +213,39 @@ public class ApiV1ProductControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
                 .andExpect(jsonPath("$.msg").value("%d번 상품이 삭제되었습니다.".formatted(id)));
+    }
+
+    @Test
+    @DisplayName("상품 수정")
+    public void t5() throws Exception {
+        int id = 1;
+
+        ResultActions resultActions = mvc
+                .perform(
+                        put("/api/v1/products/%d".formatted(id))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                            "name": "상품 new",
+                                            "price": 1000,
+                                            "description": "상품 new",
+                                            "stock": 100
+                                        }
+                                        """)
+                ).andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1ProductController.class))
+                .andExpect(handler().methodName("update"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value("200-1"))
+                .andExpect(jsonPath("$.msg").value("%d번 상품이 수정되었습니다.".formatted(id)));
+
+        Product product = productService.findById(id).get();
+
+        assertThat(product.getName()).isEqualTo("상품 new");
+        assertThat(product.getPrice()).isEqualTo(1000);
+        assertThat(product.getDescription()).isEqualTo("상품 new");
+        assertThat(product.getStock()).isEqualTo(100);
     }
 }
