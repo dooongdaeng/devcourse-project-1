@@ -1,4 +1,4 @@
-package com.back.global.file.file;
+package com.back.global.file.file.entity;
 
 import com.back.global.jpa.entity.BaseEntity;
 import jakarta.persistence.Entity;
@@ -12,13 +12,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class File extends BaseEntity {
 
-    private String type;
     private String name;
+    private String type;
 
-    public File(String type, String name) {
-        this.type = type;
+    public File(String name, String type) {
         this.name = name;
+        this.type = type;
     }
-
-
 }
