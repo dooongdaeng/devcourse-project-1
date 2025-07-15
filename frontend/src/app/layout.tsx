@@ -47,12 +47,12 @@ export default function RootLayout({
                   </Link>
                 </li>
                 <li>
-                  <Link href="/orderHistory" className="hover:text-gray-300">
+                  <Link href="/login" className="hover:text-gray-300">
                     로그인
                   </Link>
                 </li>
                 <li>
-                  <Link href="/orderHistory" className="hover:text-gray-300">
+                  <Link href="/signup" className="hover:text-gray-300">
                     회원가입
                   </Link>
                 </li>
