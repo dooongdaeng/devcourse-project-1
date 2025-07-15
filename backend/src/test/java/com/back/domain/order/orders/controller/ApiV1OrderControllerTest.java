@@ -128,7 +128,7 @@ public class ApiV1OrderControllerTest {
 
         ResultActions resultActions = mvc
                 .perform(
-                        get("/api/v1/orders/")
+                        get("/api/v1/orders")
                 )
                 .andDo(print());
 
@@ -136,19 +136,19 @@ public class ApiV1OrderControllerTest {
 
         resultActions
                 .andExpect(handler().handlerType(ApiV1OrderController.class))
-                .andExpect(handler().methodName("getOrder"))
+                .andExpect(handler().methodName("getOrders"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(orders.size()));
         for(int i = 0; i < orders.size(); i++) {
             Orders order = orders.get(i);
             resultActions
-                    .andExpect(jsonPath("$.id").value(order.getId()))
-                    .andExpect(jsonPath("$.createDate").value(Matchers.startsWith(order.getCreateDate().toString().substring(0, 20))))
-                    .andExpect(jsonPath("$.modifyDate").value(Matchers.startsWith(order.getModifyDate().toString().substring(0, 20))))
-                    .andExpect(jsonPath("$.orderCount").value(order.getOrderCount()))
-                    .andExpect(jsonPath("$.totalPrice").value(order.getTotalPrice()))
-                    .andExpect(jsonPath("$.paymentMethod").value(order.getPaymentMethod()))
-                    .andExpect(jsonPath("$.paymentStatus").value(order.getPaymentStatus()));
+                    .andExpect(jsonPath("$[" + i + "].id").value(order.getId()))  // $[0].id, $[1].id ...
+                    .andExpect(jsonPath("$[" + i + "].createDate").value(Matchers.startsWith(order.getCreateDate().toString().substring(0, 20))))
+                    .andExpect(jsonPath("$[" + i + "].modifyDate").value(Matchers.startsWith(order.getModifyDate().toString().substring(0, 20))))
+                    .andExpect(jsonPath("$[" + i + "].orderCount").value(order.getOrderCount()))
+                    .andExpect(jsonPath("$[" + i + "].totalPrice").value(order.getTotalPrice()))
+                    .andExpect(jsonPath("$[" + i + "].paymentMethod").value(order.getPaymentMethod()))
+                    .andExpect(jsonPath("$[" + i + "].paymentStatus").value(order.getPaymentStatus()));
         }
     }
 

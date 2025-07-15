@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
@@ -66,6 +68,16 @@ public class ApiV1OrderController {
         return new OrderDto(order);
     }
 
+    @GetMapping
+    @Operation(summary = "주문 목록 조회")
+    public List<OrderDto> getOrders() {
+        List<Orders> orders = orderService.findAll();
+        List<OrderDto> orderDtos = orders.stream()
+                .map(OrderDto::new)
+                .toList();
+
+        return orderDtos;
+    }
 
 
 }
