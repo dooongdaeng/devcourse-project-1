@@ -38,7 +38,7 @@ public class ApiV1ProductControllerTest {
                                 .content("""
                                         {
                                             "name": "상품 test",
-                                            "price": 1000,
+                                            "price": 10000,
                                             "description": "상품 test",
                                             "stock": 10
                                         }

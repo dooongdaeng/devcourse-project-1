@@ -16,4 +16,9 @@ public class ProductService {
     public Optional<Product> findLatest() {
         return productRepository.findFirstByOrderByIdDesc();
     }
+
+    public Product create(String name, int price, String description, int stock) {
+        Product product = new Product(name, price, description, stock);
+        return productRepository.save(product);
+    }
 }
