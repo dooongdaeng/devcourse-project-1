@@ -47,4 +47,12 @@ public class ProductService {
     public void deleteProductImage(Product product, ProductImage productImage) {
         product.deleteProductImage(productImage);
     }
+
+    public ProductImage createProductImage(Product product, String url) {
+        return product.addProductImage(url);
+    }
+
+    public void flush() {
+        productRepository.flush();
+    }
 }

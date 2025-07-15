@@ -44,7 +44,7 @@ public class ApiV1ProductImageController {
 
     @DeleteMapping("/{id}")
     @Transactional
-    @Operation(summary = " 삭제")
+    @Operation(summary = "삭제")
     public RsData<Void> delete(@PathVariable int productId, @PathVariable int id) {
         Product product = productService.findById(productId).get();
         ProductImage productImage = product.findProductImageById(id).get();
@@ -54,6 +54,28 @@ public class ApiV1ProductImageController {
         return new RsData<>(
                 "200-1",
                 "%d번 상품 이미지가 삭제되었습니다.".formatted(id)
+        );
+    }
+
+
+    record ProductImageCreateReqBody(String url) {}
+
+    @PostMapping
+    @Transactional
+    @Operation(summary = "생성")
+    public RsData<ProductImageDto> create(
+            @PathVariable int productId,
+            @RequestBody ProductImageCreateReqBody requestBody
+    ) {
+        Product product = productService.findById(productId).get();
+        ProductImage productImage = productService.createProductImage(product, requestBody.url);
+
+        productService.flush();
+
+        return new RsData<>(
+                "201-1",
+                "%d번 상품 이미지가 등록되었습니다.".formatted(productImage.getId()),
+                new ProductImageDto(productImage)
         );
     }
 }

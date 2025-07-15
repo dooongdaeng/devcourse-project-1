@@ -104,4 +104,35 @@ public class ApiV1ProductImageControllerTest {
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
                 .andExpect(jsonPath("$.msg").value("%d번 상품 이미지가 삭제되었습니다.".formatted(id)));
     }
+
+    @Test
+    @DisplayName("상품 이미지 등록")
+    public void t4() throws Exception {
+        int productId = 1;
+
+        ResultActions resultActions = mvc
+                .perform(
+                        post("/api/v1/products/%d/images".formatted(productId))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                            "url": "url"
+                                        }
+                                        """)
+                ).andDo(print());
+
+        Product product = productService.findById(productId).get();
+        ProductImage productImage = product.getProductImages().getLast();
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1ProductImageController.class))
+                .andExpect(handler().methodName("create"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.resultCode").value("201-1"))
+                .andExpect(jsonPath("$.msg").value("%d번 상품 이미지가 등록되었습니다.".formatted(productImage.getId())))
+                .andExpect(jsonPath("$.data.id").value(productImage.getId()))
+                .andExpect(jsonPath("$.data.createDate").value(Matchers.startsWith(productImage.getCreateDate().toString().substring(0, 20))))
+                .andExpect(jsonPath("$.data.modifyDate").value(Matchers.startsWith(productImage.getModifyDate().toString().substring(0, 20))))
+                .andExpect(jsonPath("$.data.url").value(productImage.getUrl()));
+    }
 }
