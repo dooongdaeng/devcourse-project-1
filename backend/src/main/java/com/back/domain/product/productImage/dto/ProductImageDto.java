@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 public record ProductImageDto(
         int id,
         LocalDateTime createDate,
-        LocalDateTime ModifyDate,
+        LocalDateTime modifyDate,
         String url,
         int productId
 ){
