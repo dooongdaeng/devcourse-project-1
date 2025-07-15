@@ -1,10 +1,16 @@
 package com.back.domain.product.product.entity;
 
+import com.back.domain.product.productImage.entity.ProductImage;
 import com.back.global.jpa.entity.BaseEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -18,8 +24,8 @@ public class Product extends BaseEntity {
     @Column(length = 100)
     private String description;
 
-    @Column(columnDefinition = "TEXT")
-    private String image;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImage> productImages = new ArrayList<>();
 
     private int stock;
 }
