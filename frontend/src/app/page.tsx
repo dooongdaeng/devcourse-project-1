@@ -3,14 +3,18 @@
 import { useState } from "react";
 
 export default function Home() {
-  const [likedProducts, setLikedProducts] = useState({
+  type ProductKey = 'product1' | 'product2' | 'product3' | 'product4';
+
+  type LikedProducts = Record<ProductKey, boolean>;
+
+  const [likedProducts, setLikedProducts] = useState<LikedProducts>({
     product1: false,
     product2: false,
     product3: false,
     product4: false,
   });
 
-  const toggleLike = (productName) => {
+  const toggleLike = (productName: ProductKey) => {
     setLikedProducts((prev) => ({
       ...prev,
       [productName]: !prev[productName],
