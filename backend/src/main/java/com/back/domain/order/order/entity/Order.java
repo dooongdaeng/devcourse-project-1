@@ -1,5 +1,6 @@
 package com.back.domain.order.order.entity;
 
+import com.back.domain.order.orderItem.entity.OrderItem;
 import com.back.global.jpa.entity.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -9,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -19,7 +21,7 @@ public class Order extends BaseEntity {
     private String paymentMethod;
     private String paymentStatus;
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<OrderItems> orderItems = new ArrayList<>();
+    private List<OrderItem> orderItems = new ArrayList<>();
 
     public Order(int orderCount, int totalPrice, String paymentMethod, String paymentStatus) {
         this.orderCount = orderCount;
