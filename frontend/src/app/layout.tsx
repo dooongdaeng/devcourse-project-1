@@ -46,6 +46,16 @@ export default function RootLayout({
                     주문내역
                   </Link>
                 </li>
+                <li>
+                  <Link href="/orderHistory" className="hover:text-gray-300">
+                    로그인
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/orderHistory" className="hover:text-gray-300">
+                    회원가입
+                  </Link>
+                </li>
               </ul>
             </nav>
           </div>
