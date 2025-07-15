@@ -3,6 +3,7 @@ package com.back.domain.user.user.entity;
 import com.back.global.jpa.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -35,6 +36,7 @@ public class User extends BaseEntity {
         this.role = "ROLE_USER";
     }
 
+    @Builder
     public User(String username, String password, String nickname, String email, String address, String role) {
         this.username = username;
         this.password = password;
