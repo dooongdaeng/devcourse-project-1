@@ -7,6 +7,7 @@ import com.back.global.rq.Rq;
 import com.back.global.rsData.RsData;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class ApiV1WishListController {
     ){}
 
     @GetMapping
+    @Transactional(readOnly = true)
     public RsData<List<WishListDto>> getAllWishLists() {
         int currentUserId = rq.getCurrentUserId();
 
@@ -33,15 +35,17 @@ public class ApiV1WishListController {
         return new RsData<>("200", "위시리스트 조회 성공", wishListDtos);
     }
 
-    @GetMapping("/check/{productId}")
+    @GetMapping("/{productId}")
+    @Transactional(readOnly = true)
     public RsData<Boolean> checkWishList(@PathVariable int productId) {
         int currentUserId = rq.getCurrentUserId();
         boolean exists = wishListService.existsWishList(currentUserId, productId);
 
-        return new RsData<>("200", "위시리스트 조회 성공", exists);
+        return new RsData<>("200", "위시리스트 존재 여부 조회 성공", exists);
     }
 
     @PostMapping
+    @Transactional
     public RsData<WishListDto> addWishList(@Valid @RequestBody WishListAddReqBody reqBody) {
         int currentUserId = rq.getCurrentUserId();
         WishList wishList = wishListService.addToWishList(currentUserId, reqBody.productId);
@@ -50,6 +54,7 @@ public class ApiV1WishListController {
     }
 
     @DeleteMapping("/{productId}")
+    @Transactional
     public RsData<WishListDto> removeWishList(@PathVariable int productId) {
         int currentUserId = rq.getCurrentUserId();
         WishListDto removedWishList = wishListService.removeWishList(currentUserId, productId);
