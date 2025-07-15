@@ -87,4 +87,37 @@ public class ApiV1ProductController {
                 "%d번 상품이 삭제되었습니다.".formatted(id)
         );
     }
+
+
+    record ProductUpdateReqBody(
+            @NotBlank
+            @Size(min = 2, max = 100)
+            String name,
+            @Min(100)
+            @Max(1000000)
+            int price,
+            @NotBlank
+            @Size(min = 2, max = 500)
+            String description,
+            @Min(1)
+            @Max(10000)
+            int stock
+    ) {}
+
+
+    @PutMapping("/{id}")
+    @Transactional
+    @Operation(summary = " 수정")
+    public RsData<Void> update(
+            @PathVariable int id,
+            @Valid @RequestBody ProductUpdateReqBody reqBody
+    ) {
+        Product product = productService.findById(id).get();
+        productService.modify(product, reqBody.name, reqBody.price, reqBody.description, reqBody.stock);
+
+        return new RsData<>(
+                "200-1",
+                "%d번 상품이 수정되었습니다.".formatted(id)
+        );
+    }
 }
