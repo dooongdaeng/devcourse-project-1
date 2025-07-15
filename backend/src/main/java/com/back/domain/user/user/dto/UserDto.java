@@ -1,7 +1,7 @@
 package com.back.domain.user.user.dto;
 
 import com.back.domain.user.user.entity.User;
-import org.jspecify.annotations.NonNull;
+import org.springframework.lang.NonNull;
 
 public record UserDto(
         @NonNull int id,
@@ -11,6 +11,12 @@ public record UserDto(
         @NonNull String address
 ) {
     public UserDto(User user) {
-        this(user.getId(), user.getUsername(), user.getNickname(), user.getEmail(), user.getAddress());
+        this(
+                user.getId(),
+                user.getUsername(),
+                user.getNickname(),
+                user.getEmail(),
+                user.getAddress()
+        );
     }
 }
