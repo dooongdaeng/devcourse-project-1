@@ -39,11 +39,6 @@ public class ApiV1UserController {
         return new RsData<>("201", "회원가입 완료", new UserDto(user));
     }
 
-    record UserLoginRequest(
-            @NotBlank @Size(min = 2, max = 30) String username,
-            @NotBlank @Size(min = 2, max = 30) String password
-    ) {}
-
     record UserLoginReqBody(
             @NotBlank @Size(min = 2, max = 30) String username,
             @NotBlank @Size(min = 2, max = 30) String password
