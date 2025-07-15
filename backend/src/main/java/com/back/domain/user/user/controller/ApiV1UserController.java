@@ -62,4 +62,18 @@ public class ApiV1UserController {
         return new RsData<>("200", "로그아웃 되었습니다.");
     }
 
+    @GetMapping("/me")
+    public RsData<UserDto> me() {
+        if (!rq.isLogined()) {
+            return new RsData<>("401-1", "로그인이 필요합니다.");
+        }
+
+        Integer userId = rq.getLoginedUserId();
+
+        User user = userService.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자 정보가 존재하지 않습니다."));
+
+        return new RsData<>("200-1", "내 정보 조회 성공", new UserDto(user));
+    }
+
 }
