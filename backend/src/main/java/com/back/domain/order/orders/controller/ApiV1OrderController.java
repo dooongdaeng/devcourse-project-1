@@ -1,9 +1,9 @@
-package com.back.domain.order.order.controller;
+package com.back.domain.order.orders.controller;
 
 
-import com.back.domain.order.order.dto.OrderDto;
-import com.back.domain.order.order.entity.Order;
-import com.back.domain.order.order.service.OrderService;
+import com.back.domain.order.orders.dto.OrderDto;
+import com.back.domain.order.orders.entity.Orders;
+import com.back.domain.order.orders.service.OrderService;
 import com.back.global.rq.Rq;
 import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,21 +38,12 @@ public class ApiV1OrderController {
     public RsData<OrderDto> write(
             @Valid @RequestBody OrderCreateReqBody reqBody
     ) {
-        if (!rq.isLogined()){
-            return new RsData<>(
-                    "401-1",
-                    "로그인 후 이용해주세요."
-            );
-        }
 
-        int userId = rq.getLoginedUserId();
-
-        Order order = orderService.write(
+        Orders order = orderService.write(
                 reqBody.orderCount(),
                 reqBody.totalPrice(),
                 reqBody.paymentMethod(),
-                reqBody.paymentStatus(),
-                userId
+                reqBody.paymentStatus()
         );
 
         return new RsData<>(

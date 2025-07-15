@@ -1,6 +1,6 @@
-package com.back.domain.order.order.dto;
+package com.back.domain.order.orders.dto;
 
-import com.back.domain.order.order.entity.Order;
+import com.back.domain.order.orders.entity.Orders;
 
 import java.time.LocalDateTime;
 
@@ -11,11 +11,10 @@ public record OrderDto(
         int orderCount,
         int totalPrice,
         String paymentMethod,
-        String paymentStatus,
-        int userId
+        String paymentStatus
 ) {
 
-    public OrderDto(Order order) {
+    public OrderDto(Orders order) {
         this(
                 order.getId(),
                 order.getCreateDate(),
@@ -23,8 +22,7 @@ public record OrderDto(
                 order.getOrderCount(),
                 order.getTotalPrice(),
                 order.getPaymentMethod(),
-                order.getPaymentStatus(),
-                order.getUser().getId()
+                order.getPaymentStatus()
         );
     }
 }
