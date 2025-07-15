@@ -8,12 +8,14 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 public class Orders extends BaseEntity {
     private int orderCount;
@@ -28,6 +30,13 @@ public class Orders extends BaseEntity {
     public Orders(int orderCount, int totalPrice, String paymentMethod, String paymentStatus) {
         this.orderCount = orderCount;
 
+        this.totalPrice = totalPrice;
+        this.paymentMethod = paymentMethod;
+        this.paymentStatus = paymentStatus;
+    }
+
+    public void update(int orderCount, int totalPrice, String paymentMethod, String paymentStatus) {
+        this.orderCount = orderCount;
         this.totalPrice = totalPrice;
         this.paymentMethod = paymentMethod;
         this.paymentStatus = paymentStatus;

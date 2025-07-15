@@ -31,4 +31,13 @@ public class OrderService {
     public List<Orders> findAll() {
         return orderRepository.findAll();
     }
+
+
+    public void update(Orders orders, int orderCount, int totalPrice, String paymentMethod, String paymentStatus) {
+        orders.update(orderCount, totalPrice, paymentMethod, paymentStatus);
+    }
+
+    public void delete(Orders order) {
+        orderRepository.delete(order);
+    }
 }

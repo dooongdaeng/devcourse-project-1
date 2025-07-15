@@ -19,8 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -152,5 +151,58 @@ public class ApiV1OrderControllerTest {
         }
     }
 
+    @Test
+    @DisplayName("주문 수정 테스트")
+    @WithMockUser
+    void t5() throws Exception {
+        int id = 1;
+
+        ResultActions resultActions = mvc
+                .perform(
+                        put("/api/v1/orders/" + id)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                            "orderCount": 5,
+                                            "totalPrice": 150000,
+                                            "paymentMethod": "CREDIT_CARD",
+                                            "paymentStatus": "PENDING"
+                                        }
+                                        """)
+                                .with(csrf())
+                )
+                .andDo(print());
+
+        Orders order = orderService.findById(id).get();
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1OrderController.class))
+                .andExpect(handler().methodName("update"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value("200-1"))
+                .andExpect(jsonPath("$.msg").value("%d번 주문이 수정되었습니다.".formatted(order.getId())));
+    }
+
+    @Test
+    @DisplayName("주문 삭제 테스트")
+    @WithMockUser
+    void t6() throws Exception {
+        int id = 1;
+
+        ResultActions resultActions = mvc
+                .perform(
+                        delete("/api/v1/orders/" + id)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andDo(print());
+
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1OrderController.class))
+                .andExpect(handler().methodName("delete"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value("200-1"))
+                .andExpect(jsonPath("$.msg").value("%d번 주문이 삭제되었습니다.".formatted(id)));
+    }
 
 }
