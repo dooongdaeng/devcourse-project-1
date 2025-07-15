@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 public record ProductDto (
         int id,
         LocalDateTime createDate,
-        LocalDateTime ModifyDate,
+        LocalDateTime modifyDate,
         String name,
         int price,
         String description,

@@ -132,8 +132,6 @@ public class ApiV1ProductControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                 ).andDo(print());
 
-        Product product = productService.findById(id).get();
-
         resultActions
                 .andExpect(handler().handlerType(ApiV1ProductController.class))
                 .andExpect(handler().methodName("getItem"))
