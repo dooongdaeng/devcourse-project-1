@@ -1,6 +1,6 @@
 package com.back.domain.product.product.controller;
 
-import com.back.domain.product.product.controller.service.ProductService;
+import com.back.domain.product.product.service.ProductService;
 import com.back.domain.product.product.entity.Product;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
@@ -52,7 +52,7 @@ public class ApiV1ProductControllerTest {
                 .andExpect(handler().methodName("create"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.resultCode").value("201-1"))
-                .andExpect(jsonPath("$.msg").value("%d번 상품이 등록되었습니다.".formatted(1)))
+                .andExpect(jsonPath("$.msg").value("%d번 상품이 등록되었습니다.".formatted(product.getId())))
                 .andExpect(jsonPath("$.data.id").value(product.getId()))
                 .andExpect(jsonPath("$.data.createDate").value(Matchers.startsWith(product.getCreateDate().toString().substring(0, 20))))
                 .andExpect(jsonPath("$.data.modifyDate").value(Matchers.startsWith(product.getModifyDate().toString().substring(0, 20))))
