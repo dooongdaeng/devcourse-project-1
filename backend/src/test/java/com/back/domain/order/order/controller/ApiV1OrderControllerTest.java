@@ -53,10 +53,10 @@ public class ApiV1OrderControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                         {
-                                            "userId" : 1,
-                                            "orderCount" : 2,
-                                            "totalPrice" : 20000,
-                                            "paymentMethod" : "CARD"
+                                            "orderCount": 2,
+                                            "totalPrice": 50000,
+                                            "paymentMethod": "CREDIT_CARD",
+                                            "paymentStatus": "PENDING"
                                         }
                                         """)
                 )
@@ -76,7 +76,7 @@ public class ApiV1OrderControllerTest {
                 .andExpect(jsonPath("$.data.orderCount").value(order.getOrderCount()))
                 .andExpect(jsonPath("$.data.totalPrice").value(order.getTotalPrice()))
                 .andExpect(jsonPath("$.data.paymentMethod").value(order.getPaymentMethod()))
-                .andExpect(jsonPath("$.data.paymentStatus").value(order.getPaymentStatus()))
+                .andExpect(jsonPath("$.data.paymentStatus").value(order.getPaymentStatus()));
     }
 
 }

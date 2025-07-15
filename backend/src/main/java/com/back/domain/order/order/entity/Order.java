@@ -24,7 +24,7 @@ public class Order extends BaseEntity {
     private User user;
 
 
-    public Order(int orderCount, int totalPrice, String paymentMethod, String paymentStatus, User user) {
+    public Order(int orderCount, int totalPrice, String paymentMethod, String paymentStatus, int userId) {
         this.orderCount = orderCount;
 
         this.totalPrice = totalPrice;

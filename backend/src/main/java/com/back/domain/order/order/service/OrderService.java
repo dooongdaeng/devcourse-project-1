@@ -14,8 +14,8 @@ public class OrderService {
     private final OrderRepository orderRepository;
 
 
-    public Order write(int orderCount, int totalPrice, String paymentMethod, String paymentStatus, User user) {
-        Order order = new Order(orderCount, totalPrice, paymentMethod, paymentStatus, user);
+    public Order write(int orderCount, int totalPrice, String paymentMethod, String paymentStatus, int userId) {
+        Order order = new Order(orderCount, totalPrice, paymentMethod, paymentStatus, userId);
 
         return orderRepository.save(order);
     }

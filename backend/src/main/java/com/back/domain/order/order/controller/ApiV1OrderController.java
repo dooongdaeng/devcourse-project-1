@@ -4,7 +4,6 @@ package com.back.domain.order.order.controller;
 import com.back.domain.order.order.dto.OrderDto;
 import com.back.domain.order.order.entity.Order;
 import com.back.domain.order.order.service.OrderService;
-import com.back.domain.user.user.entity.User;
 import com.back.global.rq.Rq;
 import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,15 +28,14 @@ public class ApiV1OrderController {
             int orderCount,
             int totalPrice,
             String paymentMethod,
-            String paymentStatus,
-            User user
+            String paymentStatus
     ) {
     }
 
     @PostMapping
     @Transactional
     @Operation(summary = "주문 생성")
-    public RsData<OrderDto> create(
+    public RsData<OrderDto> write(
             @Valid @RequestBody OrderCreateReqBody reqBody
     ) {
         if (!rq.isLogined()){
@@ -54,7 +52,7 @@ public class ApiV1OrderController {
                 reqBody.totalPrice(),
                 reqBody.paymentMethod(),
                 reqBody.paymentStatus(),
-                reqBody.user()
+                userId
         );
 
         return new RsData<>(
