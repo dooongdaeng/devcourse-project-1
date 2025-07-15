@@ -20,6 +20,7 @@ public class WishListService {
     private final UserService userService;
     private final ProductService productService;
 
+    @Transactional
     public WishList addToWishList(int userId, int productId) {
         User user = userService.findById(userId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다."));
@@ -43,7 +44,11 @@ public class WishListService {
 
         return new WishListDto(wishList);
     }
+    
+    public boolean existsWishList(int currentUserId, int productId) {
+        return wishListRepository.existsByUserIdAndProductId(currentUserId, productId);
 
+    }
 
     public List<WishList> getWishListsByUserId(int userId) {
         return wishListRepository.findByUserIdOrderByCreated(userId);
