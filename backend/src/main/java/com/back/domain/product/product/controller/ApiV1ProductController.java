@@ -41,7 +41,7 @@ public class ApiV1ProductController {
 
     @PostMapping
     @Transactional
-    @Operation(summary = "작성")
+    @Operation(summary = "생성")
     public RsData<ProductDto> create(
             @Valid @RequestBody ProductCreateReqBody reqBody
     ) {
@@ -77,7 +77,7 @@ public class ApiV1ProductController {
 
     @DeleteMapping("/{id}")
     @Transactional
-    @Operation(summary = " 삭제")
+    @Operation(summary = "삭제")
     public RsData<Void> delete(@PathVariable int id) {
         Product product = productService.findById(id).get();
         productService.delete(product);
@@ -107,7 +107,7 @@ public class ApiV1ProductController {
 
     @PutMapping("/{id}")
     @Transactional
-    @Operation(summary = " 수정")
+    @Operation(summary = "수정")
     public RsData<Void> update(
             @PathVariable int id,
             @Valid @RequestBody ProductUpdateReqBody reqBody
