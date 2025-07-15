@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -32,18 +33,19 @@ public class ApiV1AdmProductImageControllerTest {
 
     @Test
     @DisplayName("상품 이미지 삭제")
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
     public void t1() throws Exception {
         int productId = 1;
         int id = 1;
 
         ResultActions resultActions = mvc
                 .perform(
-                        delete("/api/v1/products/%d/images/%d".formatted(productId, id))
+                        delete("/api/v1/adm/products/%d/images/%d".formatted(productId, id))
                                 .contentType(MediaType.APPLICATION_JSON)
                 ).andDo(print());
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1ProductImageController.class))
+                .andExpect(handler().handlerType(ApiV1AdmProductImageController.class))
                 .andExpect(handler().methodName("delete"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
@@ -52,12 +54,13 @@ public class ApiV1AdmProductImageControllerTest {
 
     @Test
     @DisplayName("상품 이미지 등록")
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
     public void t2() throws Exception {
         int productId = 1;
 
         ResultActions resultActions = mvc
                 .perform(
-                        post("/api/v1/products/%d/images".formatted(productId))
+                        post("/api/v1/adm/products/%d/images".formatted(productId))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                         {
@@ -70,7 +73,7 @@ public class ApiV1AdmProductImageControllerTest {
         ProductImage productImage = product.getProductImages().getLast();
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1ProductImageController.class))
+                .andExpect(handler().handlerType(ApiV1AdmProductImageController.class))
                 .andExpect(handler().methodName("create"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.resultCode").value("201-1"))
@@ -83,13 +86,14 @@ public class ApiV1AdmProductImageControllerTest {
 
     @Test
     @DisplayName("상품 이미지 수정")
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
     public void t3() throws Exception {
         int productId = 1;
         int id = 1;
 
         ResultActions resultActions = mvc
                 .perform(
-                        put("/api/v1/products/%d/images/%d".formatted(productId, id))
+                        put("/api/v1/adm/products/%d/images/%d".formatted(productId, id))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                         {
@@ -99,7 +103,7 @@ public class ApiV1AdmProductImageControllerTest {
                 ).andDo(print());
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1ProductImageController.class))
+                .andExpect(handler().handlerType(ApiV1AdmProductImageController.class))
                 .andExpect(handler().methodName("update"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))

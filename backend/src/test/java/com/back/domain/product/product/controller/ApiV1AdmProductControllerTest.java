@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -38,14 +37,9 @@ public class ApiV1AdmProductControllerTest {
     @DisplayName("상품 등록")
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     public void t1() throws Exception {
-        int actorId = userService.findByUsername("admin").get().getId();
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("loginedUserId", actorId);
-
         ResultActions resultActions = mvc
                 .perform(
                         post("/api/v1/adm/products")
-                                .session(session)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                         {
@@ -78,14 +72,9 @@ public class ApiV1AdmProductControllerTest {
     @DisplayName("상품 등록 - without name")
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     public void t1_1() throws Exception {
-        int actorId = userService.findByUsername("admin").get().getId();
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("loginedUserId", actorId);
-
         ResultActions resultActions = mvc
                 .perform(
                         post("/api/v1/adm/products")
-                                .session(session)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                         {
@@ -112,14 +101,9 @@ public class ApiV1AdmProductControllerTest {
     @DisplayName("상품 등록 - without price")
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     public void t1_2() throws Exception {
-        int actorId = userService.findByUsername("admin").get().getId();
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("loginedUserId", actorId);
-
         ResultActions resultActions = mvc
                 .perform(
                         post("/api/v1/adm/products")
-                                .session(session)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                         {
@@ -168,14 +152,9 @@ public class ApiV1AdmProductControllerTest {
     @DisplayName("상품 등록 - without permission")
     @WithMockUser(username = "user1", roles = {"USER"})
     public void t1_4() throws Exception {
-        int actorId = userService.findByUsername("user1").get().getId();
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("loginedUserId", actorId);
-
         ResultActions resultActions = mvc
                 .perform(
                         post("/api/v1/adm/products")
-                                .session(session)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                         {
@@ -197,16 +176,11 @@ public class ApiV1AdmProductControllerTest {
     @DisplayName("상품 삭제")
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     public void t2() throws Exception {
-        int actorId = userService.findByUsername("admin").get().getId();
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("loginedUserId", actorId);
-
         int id = 1;
 
         ResultActions resultActions = mvc
                 .perform(
                         delete("/api/v1/adm/products/%d".formatted(id))
-                                .session(session)
                 ).andDo(print());
 
         resultActions
@@ -221,16 +195,11 @@ public class ApiV1AdmProductControllerTest {
     @DisplayName("상품 수정")
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     public void t3() throws Exception {
-        int actorId = userService.findByUsername("admin").get().getId();
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("loginedUserId", actorId);
-
         int id = 1;
 
         ResultActions resultActions = mvc
                 .perform(
                         put("/api/v1/adm/products/%d".formatted(id))
-                                .session(session)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                         {
