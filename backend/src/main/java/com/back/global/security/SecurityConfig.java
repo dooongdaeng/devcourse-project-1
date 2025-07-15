@@ -31,7 +31,8 @@ public class SecurityConfig {
                                 .frameOptions(
                                         HeadersConfigurer.FrameOptionsConfig::sameOrigin
                                 )
-                ).csrf(AbstractHttpConfigurer::disable).exceptionHandling(
+                ).csrf(AbstractHttpConfigurer::disable)
+                .exceptionHandling(
                         exceptionHandling -> exceptionHandling
                                 .authenticationEntryPoint(
                                         (request, response, authException) -> {
