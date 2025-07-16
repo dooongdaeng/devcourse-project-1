@@ -110,7 +110,10 @@ export default function Order() {
             <div className="mt-8 w-full flex flex-col items-start">
               <h5 className="text-2xl font-bold mb-4">찜목록</h5>
               <ul className="w-full">
-                {favoritedProductsList.map(item => (
+                {favoritedProductsList.length === 0 ? (
+                  <p className="text-gray-500">찜 목록이 비어있습니다.</p>
+                ) : (
+                  favoritedProductsList.map(item => (
                   <li key={item.id} className="flex items-center mt-3 p-2 border-b border-gray-200">
                     <div className="w-1/5 md:w-1/6 flex-shrink-0">
                       <img className="w-14 h-14 object-cover rounded" src={item.imageUrl} alt={item.name} />
@@ -128,7 +131,8 @@ export default function Order() {
                       </button>
                     </div>
                   </li>
-                ))}
+                  ))
+                )}
               </ul>
             </div>
           </div>
