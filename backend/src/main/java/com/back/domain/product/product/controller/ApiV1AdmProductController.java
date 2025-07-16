@@ -5,6 +5,7 @@ import com.back.domain.product.product.entity.Product;
 import com.back.domain.product.product.service.ProductService;
 import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/adm/products")
 @RequiredArgsConstructor
 @Tag(name = "ApiV1AdmProductController", description = "API 관리자용 상품 컨트롤러")
+@SecurityRequirement(name = "bearerAuth")
 public class ApiV1AdmProductController {
     private final ProductService productService;
 
