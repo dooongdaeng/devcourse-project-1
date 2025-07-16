@@ -271,6 +271,90 @@ public class ApiV1OrderControllerTest {
                 .andExpect(jsonPath("$.msg").value("본인의 주문만 삭제할 수 있습니다."));
     }
 
+    @Test
+    @DisplayName("주문 다건 조회 테스트 (user 검색)")
+    @WithMockUser
+    void t9() throws Exception {
+
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/v1/orders/user/1")
+                )
+                .andDo(print());
+
+        List<Orders> orders = orderService.findByUserId(1);
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1OrderController.class))
+                .andExpect(handler().methodName("getOrdersByUserId"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(orders.size()));
+        for(int i = 0; i < orders.size(); i++) {
+            Orders order = orders.get(i);
+            resultActions
+                    .andExpect(jsonPath("$[" + i + "].id").value(order.getId()))  // $[0].id, $[1].id ...
+                    .andExpect(jsonPath("$[" + i + "].createDate").value(Matchers.startsWith(order.getCreateDate().toString().substring(0, 20))))
+                    .andExpect(jsonPath("$[" + i + "].modifyDate").value(Matchers.startsWith(order.getModifyDate().toString().substring(0, 20))))
+                    .andExpect(jsonPath("$[" + i + "].orderCount").value(order.getOrderCount()))
+                    .andExpect(jsonPath("$[" + i + "].totalPrice").value(order.getTotalPrice()))
+                    .andExpect(jsonPath("$[" + i + "].paymentMethod").value(order.getPaymentMethod()))
+                    .andExpect(jsonPath("$[" + i + "].paymentStatus").value(order.getPaymentStatus()));
+        }
+    }
+
+    @Test
+    @DisplayName("주문 다건 조회 테스트 (my 검색)")
+    void t10() throws Exception {
+
+
+        User user = userService.findByUsername("user1").get();
+        String userApiKey = user.getApiKey();
+
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/v1/orders/my")
+                                .header("Authorization", "Bearer " + userApiKey)
+                )
+                .andDo(print());
+
+        List<Orders> orders = orderService.findByUserId(1);
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1OrderController.class))
+                .andExpect(handler().methodName("getMyOrders"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(orders.size()));
+        for(int i = 0; i < orders.size(); i++) {
+            Orders order = orders.get(i);
+            resultActions
+                    .andExpect(jsonPath("$[" + i + "].id").value(order.getId()))  // $[0].id, $[1].id ...
+                    .andExpect(jsonPath("$[" + i + "].createDate").value(Matchers.startsWith(order.getCreateDate().toString().substring(0, 20))))
+                    .andExpect(jsonPath("$[" + i + "].modifyDate").value(Matchers.startsWith(order.getModifyDate().toString().substring(0, 20))))
+                    .andExpect(jsonPath("$[" + i + "].orderCount").value(order.getOrderCount()))
+                    .andExpect(jsonPath("$[" + i + "].totalPrice").value(order.getTotalPrice()))
+                    .andExpect(jsonPath("$[" + i + "].paymentMethod").value(order.getPaymentMethod()))
+                    .andExpect(jsonPath("$[" + i + "].paymentStatus").value(order.getPaymentStatus()));
+        }
+    }
+
+    @Test
+    @DisplayName("주문 다건 조회 실패(로그인 없이)")
+    void t11() throws Exception {
+
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/v1/orders/my")
+                )
+                .andDo(print());
+
+
+        resultActions
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.resultCode").value("401-1"))
+                .andExpect(jsonPath("$.msg").value("로그인 후 이용해주세요."));
+    }
+
+
 
 
 }
