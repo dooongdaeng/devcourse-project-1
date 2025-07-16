@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,6 +38,13 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
         logger.debug("Processing request for " + request.getRequestURI());
 
         try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.isAuthenticated() &&
+                    !(authentication instanceof AnonymousAuthenticationToken)) {
+                logger.debug("Already authenticated in SecurityContextHolder, skipping custom token validation for URI: " + request.getRequestURI());
+                filterChain.doFilter(request, response);
+                return;
+            }
             work(request, response, filterChain);
         } catch (ServiceException e) {
             RsData<Void> rsData = e.getRsData();
@@ -100,9 +108,9 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
             if (payload != null) {
                 int id = (int) payload.get("id");
                 String username = (String) payload.get("username");
-                String ninkName = (String) payload.get("nickName");
+                String nickName = (String) payload.get("nickName");
                 String role = (String) payload.get("role");
-                user = new User(id, username, ninkName, role);
+                user = new User(id, username, nickName, role);
 
                 isAccessTokenValid = true;
             }

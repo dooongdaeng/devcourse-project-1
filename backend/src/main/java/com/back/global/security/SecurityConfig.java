@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -17,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
     private final CustomAuthenticationFilter customAuthenticationFilter;
 
@@ -27,7 +29,8 @@ public class SecurityConfig {
                                 .requestMatchers("/favicon.ico").permitAll()
                                 .requestMatchers("/h2-console/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/*/products", "api/*/products/{id:\\d+}", "api/*/products/{productId:\\d+}/images", "api/*/products/{productId:\\d+}/images/{id:\\d+}").permitAll()
-                                .requestMatchers("/api/*/users", "api/*/users/login", "api/*/users/logout", "api/*/users/check-username", "api/*/users/check-email").permitAll()
+                                .requestMatchers("/api/*/users", "api/*/users/login", "api/*/users/check-username", "api/*/users/check-email").permitAll()
+                                .requestMatchers("/api/v1/users/logout").authenticated()
                                 .requestMatchers("/api/*/adm/**").hasRole("ADMIN")
                                 .requestMatchers("/api/*/**").authenticated()
                                 .anyRequest().permitAll()
