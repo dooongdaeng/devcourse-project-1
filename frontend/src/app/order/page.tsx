@@ -2,15 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-
-// Define a type for our product items for better type-safety
-type Product = {
-  id: number;
-  name: string;
-  category: string;
-  price: number;
-  imageUrl: string;
-};
+import { useProducts, Product } from '@/context/ProductContext';
 
 // Define a type for cart items, which includes quantity
 type CartItem = Product & {
@@ -19,27 +11,19 @@ type CartItem = Product & {
 
 export default function Order() {
   const router = useRouter();
-
-  // Initial data for products and wishlist
-  const initialProducts: Product[] = [
-    { id: 1, name: 'Columbia Nariñó', category: '커피콩', price: 5000, imageUrl: 'https://i.imgur.com/HKOFQYa.jpeg' },
-    { id: 2, name: 'Brazil Serra Do Caparaó', category: '커피콩', price: 6000, imageUrl: 'https://i.imgur.com/HKOFQYa.jpeg' },
-    { id: 3, name: 'Ethiopia Yirgacheffe', category: '커피콩', price: 7000, imageUrl: 'https://i.imgur.com/HKOFQYa.jpeg' },
-  ];
+  const { products } = useProducts(); // 전역 상품 목록 가져오기
 
   const initialWishlist: Product[] = [
-    { id: 4, name: 'Favorite Blend A', category: '찜한 커피콩', price: 8000, imageUrl: 'https://i.imgur.com/HKOFQYa.jpeg' },
-    { id: 5, name: 'Favorite Blend B', category: '찜한 커피콩', price: 9500, imageUrl: 'https://i.imgur.com/HKOFQYa.jpeg' },
+    { id: 4, name: '콜롬비아 나리뇨', price: '5000', imageUrl: 'https://i.imgur.com/HKOFQYa.jpeg', description:"", stock:0 },
+    { id: 5, name: '브라질 세하도', price: '6000', imageUrl: 'https://i.imgur.com/HKOFQYa.jpeg', description:"", stock:0 },
   ];
   
   const initialCart: CartItem[] = [
-      { id: 1, name: 'Columbia Nariñó', category: '커피콩', price: 5000, imageUrl: 'https://i.imgur.com/HKOFQYa.jpeg', quantity: 2 },
-      { id: 2, name: 'Brazil Serra Do Caparaó', category: '커피콩', price: 6000, imageUrl: 'https://i.imgur.com/HKOFQYa.jpeg', quantity: 1 },
-      { id: 3, name: 'Ethiopia Yirgacheffe', category: '커피콩', price: 7000, imageUrl: 'https://i.imgur.com/HKOFQYa.jpeg', quantity: 1 },
+      { id: 1, name: '콜롬비아 나리뇨', price: '5000', imageUrl: 'https://i.imgur.com/HKOFQYa.jpeg', quantity: 2, description:"", stock:0 },
+      { id: 2, name: '브라질 세하도', price: '6000', imageUrl: 'https://i.imgur.com/HKOFQYa.jpeg', quantity: 1, description:"", stock:0 },
   ]
 
-  // State management for products, wishlist, and cart
-  const [products, setProducts] = useState<Product[]>(initialProducts);
+  // State management for wishlist and cart
   const [wishlistItems, setWishlistItems] = useState<Product[]>(initialWishlist);
   const [cartItems, setCartItems] = useState<CartItem[]>(initialCart);
 
@@ -91,7 +75,7 @@ export default function Order() {
   };
 
   // Calculate total price dynamically
-  const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const totalPrice = cartItems.reduce((sum, item) => sum + parseInt(item.price) * item.quantity, 0);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-4 md:p-24">
@@ -107,10 +91,9 @@ export default function Order() {
                     <img className="w-14 h-14 object-cover rounded" src={product.imageUrl} alt={product.name} />
                   </div>
                   <div className="flex-grow ml-4">
-                    <div className="text-sm text-gray-500">{product.category}</div>
                     <div className="font-semibold">{product.name}</div>
                   </div>
-                  <div className="text-center font-medium w-1/5 md:w-1/6">{product.price.toLocaleString()}원</div>
+                  <div className="text-center font-medium w-1/5 md:w-1/6">{parseInt(product.price).toLocaleString()}원</div>
                   <div className="text-right w-1/5 md:w-1/6">
                     <button
                       onClick={() => handleAddToCart(product)}
@@ -132,10 +115,9 @@ export default function Order() {
                       <img className="w-14 h-14 object-cover rounded" src={item.imageUrl} alt={item.name} />
                     </div>
                     <div className="flex-grow ml-4">
-                      <div className="text-sm text-gray-500">{item.category}</div>
                       <div className="font-semibold">{item.name}</div>
                     </div>
-                    <div className="text-center font-medium w-1/5 md:w-1/6">{item.price.toLocaleString()}원</div>
+                    <div className="text-center font-medium w-1/5 md:w-1/6">{parseInt(item.price).toLocaleString()}원</div>
                     <div className="text-right w-1/5 md:w-1/6">
                       <button
                         onClick={() => handleAddToCart(item)}
@@ -164,10 +146,10 @@ export default function Order() {
                   <div key={item.id} className="flex justify-between items-center mb-2">
                     <span className="text-base truncate pr-2">{item.name}</span>
                     <div className="flex items-center">
-                      <button onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)} className="px-2 py-1 border rounded">-</button>
+                      <button onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)} className="px-2 py-1 border rounded hover:bg-gray-800 hover:text-white cursor-pointer">-</button>
                       <span className="px-3">{item.quantity}</span>
-                      <button onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)} className="px-2 py-1 border rounded">+</button>
-                      <button onClick={() => handleRemoveFromCart(item.id)} className="ml-3 text-red-500 hover:text-red-700 text-sm">삭제</button>
+                      <button onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)} className="px-2 py-1 border rounded hover:bg-gray-800 hover:text-white cursor-pointer">+</button>
+                      <button onClick={() => handleRemoveFromCart(item.id)} className="ml-3 px-2 py-1 border border-gray-800 text-gray-800 rounded hover:bg-gray-800 hover:text-white text-sm cursor-pointer">삭제</button>
                     </div>
                   </div>
                 ))
@@ -199,4 +181,5 @@ export default function Order() {
     </main>
   );
 }
+
 
