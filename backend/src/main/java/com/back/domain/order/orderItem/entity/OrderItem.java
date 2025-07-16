@@ -30,4 +30,11 @@ public class OrderItem extends BaseEntity {
         this.productId = productId;
     }
 
+    public void update(int quantity, int unitPrice, int totalPrice, int productId) {
+        this.quantity = quantity;
+        this.unitPrice = unitPrice;
+        this.totalPrice = totalPrice;
+        this.productId = productId;
+    }
+
 }

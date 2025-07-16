@@ -55,4 +55,10 @@ public class OrderItemService {
         return orderItemRepository.findByProductId(productId);
     }
 
+    public void update(OrderItem orderItem, int quantity, int unitPrice, int productId) {
+        // totalPrice 자동 계산
+        int totalPrice = quantity * unitPrice;
+        orderItem.update(quantity, unitPrice, totalPrice, productId);
+    }
+
 }

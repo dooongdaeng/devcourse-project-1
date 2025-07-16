@@ -96,4 +96,39 @@ public class ApiV1OrderItemController {
                 .toList();
     }
 
+    record OrderItemUpdateReqBody(
+            @NotNull
+            @Positive
+            int quantity,
+            @NotNull
+            @Positive
+            int unitPrice,
+            @NotNull
+            @Positive
+            int productId
+    ) {
+    }
+
+    @PutMapping("/{id}")
+    @Transactional
+    @Operation(summary = "주문 아이템 수정")
+    public RsData<Void> update(
+            @PathVariable int id,
+            @Valid @RequestBody OrderItemUpdateReqBody reqBody
+    ) {
+        OrderItem orderItem = orderItemService.findById(id).get();
+
+        orderItemService.update(
+                orderItem,
+                reqBody.quantity(),
+                reqBody.unitPrice(),
+                reqBody.productId()
+        );
+
+        return new RsData<>(
+                "200-1",
+                "%d번 주문 아이템이 수정되었습니다.".formatted(id)
+        );
+    }
+
 }
