@@ -17,30 +17,6 @@ public class Rq {
     private final HttpServletRequest req;
     private final HttpServletResponse res;
 
-    public Integer getLoginedUserId() {
-        return (Integer) req.getSession().getAttribute("loginedUserId");
-    }
-
-    public boolean isLogined() {
-        return getLoginedUserId() != null;
-    }
-
-    public void login(int userId) {
-        req.getSession().setAttribute("loginedUserId", userId);
-    }
-
-    public void logout() {
-        req.getSession().invalidate();
-    }
-
-    public int getCurrentUserId() {
-        Integer loginedUserId = getLoginedUserId();
-        if (loginedUserId == null) {
-            throw new IllegalStateException("로그인하지 않았습니다.");
-        }
-        return loginedUserId;
-    }
-
     public String getCookieValue(String name, String defaultValue) {
         if (req.getCookies() == null) return defaultValue;
         return Arrays.stream(req.getCookies())
