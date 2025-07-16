@@ -126,7 +126,7 @@ public class ApiV1AdmProductControllerTest {
     }
     
     @Test
-    @DisplayName("상품 등록 - without login")
+    @DisplayName("상품 등록 - without Authorization header")
     public void t1_3() throws Exception {
         ResultActions resultActions = mvc
                 .perform(
@@ -149,9 +149,57 @@ public class ApiV1AdmProductControllerTest {
     }
 
     @Test
+    @DisplayName("상품 등록 - with wrong Authorization header")
+    public void t1_4() throws Exception {
+        ResultActions resultActions = mvc
+                .perform(
+                        post("/api/v1/adm/products")
+                                .header("Authorization", "B")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                            "name": "상품 test",
+                                            "price": 0,
+                                            "description": "상품 test",
+                                            "stock": 10
+                                        }
+                                        """)
+                ).andDo(print());
+
+        resultActions
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.resultCode").value("401-2"))
+                .andExpect(jsonPath("$.msg").value("Authorization 헤더가 Bearer 형식이 아닙니다."));
+    }
+
+    @Test
+    @DisplayName("상품 등록 - with wrong ApiKey")
+    public void t1_5() throws Exception {
+        ResultActions resultActions = mvc
+                .perform(
+                        post("/api/v1/adm/products")
+                                .header("Authorization", "Bearer wrongApiKey")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                            "name": "상품 test",
+                                            "price": 0,
+                                            "description": "상품 test",
+                                            "stock": 10
+                                        }
+                                        """)
+                ).andDo(print());
+
+        resultActions
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.resultCode").value("401-3"))
+                .andExpect(jsonPath("$.msg").value("API 키가 유효하지 않습니다."));
+    }
+
+    @Test
     @DisplayName("상품 등록 - without permission")
     @WithMockUser(username = "user1", roles = {"USER"})
-    public void t1_4() throws Exception {
+    public void t1_6() throws Exception {
         ResultActions resultActions = mvc
                 .perform(
                         post("/api/v1/adm/products")
