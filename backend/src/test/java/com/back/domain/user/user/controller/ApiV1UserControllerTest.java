@@ -265,4 +265,44 @@ public class ApiV1UserControllerTest {
                 .andExpect(jsonPath("$.msg", containsString("email")));
     }
 
+    @Test
+    @DisplayName("로그인 실패 - 잘못된 비밀번호")
+    void testLoginFail_BadCredentials() throws Exception {
+        Map<String, Object> reqBody = Map.of(
+                "username", "user10", // 'user10' 사용
+                "password", "wrongpassword" // 잘못된 비밀번호
+        );
+
+        mvc.perform(post("/api/v1/users/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(reqBody))
+                )
+                .andDo(print())
+                // 비밀번호 불일치 시 UserService.checkPassword에서 RuntimeException 발생,
+                // GlobalExceptionHandler가 400 BAD_REQUEST로 처리
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.resultCode", is("400-0")))
+                .andExpect(jsonPath("$.msg", containsString("비밀번호가 일치하지 않습니다.")));
+    }
+
+    @Test
+    @DisplayName("로그인 실패 - 존재하지 않는 사용자명")
+    void testLoginFail_UsernameNotFound() throws Exception {
+        Map<String, Object> reqBody = Map.of(
+                "username", "nonexistentuser", // 존재하지 않는 사용자명
+                "password", "1234"
+        );
+
+        mvc.perform(post("/api/v1/users/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(reqBody))
+                )
+                .andDo(print())
+                // UserService.findByUsername에서 사용자를 찾지 못하면 RuntimeException 발생,
+                // GlobalExceptionHandler가 400 BAD_REQUEST로 처리
+                .andExpect(status().isBadRequest()) // <-- 401 대신 400을 기대
+                .andExpect(jsonPath("$.resultCode", is("400-0")))
+                .andExpect(jsonPath("$.msg", containsString("존재하지 않는 아이디입니다.")));
+    }
+
 }
