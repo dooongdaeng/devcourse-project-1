@@ -15,18 +15,19 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.TestExecutionEvent;
-import org.springframework.security.test.context.support.WithUserDetails; // WithUserDetails 사용 유지
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print; // print() 추가
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -137,7 +138,7 @@ public class ApiV1UserControllerTest {
     }
 
     @Test
-    @DisplayName("아이디 중복 체크")
+    @DisplayName("아이디 중복 체크 - 이미 존재하는 아이디")
     void testCheckUsernameAvailable() throws Exception {
         mvc.perform(get("/api/v1/users/check-username")
                         .param("username", "user10")) // `setup()`에서 생성된 "user1" 사용
@@ -147,13 +148,33 @@ public class ApiV1UserControllerTest {
     }
 
     @Test
-    @DisplayName("이메일 중복 체크")
+    @DisplayName("아이디 중복 체크 - 사용 가능한 아이디")
+    void testCheckUsernameAvailable_NotExists() throws Exception {
+        mvc.perform(get("/api/v1/users/check-username")
+                        .param("username", "totally_new_user_" + UUID.randomUUID().toString().substring(0,4)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().string("true")); // 존재하지 않는 아이디이므로 `true` 반환 예상
+    }
+
+    @Test
+    @DisplayName("이메일 중복 체크 - 이미 존재하는 이메일")
     void testCheckEmailAvailable() throws Exception {
         mvc.perform(get("/api/v1/users/check-email")
                         .param("email", "user10@test.com")) // `setup()`에서 생성된 이메일 사용
                 .andDo(print()) // 요청/응답 내용 출력
                 .andExpect(status().isOk())
                 .andExpect(content().string("false")); // 이미 존재하는 이메일이므로 `false` 반환 예상
+    }
+
+    @Test
+    @DisplayName("이메일 중복 체크 - 사용 가능한 이메일")
+    void testCheckEmailAvailable_NotExists() throws Exception {
+        mvc.perform(get("/api/v1/users/check-email")
+                        .param("email", "totally_new_email_" + UUID.randomUUID().toString().substring(0,4) + "@test.com"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().string("true")); // 존재하지 않는 이메일이므로 `true` 반환 예상
     }
 
     @Test
@@ -177,4 +198,7 @@ public class ApiV1UserControllerTest {
                 .andExpect(jsonPath("$.resultCode", is("400-0"))) // 적절한 에러 코드 (예상 결과에 따라 수정)
                 .andExpect(jsonPath("$.msg", containsString("이미 존재하는 아이디입니다."))); // 서비스에서 반환하는 메시지
     }
+
+
+
 }
