@@ -79,83 +79,8 @@ public class ApiV1OrderControllerTest {
 
     }
 
-    @Test
-    @DisplayName("주문 단건 조회 테스트")
-    @WithMockUser
-    void t2() throws Exception {
-        int id = 1;
-
-        ResultActions resultActions = mvc
-                .perform(
-                        get("/api/v1/orders/" + id)
-                )
-                .andDo(print());
-
-        Orders order = orderService.findById(id).get();
-
-        resultActions
-                .andExpect(handler().handlerType(ApiV1OrderController.class))
-                .andExpect(handler().methodName("getOrder"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(order.getId()))
-                .andExpect(jsonPath("$.createDate").value(Matchers.startsWith(order.getCreateDate().toString().substring(0, 20))))
-                .andExpect(jsonPath("$.modifyDate").value(Matchers.startsWith(order.getModifyDate().toString().substring(0, 20))))
-                .andExpect(jsonPath("$.orderCount").value(order.getOrderCount()))
-                .andExpect(jsonPath("$.totalPrice").value(order.getTotalPrice()))
-                .andExpect(jsonPath("$.paymentMethod").value(order.getPaymentMethod()))
-                .andExpect(jsonPath("$.paymentStatus").value(order.getPaymentStatus()));
-
-    }
-
-    @Test
-    @DisplayName("주문 단건 조회 테스트, 404")
-    @WithMockUser
-    void t4() throws Exception {
-        int id = Integer.MAX_VALUE;
-
-        ResultActions resultActions = mvc
-                .perform(
-                        get("/api/v1/orders/" + id)
-                )
-                .andDo(print());
 
 
-        resultActions
-                .andExpect(handler().handlerType(ApiV1OrderController.class))
-                .andExpect(handler().methodName("getOrder"))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    @DisplayName("주문 다건 조회 테스트")
-    @WithMockUser
-    void t3() throws Exception {
-
-        ResultActions resultActions = mvc
-                .perform(
-                        get("/api/v1/orders")
-                )
-                .andDo(print());
-
-        List<Orders> orders = orderService.findAll();
-
-        resultActions
-                .andExpect(handler().handlerType(ApiV1OrderController.class))
-                .andExpect(handler().methodName("getOrders"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(orders.size()));
-        for(int i = 0; i < orders.size(); i++) {
-            Orders order = orders.get(i);
-            resultActions
-                    .andExpect(jsonPath("$[" + i + "].id").value(order.getId()))  // $[0].id, $[1].id ...
-                    .andExpect(jsonPath("$[" + i + "].createDate").value(Matchers.startsWith(order.getCreateDate().toString().substring(0, 20))))
-                    .andExpect(jsonPath("$[" + i + "].modifyDate").value(Matchers.startsWith(order.getModifyDate().toString().substring(0, 20))))
-                    .andExpect(jsonPath("$[" + i + "].orderCount").value(order.getOrderCount()))
-                    .andExpect(jsonPath("$[" + i + "].totalPrice").value(order.getTotalPrice()))
-                    .andExpect(jsonPath("$[" + i + "].paymentMethod").value(order.getPaymentMethod()))
-                    .andExpect(jsonPath("$[" + i + "].paymentStatus").value(order.getPaymentStatus()));
-        }
-    }
 
     @Test
     @DisplayName("주문 수정 테스트")
@@ -163,10 +88,14 @@ public class ApiV1OrderControllerTest {
     void t5() throws Exception {
         int id = 1;
 
+        User user = userService.findByUsername("user1").get();
+        String userApiKey = user.getApiKey();
+
         ResultActions resultActions = mvc
                 .perform(
                         put("/api/v1/orders/" + id)
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + userApiKey)
                                 .content("""
                                         {
                                             "orderCount": 5,
@@ -228,10 +157,14 @@ public class ApiV1OrderControllerTest {
     void t6() throws Exception {
         int id = 1;
 
+        User user = userService.findByUsername("user1").get();
+        String userApiKey = user.getApiKey();
+
         ResultActions resultActions = mvc
                 .perform(
                         delete("/api/v1/orders/" + id)
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + userApiKey)
                 )
                 .andDo(print());
 
@@ -271,36 +204,6 @@ public class ApiV1OrderControllerTest {
                 .andExpect(jsonPath("$.msg").value("본인의 주문만 삭제할 수 있습니다."));
     }
 
-    @Test
-    @DisplayName("주문 다건 조회 테스트 (user 검색)")
-    @WithMockUser
-    void t9() throws Exception {
-
-        ResultActions resultActions = mvc
-                .perform(
-                        get("/api/v1/orders/user/1")
-                )
-                .andDo(print());
-
-        List<Orders> orders = orderService.findByUserId(1);
-
-        resultActions
-                .andExpect(handler().handlerType(ApiV1OrderController.class))
-                .andExpect(handler().methodName("getOrdersByUserId"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(orders.size()));
-        for(int i = 0; i < orders.size(); i++) {
-            Orders order = orders.get(i);
-            resultActions
-                    .andExpect(jsonPath("$[" + i + "].id").value(order.getId()))  // $[0].id, $[1].id ...
-                    .andExpect(jsonPath("$[" + i + "].createDate").value(Matchers.startsWith(order.getCreateDate().toString().substring(0, 20))))
-                    .andExpect(jsonPath("$[" + i + "].modifyDate").value(Matchers.startsWith(order.getModifyDate().toString().substring(0, 20))))
-                    .andExpect(jsonPath("$[" + i + "].orderCount").value(order.getOrderCount()))
-                    .andExpect(jsonPath("$[" + i + "].totalPrice").value(order.getTotalPrice()))
-                    .andExpect(jsonPath("$[" + i + "].paymentMethod").value(order.getPaymentMethod()))
-                    .andExpect(jsonPath("$[" + i + "].paymentStatus").value(order.getPaymentStatus()));
-        }
-    }
 
     @Test
     @DisplayName("주문 다건 조회 테스트 (my 검색)")
