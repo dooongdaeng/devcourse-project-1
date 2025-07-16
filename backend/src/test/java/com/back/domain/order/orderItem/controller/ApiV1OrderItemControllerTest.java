@@ -17,8 +17,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -183,6 +182,53 @@ public class ApiV1OrderItemControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
                 .andExpect(jsonPath("$.msg").value("1번 주문 아이템이 수정되었습니다."));
+    }
+    @Test
+    @DisplayName("존재하지 않는 주문 아이템 수정 테스트")
+    @WithMockUser
+    void t8() throws Exception {
+        ResultActions resultActions = mvc
+                .perform(
+                        MockMvcRequestBuilders.put("/api/v1/orderItems/999")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                            "quantity": 3,
+                                            "unitPrice": 15000,
+                                            "productId": 1
+                                        }
+                                        """)
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1OrderItemController.class))
+                .andExpect(handler().methodName("update"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("주문 아이템 수정 유효성 검증 테스트 - 음수 값")
+    @WithMockUser
+    void t9() throws Exception {
+
+        ResultActions resultActions = mvc
+                .perform(
+                        put("/api/v1/orderItems/1")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                            "quantity": -1,
+                                            "unitPrice": 10000,
+                                            "productId": 1
+                                        }
+                                        """)
+                )
+                .andDo(print());
+        resultActions
+                .andExpect(handler().handlerType(ApiV1OrderItemController.class))
+                .andExpect(handler().methodName("update"))
+                .andExpect(status().isBadRequest());
     }
 }
 
