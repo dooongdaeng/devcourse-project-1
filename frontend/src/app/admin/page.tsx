@@ -1,16 +1,7 @@
 "use client";
 
 import { useState, ChangeEvent } from 'react';
-
-// Define a type for product items
-type Product = {
-  id: number;
-  name: string;
-  price: string;
-  stock: number;
-  description: string;
-  imageUrl: string;
-};
+import { useProducts, Product } from '@/context/ProductContext';
 
 // Define a type for the new/edit product form state
 type ProductFormState = {
@@ -22,11 +13,7 @@ type ProductFormState = {
 };
 
 export default function Admin() {
-  // Initial product data
-  const initialProducts: Product[] = [
-    { id: 101, name: '콜롬비아 나리뇨', price: '5000', stock: 100, description: '신선한 콜롬비아 원두입니다.', imageUrl: '' },
-    { id: 102, name: '브라질 세하도', price: '6000', stock: 150, description: '고소한 브라질 원두입니다.', imageUrl: '' },
-  ];
+  const { products, addProduct, updateProduct, deleteProduct } = useProducts();
 
   const initialProductFormState: ProductFormState = {
     name: '',
@@ -36,8 +23,6 @@ export default function Admin() {
     imageUrl: ''
   };
 
-  // State for managing products
-  const [products, setProducts] = useState<Product[]>(initialProducts);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newProduct, setNewProduct] = useState<ProductFormState>(initialProductFormState);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -45,14 +30,14 @@ export default function Admin() {
   // --- Handlers for Deleting Products ---
   const handleDeleteProduct = (productId: number) => {
     if (window.confirm('정말로 이 상품을 삭제하시겠습니까?')) {
-      setProducts(prevProducts => prevProducts.filter(p => p.id !== productId));
+      deleteProduct(productId);
     }
   };
 
   // --- Handlers for Adding Products ---
   const handleAddNewClick = () => {
     setShowAddForm(true);
-    setEditingProduct(null); // Ensure not in edit mode
+    setEditingProduct(null);
   };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -69,15 +54,10 @@ export default function Admin() {
       return;
     }
 
-    setProducts(prevProducts => {
-      const newId = prevProducts.length > 0 ? Math.max(...prevProducts.map(p => p.id)) + 1 : 101;
-      const productToAdd: Product = {
-        id: newId,
-        ...newProduct,
+    addProduct({ 
+        ...newProduct, 
         price: `${priceNum}`,
         stock: stockNum,
-      };
-      return [...prevProducts, productToAdd];
     });
 
     setNewProduct(initialProductFormState);
@@ -87,7 +67,7 @@ export default function Admin() {
   // --- Handlers for Editing Products ---
   const handleEditClick = (product: Product) => {
     setEditingProduct(product);
-    setShowAddForm(false); // Ensure not in add mode
+    setShowAddForm(false);
   };
 
   const handleUpdateProduct = () => {
@@ -101,7 +81,7 @@ export default function Admin() {
       return;
     }
 
-    setProducts(prev => prev.map(p => (p.id === editingProduct.id ? editingProduct : p)));
+    updateProduct(editingProduct);
     setEditingProduct(null);
   };
 
