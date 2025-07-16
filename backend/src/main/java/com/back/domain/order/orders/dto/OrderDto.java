@@ -11,7 +11,9 @@ public record OrderDto(
         int orderCount,
         int totalPrice,
         String paymentMethod,
-        String paymentStatus
+        String paymentStatus,
+        int userId,
+        String userName
 ) {
 
     public OrderDto(Orders order) {
@@ -22,7 +24,9 @@ public record OrderDto(
                 order.getOrderCount(),
                 order.getTotalPrice(),
                 order.getPaymentMethod(),
-                order.getPaymentStatus()
+                order.getPaymentStatus(),
+                order.getUser().getId(),
+                order.getUser().getUsername()
         );
     }
 }

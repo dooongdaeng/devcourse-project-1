@@ -48,7 +48,8 @@ public class ApiV1OrderControllerTest {
                                             "orderCount": 2,
                                             "totalPrice": 50000,
                                             "paymentMethod": "CREDIT_CARD",
-                                            "paymentStatus": "PENDING"
+                                            "paymentStatus": "PENDING",
+                                            "userId": 1
                                         }
                                         """)
                                 .with(csrf())

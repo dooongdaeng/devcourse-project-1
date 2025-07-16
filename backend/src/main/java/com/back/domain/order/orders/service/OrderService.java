@@ -2,6 +2,8 @@ package com.back.domain.order.orders.service;
 
 import com.back.domain.order.orders.entity.Orders;
 import com.back.domain.order.orders.repository.OrderRepository;
+import com.back.domain.user.user.entity.User;
+import com.back.domain.user.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,10 +14,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
+    private final UserService userService;
 
 
-    public Orders create(int orderCount, int totalPrice, String paymentMethod, String paymentStatus) {
-        Orders order = new Orders(orderCount, totalPrice, paymentMethod, paymentStatus);
+    public Orders create(int orderCount, int totalPrice, String paymentMethod, String paymentStatus, int userId) {
+        User user = userService.findById(userId).get();
+
+        Orders order = new Orders(orderCount, totalPrice, paymentMethod, paymentStatus, user);
 
         return orderRepository.save(order);
     }
