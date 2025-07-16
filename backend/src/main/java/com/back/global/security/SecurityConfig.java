@@ -23,8 +23,10 @@ public class SecurityConfig {
                                 .requestMatchers("/favicon.ico").permitAll()
                                 .requestMatchers("/h2-console/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/*/products", "api/*/products/{id:\\d+}", "api/*/products/{productId:\\d+}/images", "api/*/products/{productId:\\d+}/images/{id:\\d+}").permitAll()
-                                .requestMatchers("/api/v1/adm/**").hasRole("ADMIN")
-                                .anyRequest().authenticated()
+                                .requestMatchers("/api/*/users", "api/*/users/login", "api/*/users/logout").permitAll()
+                                .requestMatchers("/api/*/adm/**").hasRole("ADMIN")
+                                .requestMatchers("/api/*/**").authenticated()
+                                .anyRequest().permitAll()
                 )
                 .headers(
                         headers -> headers
