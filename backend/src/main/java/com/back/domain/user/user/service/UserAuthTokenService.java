@@ -31,6 +31,24 @@ public class UserAuthTokenService{
     }
 
     public Map<String, Object> payload(String accessToken) {
-        return Ut.jwt.payload(jwtSecretKey, accessToken);
+        Map<String, Object> parsedPayload = Ut.jwt.payload(jwtSecretKey, accessToken);
+
+        if (parsedPayload == null) return null;
+
+        try {
+            int id = (int) parsedPayload.get("id");
+            String username = (String) parsedPayload.get("username");
+            String nickname = (String) parsedPayload.get("nickname");
+            String role = (String) parsedPayload.get("role");
+
+            return Map.of(
+                    "id", id,
+                    "username", username,
+                    "nickname", nickname,
+                    "role", role
+            );
+        } catch (Exception e) {
+            return null; // 잘못된 payload 처리
+        }
     }
 }
