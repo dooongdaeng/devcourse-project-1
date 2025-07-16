@@ -184,10 +184,10 @@ export default function Admin() {
                 </div>
               </div>
               <div className="mt-6 flex justify-end space-x-4">
-                <button onClick={editingProduct ? handleUpdateProduct : handleSaveNewProduct} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                <button onClick={editingProduct ? handleUpdateProduct : handleSaveNewProduct} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
                   {editingProduct ? '수정 완료' : '저장'}
                 </button>
-                <button onClick={handleCancel} className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">취소</button>
+                <button onClick={handleCancel} className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded cursor-pointer">취소</button>
               </div>
             </div>
           )}
