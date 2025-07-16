@@ -6,7 +6,7 @@ export default function Login() {
   const router = useRouter();
 
   const handleLogin = () => {
-    localStorage.setItem('isLoggedIn', 'true');
+    sessionStorage.setItem('isLoggedIn', 'true');
     router.push('/');
   };
   return (

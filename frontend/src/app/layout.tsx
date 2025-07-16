@@ -28,7 +28,7 @@ export default function RootLayout({
   useEffect(() => {
     const checkLoginStatus = () => {
       if (typeof window !== 'undefined') {
-        const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        const loggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
         setIsLoggedIn(loggedIn);
       }
     };
@@ -49,7 +49,7 @@ export default function RootLayout({
   const handleLogout = () => {
     setIsLoggedIn(false);
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('isLoggedIn');
+      sessionStorage.removeItem('isLoggedIn');
     }
     router.push('/');
   };
