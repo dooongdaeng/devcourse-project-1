@@ -6,6 +6,7 @@ import com.back.domain.wishList.wishList.service.WishListService;
 import com.back.global.rq.Rq;
 import com.back.global.rsData.RsData;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,8 +21,19 @@ public class ApiV1WishListController {
     private final Rq rq;
 
     record WishListAddReqBody(
-            int productId
-    ){}
+            int productId,
+            @Min(value = 1, message = "수량은 1 이상이어야 합니다.")
+            Integer quantity
+    ){
+        public int getQuantityOrDefault() {
+            return quantity != null ? quantity : 1;
+        }
+    }
+
+    record WishListUpdateQuantityReqBody(
+            @Min(value = 1, message = "수량은 1 이상이어야 합니다.")
+            Integer quantity
+    ) {}
 
     @GetMapping
     public RsData<List<WishListDto>> getAllWishLists() {
@@ -33,7 +45,7 @@ public class ApiV1WishListController {
         return new RsData<>("200", "위시리스트 조회 성공", wishListDtos);
     }
 
-    @GetMapping("/check/{productId}")
+    @GetMapping("/{productId}")
     public RsData<Boolean> checkWishList(@PathVariable int productId) {
         int currentUserId = rq.getCurrentUserId();
         boolean exists = wishListService.existsWishList(currentUserId, productId);
@@ -44,7 +56,7 @@ public class ApiV1WishListController {
     @PostMapping
     public RsData<WishListDto> addWishList(@Valid @RequestBody WishListAddReqBody reqBody) {
         int currentUserId = rq.getCurrentUserId();
-        WishList wishList = wishListService.addToWishList(currentUserId, reqBody.productId);
+        WishList wishList = wishListService.addToWishList(currentUserId, reqBody.productId, reqBody.getQuantityOrDefault());
 
         return new RsData<>("201", "위시리스트에 추가했습니다.", new WishListDto(wishList));
     }

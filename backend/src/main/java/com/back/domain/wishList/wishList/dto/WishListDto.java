@@ -8,10 +8,11 @@ public record WishListDto (
         @NonNull Integer productId,
         String productName,
         String productImageUrl,
-        Integer productPrice
+        Integer productPrice,
+        Integer quantity
 ) {
     public WishListDto(Integer productId) {
-        this(productId, null, null, null);
+        this(productId, null, null, null, 1);
     }
 
     public WishListDto(WishList wishList) {
@@ -19,7 +20,8 @@ public record WishListDto (
                 wishList.getProduct().getId(), //
                 wishList.getProduct().getName(),
                 getFirstImageUrl(wishList),
-                wishList.getProduct().getPrice()
+                wishList.getProduct().getPrice(),
+                wishList.getQuantity()
         );
     }
 
