@@ -20,13 +20,13 @@ function useProductImage(productId: number) {
 }
 
 function ProductCard({ product }: { product: Product }) {
-  const productImage = useProductImage(product.id);
+  const imageUrl = useProductImage(product.id);
   const { favoriteProducts, toggleFavorite } = useProducts();
 
 
   return (
-    <div key={product.id} className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30">
-      <img src={productImage} alt={product.name} className="mb-3 h-40 w-full object-cover"/>
+    <div className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30">
+      <img src={imageUrl} alt={product.name} className="mb-3 h-40 w-full object-cover"/>
 
       <h2 className="mb-3 text-xl font-semibold">
         {product.name}{" "}
