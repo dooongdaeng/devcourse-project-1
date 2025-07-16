@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useState, useContext, ReactNode, ChangeEvent } from 'react';
+import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 
 // 상품 데이터 타입 정의
 export type Product = {
@@ -41,7 +41,19 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     { id: 104, name: '에티오피아 게이샤', price: '8000', stock: 80, description: '감미로운 에티오피아 원두입니다.', imageUrl: 'https://i.imgur.com/HKOFQYa.jpeg' }
   ];
 
-  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [products, setProducts] = useState<Product[]>(() => {
+    if (typeof window !== 'undefined') {
+      const savedProducts = sessionStorage.getItem('products');
+      return savedProducts ? JSON.parse(savedProducts) : initialProducts;
+    }
+    return initialProducts;
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('products', JSON.stringify(products));
+    }
+  }, [products]);
 
   const addProduct = (productData: Omit<Product, 'id'>) => {
     setProducts(prev => {
