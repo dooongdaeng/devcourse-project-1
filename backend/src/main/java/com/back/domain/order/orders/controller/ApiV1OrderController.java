@@ -6,12 +6,14 @@ import com.back.domain.order.orders.entity.Orders;
 import com.back.domain.order.orders.service.OrderService;
 import com.back.global.rq.Rq;
 import com.back.global.rsData.RsData;
+import com.back.global.security.UserSecurityUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -97,9 +99,12 @@ public class ApiV1OrderController {
     @Operation(summary = "주문 수정")
     public RsData<OrderDto> update(
             @PathVariable int id,
-            @Valid @RequestBody OrderUpdateReqBody reqBody
+            @Valid @RequestBody OrderUpdateReqBody reqBody,
+            @AuthenticationPrincipal UserSecurityUser currentUser
     ) {
         Orders order = orderService.findById(id).get();
+
+        order.checkCanUpdate(currentUser.getId());
 
         orderService.update(
                 order,
@@ -119,9 +124,12 @@ public class ApiV1OrderController {
     @Transactional
     @Operation(summary = "삭제")
     public RsData<Void> delete(
-            @PathVariable int id
+            @PathVariable int id,
+            @AuthenticationPrincipal UserSecurityUser currentUser
     ) {
         Orders order = orderService.findById(id).get();
+
+        order.checkCanDelete(currentUser.getId());
 
         orderService.delete(order);
 
