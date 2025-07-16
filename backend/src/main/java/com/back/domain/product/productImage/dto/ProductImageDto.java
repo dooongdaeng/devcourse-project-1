@@ -1,15 +1,16 @@
 package com.back.domain.product.productImage.dto;
 
 import com.back.domain.product.productImage.entity.ProductImage;
+import org.springframework.lang.NonNull;
 
 import java.time.LocalDateTime;
 
 public record ProductImageDto(
-        int id,
-        LocalDateTime createDate,
-        LocalDateTime modifyDate,
-        String url,
-        int productId
+        @NonNull int id,
+        @NonNull LocalDateTime createDate,
+        @NonNull LocalDateTime modifyDate,
+        @NonNull String url,
+        @NonNull int productId
 ){
     public ProductImageDto(ProductImage productImage) {
         this(
