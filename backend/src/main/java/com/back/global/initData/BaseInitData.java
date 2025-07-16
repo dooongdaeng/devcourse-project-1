@@ -1,5 +1,6 @@
 package com.back.global.initData;
 
+import com.back.domain.order.orderItem.service.OrderItemService;
 import com.back.domain.order.orders.service.OrderService;
 import com.back.domain.product.product.entity.Product;
 import com.back.domain.product.product.service.ProductService;
@@ -22,6 +23,8 @@ public class BaseInitData {
     private BaseInitData self;
     private final ProductService productService;
     private final UserService userService;
+    private final OrderService orderService;
+    private final OrderItemService orderItemService;
 
     @Bean
     ApplicationRunner baseInitDataApplicationRunner() {
@@ -29,6 +32,7 @@ public class BaseInitData {
             self.work1();
             self.work2();
             self.work3();
+            self.work4();
         };
     }
 
@@ -60,6 +64,7 @@ public class BaseInitData {
         userService.create("admin", "1234", "admin@test.com", List.of("ROLE_ADMIN"), "서울시 중구");
     }
 
+    @Transactional
     public void work3() {
         orderService.create(3, 45000, "card", "pending");
         orderService.create(10, 12000, "card", "pending");
@@ -68,7 +73,25 @@ public class BaseInitData {
 
     }
 
+    @Transactional
+    public void work4() {
+        if (orderItemService.count() > 0) return;
 
-    @Autowired
-    private OrderService orderService;
+        // Order ID 1의 OrderItem들
+        orderItemService.create(1, 2, 15000, 1); // 상품1 2개
+        orderItemService.create(1, 1, 15000, 2); // 상품2 1개
+
+        // Order ID 2의 OrderItem들
+        orderItemService.create(2, 5, 1200, 1);  // 상품1 5개
+        orderItemService.create(2, 3, 2000, 3);  // 상품3 3개
+        orderItemService.create(2, 2, 1000, 4);  // 상품4 2개
+
+        // Order ID 3의 OrderItem들
+        orderItemService.create(3, 4, 10000, 2); // 상품2 4개
+        orderItemService.create(3, 3, 15000, 4); // 상품4 3개
+
+        // Order ID 4의 OrderItem들
+        orderItemService.create(4, 1, 5000, 1);  // 상품1 1개
+    }
+
 }

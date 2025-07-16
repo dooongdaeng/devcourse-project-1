@@ -33,4 +33,12 @@ public class OrderItemService {
     public Optional<OrderItem> findLatest() {
         return orderItemRepository.findFirstByOrderByIdDesc();
     }
+
+    public long count() {
+        return orderItemRepository.count();
+    }
+
+    public Optional<OrderItem> findById(int id) {
+        return orderItemRepository.findById(id);
+    }
 }

@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -64,6 +65,27 @@ public class ApiV1OrderItemControllerTest {
                 .andExpect(jsonPath("$.data.unitPrice").value(25000))
                 .andExpect(jsonPath("$.data.totalPrice").value(50000))
                 .andExpect(jsonPath("$.data.productId").value(1));
+    }
+
+    @Test
+    @DisplayName("주문 아이템 단건 조회 테스트")
+    @WithMockUser
+    void t2() throws Exception {
+        mvc.perform(
+                        get("/api/v1/orderItems/1")
+                )
+                .andDo(print())
+                .andExpect(handler().handlerType(ApiV1OrderItemController.class))
+                .andExpect(handler().methodName("getOrderItem"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.orderId").value(1))
+                .andExpect(jsonPath("$.productId").value(1))
+                .andExpect(jsonPath("$.quantity").value(2))
+                .andExpect(jsonPath("$.unitPrice").value(15000))
+                .andExpect(jsonPath("$.totalPrice").value(30000))
+                .andExpect(jsonPath("$.createDate").exists())
+                .andExpect(jsonPath("$.modifyDate").exists());
     }
 
 }

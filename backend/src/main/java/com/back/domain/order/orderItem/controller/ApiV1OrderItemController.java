@@ -13,10 +13,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/orderItems")
@@ -61,4 +58,13 @@ public class ApiV1OrderItemController {
                 new OrderItemDto(orderItem)
         );
     }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "주문 아이템 단건 조회")
+    public OrderItemDto getOrderItem(@PathVariable int id) {
+        OrderItem orderItem = orderItemService.findById(id).get();
+
+        return new OrderItemDto(orderItem);
+    }
+
 }
