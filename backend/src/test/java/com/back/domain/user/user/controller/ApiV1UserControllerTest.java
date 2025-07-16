@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -85,14 +84,10 @@ public class ApiV1UserControllerTest {
     }
 
     @Test
-    @DisplayName("내 정보 조회 성공")
-    void testMeSuccess() throws Exception {
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("loginedUserId", 1);  // user1 의 id를 넣어주세요.
-
-        mvc.perform(get("/api/v1/users/me")
-                        .session(session)
-                )
+    @DisplayName("내 정보 조회 성공 (WithMockUser 사용)")
+    @WithMockUser(username = "user1", roles = {"USER"}) // "user1"이라는 사용자명과 "USER" 역할을 가진 모의 사용자 설정
+    void testMeSuccess_withMockUser() throws Exception {
+        mvc.perform(get("/api/v1/users/me"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode", anyOf(is("200-1"), is("200"))))
                 .andExpect(jsonPath("$.data.username").value("user1"));
