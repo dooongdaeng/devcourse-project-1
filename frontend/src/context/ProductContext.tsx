@@ -31,6 +31,7 @@ type ProductContextType = {
   toggleFavorite: (productId: number) => void;
   users: User[];
   addUser: (user: Omit<User, 'id' | 'signupDate'>) => void;
+  deleteUser: (userId: number) => void;
 };
 
 // Context 생성 (초기값은 undefined)
@@ -142,6 +143,10 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const deleteUser = (userId: number) => {
+    setUsers(prev => prev.filter(u => u.id !== userId));
+  };
+
   const value = {
     products,
     addProduct,
@@ -151,6 +156,7 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     toggleFavorite,
     users,
     addUser,
+    deleteUser,
   };
 
   return (
