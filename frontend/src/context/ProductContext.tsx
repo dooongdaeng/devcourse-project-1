@@ -37,6 +37,8 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
   const initialProducts: Product[] = [
     { id: 101, name: '콜롬비아 나리뇨', price: '5000', stock: 100, description: '신선한 콜롬비아 원두입니다.', imageUrl: 'https://i.imgur.com/HKOFQYa.jpeg' },
     { id: 102, name: '브라질 세하도', price: '6000', stock: 150, description: '고소한 브라질 원두입니다.', imageUrl: 'https://i.imgur.com/HKOFQYa.jpeg' },
+    { id: 103, name: '에티오피아 예가체프', price: '6000', stock: 120, description: '달콤한 에티오피아 원두입니다.', imageUrl: 'https://i.imgur.com/HKOFQYa.jpeg' },
+    { id: 104, name: '에티오피아 게이샤', price: '8000', stock: 80, description: '감미로운 에티오피아 원두입니다.', imageUrl: 'https://i.imgur.com/HKOFQYa.jpeg' }
   ];
 
   const [products, setProducts] = useState<Product[]>(initialProducts);
