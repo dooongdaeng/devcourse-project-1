@@ -79,4 +79,8 @@ public class UserService {
     public long count() {
         return userRepository.count();
     }
+
+    public Optional<User> findByApiKey(String apiKey) {
+        return userRepository.findByApiKey(apiKey);
+    }
 }

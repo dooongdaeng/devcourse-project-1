@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "users") // 예약어 충돌 방지
 @Getter
@@ -29,6 +31,9 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String role;  // ex: "ROLE_USER", "ROLE_ADMIN"
 
+    @Column(unique = true, nullable = false)
+    private String apiKey;
+
     public User(String username, String password, String nickname, String email, String address) {
         this.username = username;
         this.password = password;
@@ -36,6 +41,7 @@ public class User extends BaseEntity {
         this.email = email;
         this.address = address;
         this.role = "ROLE_USER";
+        this.apiKey = generateApiKey();
     }
 
     @Builder
@@ -46,9 +52,14 @@ public class User extends BaseEntity {
         this.email = email;
         this.address = address;
         this.role = role;
+        this.apiKey = apiKey != null ? apiKey : generateApiKey();
     }
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    private String generateApiKey() {
+        return UUID.randomUUID().toString().replace("-", "");
     }
 }
