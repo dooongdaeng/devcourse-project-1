@@ -100,9 +100,9 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
             if (payload != null) {
                 int id = (int) payload.get("id");
                 String username = (String) payload.get("username");
-                String ninkName = (String) payload.get("nickName");
+                String nickName = (String) payload.get("nickName");
                 String role = (String) payload.get("role");
-                user = new User(id, username, ninkName, role);
+                user = new User(id, username, nickName, role);
 
                 isAccessTokenValid = true;
             }
