@@ -60,12 +60,6 @@ export default function Admin() {
     setNewProduct(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setNewProduct(prev => ({ ...prev, imageUrl: e.target.files![0].name }));
-    }
-  };
-
   const handleSaveNewProduct = () => {
     const priceNum = parseInt(newProduct.price, 10);
     const stockNum = parseInt(newProduct.stock, 10);
@@ -115,13 +109,6 @@ export default function Admin() {
     if (!editingProduct) return;
     const { name, value } = e.target;
     setEditingProduct({ ...editingProduct, [name]: value });
-  };
-  
-  const handleEditFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (!editingProduct) return;
-    if (e.target.files && e.target.files[0]) {
-      setEditingProduct({ ...editingProduct, imageUrl: e.target.files[0].name });
-    }
   };
 
   // --- General Cancel Handler ---
@@ -208,8 +195,8 @@ export default function Admin() {
                   <input type="number" name="stock" id="stock" value={editingProduct ? editingProduct.stock : newProduct.stock} onChange={editingProduct ? handleEditInputChange : handleInputChange} className="w-full p-2 border border-gray-300 rounded-md text-gray-900" />
                 </div>
                 <div>
-                  <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 mb-1">상품 이미지</label>
-                  <input type="file" name="imageUrl" id="imageUrl" onChange={editingProduct ? handleEditFileChange : handleFileChange} className="w-full text-sm text-gray-900 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+                  <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 mb-1">상품 이미지 URL</label>
+                  <input type="text" name="imageUrl" id="imageUrl" placeholder="https://example.com/image.png" value={editingProduct ? editingProduct.imageUrl : newProduct.imageUrl} onChange={editingProduct ? handleEditInputChange : handleInputChange} className="w-full p-2 border border-gray-300 rounded-md text-gray-900" />
                 </div>
                 <div className="md:col-span-2">
                   <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">상품 설명</label>
@@ -217,10 +204,10 @@ export default function Admin() {
                 </div>
               </div>
               <div className="mt-6 flex justify-end space-x-4">
-                <button onClick={editingProduct ? handleUpdateProduct : handleSaveNewProduct} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
+                <button onClick={editingProduct ? handleUpdateProduct : handleSaveNewProduct} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                   {editingProduct ? '수정 완료' : '저장'}
                 </button>
-                <button onClick={handleCancel} className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded cursor-pointer">취소</button>
+                <button onClick={handleCancel} className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">취소</button>
               </div>
             </div>
           )}
@@ -262,3 +249,4 @@ export default function Admin() {
     </main>
   );
 }
+
