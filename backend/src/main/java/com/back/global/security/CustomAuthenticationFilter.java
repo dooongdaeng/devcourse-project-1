@@ -1,6 +1,7 @@
 package com.back.global.security;
 
 import com.back.domain.user.user.entity.User;
+import com.back.domain.user.user.service.UserAuthTokenService;
 import com.back.domain.user.user.service.UserService;
 import com.back.global.exception.ServiceException;
 import com.back.global.rq.Rq;
@@ -14,16 +15,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -31,6 +30,7 @@ import java.util.List;
 public class CustomAuthenticationFilter extends OncePerRequestFilter {
     private final Rq rq;
     private final UserService userService;
+    private final UserAuthTokenService userAuthTokenService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -63,79 +63,47 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-//        String apiKey;
-//        String accessToken;
-//
-//        String headerAuthorization = rq.getHeader("Authorization", "");
-//
-//        if (!headerAuthorization.isBlank()) {
-//            if (!headerAuthorization.startsWith("Bearer "))
-//                throw new ServiceException("401-2", "Authorization 헤더가 Bearer 형식이 아닙니다.");
-//
-//            String[] headerAuthorizationBits = headerAuthorization.split(" ", 3);
-//
-//            apiKey = headerAuthorizationBits[1];
-//            accessToken = headerAuthorizationBits.length == 3 ? headerAuthorizationBits[2] : "";
-//        } else {
-//            apiKey = rq.getCookieValue("apiKey", "");
-//            accessToken = rq.getCookieValue("accessToken", "");
-//        }
-//
-//        logger.debug("apiKey : " + apiKey);
-//        logger.debug("accessToken : " + accessToken);
-//
-//        User user = null;
-//        boolean isApiKeyExists = !apiKey.isBlank();
-//        boolean isAccessTokenExists = !accessToken.isBlank();
-//        boolean isAccessTokenValid = false;
-//
-//        if (!isApiKeyExists && !isAccessTokenExists) {
-//            filterChain.doFilter(request, response);
-//            return;
-//        }
-//
-//        if (isAccessTokenExists) {
-//            Map<String, Object> payload = userService.payload(accessToken);
-//
-//            if (payload != null) {
-//                int id = (int) payload.get("id");
-//                String username = (String) payload.get("username");
-//                String name = (String) payload.get("name");
-//                user = new User(id, username, name);
-//
-//                isAccessTokenValid = true;
-//            }
-//        }
-//
-//        if (user == null) {
-//            user = userService.findByApiKey(apiKey)
-//                    .orElseThrow(() -> new ServiceException("401-3", "API 키가 유효하지 않습니다."));
-//        }
-//
-//        if (isAccessTokenExists && !isAccessTokenValid) {
-//            String actorAccessToken = userService.genAccessToken(user);
-//            rq.setCookie("accessToken", actorAccessToken);
-//            rq.setHeader("Authorization", actorAccessToken);
-//        }
-        if(!rq.isLogined()) {
+        String apiKey = rq.getCookieValue("apiKey", "");
+        String accessToken = rq.getCookieValue("accessToken", "");
+
+        logger.debug("apiKey : " + apiKey);
+        logger.debug("accessToken : " + accessToken);
+
+        User user = null;
+        boolean isApiKeyExists = !apiKey.isBlank();
+        boolean isAccessTokenExists = !accessToken.isBlank();
+        boolean isAccessTokenValid = false;
+
+        if (!isApiKeyExists && !isAccessTokenExists) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        User user = userService.findById(rq.getLoginedUserId()).get();
+        if (isAccessTokenExists) {
+            Map<String, Object> payload = userAuthTokenService.payload(accessToken);
 
-        Boolean isAdmin = user.getUsername().equals("admin");
+            if (payload != null) {
+                int id = (int) payload.get("id");
+                String username = (String) payload.get("username");
+                String ninkName = (String) payload.get("nickName");
+                String role = (String) payload.get("role");
+                user = new User(id, username, ninkName, role);
 
-        Collection<? extends GrantedAuthority> authorities = isAdmin ?
-                List.of(new SimpleGrantedAuthority("ROLE_ADMIN")) : List.of();
+                isAccessTokenValid = true;
+            }
+        }
 
-        UserDetails userDetails = new SecurityUser(
-                user.getId(),
-                user.getUsername(),
-                "",
-                user.getNickname(),
-                authorities
-        );
+        if (user == null) {
+            user = userService.findByApiKey(apiKey)
+                    .orElseThrow(() -> new ServiceException("401-3", "API 키가 유효하지 않습니다."));
+        }
+
+        if (isAccessTokenExists && !isAccessTokenValid) {
+            String actorAccessToken = userService.genAccessToken(user);
+            rq.setCookie("accessToken", actorAccessToken);
+        }
+
+        UserDetails userDetails = new UserSecurityUser(user);
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 userDetails,
