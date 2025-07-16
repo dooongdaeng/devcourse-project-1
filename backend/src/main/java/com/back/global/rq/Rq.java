@@ -56,13 +56,11 @@ public class Rq {
     }
 
     public void setHeader(String name, String value) {
-        if (value == null) value = "";
+        // null이 넘어오면 빈 문자열로 처리하여 헤더를 비우는 효과를 냄
+        String actualValue = (value == null) ? "" : value;
 
-        if (value.isBlank()) {
-            res.setHeader(name, value); // 빈 문자열로 설정하여 헤더 값을 제거하는 효과
-        } else {
-            res.setHeader(name, value);
-        }
+        // 비어있든 아니든 최종적으로 설정될 값으로 한 번만 호출
+        res.setHeader(name, actualValue);
     }
 
 }
