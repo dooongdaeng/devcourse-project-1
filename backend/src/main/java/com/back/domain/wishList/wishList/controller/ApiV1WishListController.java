@@ -46,7 +46,7 @@ public class ApiV1WishListController {
     }
 
     @GetMapping("/{productId}")
-    public RsData<Boolean> checkWishList(@PathVariable int productId) {
+    public RsData<Boolean> detailWishList(@PathVariable int productId) {
         int currentUserId = rq.getCurrentUserId();
         boolean exists = wishListService.existsWishList(currentUserId, productId);
 
@@ -67,5 +67,19 @@ public class ApiV1WishListController {
         WishListDto removedWishList = wishListService.removeWishList(currentUserId, productId);
 
         return new RsData<>("200", "위시리스트에서 삭제했습니다.", removedWishList);
+    }
+
+    @PutMapping("/{productId}/quantity")
+    public RsData<WishListDto> updateWishListQuantity(
+            @PathVariable int productId,
+            @Valid @RequestBody WishListUpdateQuantityReqBody reqBody
+    ) {
+        int currentUserId = rq.getCurrentUserId();
+        if (reqBody.quantity == null) {
+            return new RsData<>("400", "수량은 필수입니다.", null);
+        }
+        WishList wishList = wishListService.updateQuantity(currentUserId, productId, reqBody.quantity);
+
+        return new RsData<>("200", "위시리스트 수량을 업데이트했습니다.", new WishListDto(wishList));
     }
 }
