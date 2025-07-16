@@ -13,7 +13,7 @@ type ProductFormState = {
 };
 
 export default function Admin() {
-  const { products, addProduct, updateProduct, deleteProduct, users } = useProducts();
+  const { products, addProduct, updateProduct, deleteProduct, users, deleteUser } = useProducts();
 
   const initialProductFormState: ProductFormState = {
     name: '',
@@ -31,6 +31,13 @@ export default function Admin() {
   const handleDeleteProduct = (productId: number) => {
     if (window.confirm('정말로 이 상품을 삭제하시겠습니까?')) {
       deleteProduct(productId);
+    }
+  };
+
+  // --- Handlers for User Management ---
+  const handleDeleteUser = (userId: number) => {
+    if (window.confirm('정말로 이 회원을 삭제하시겠습니까?')) {
+      deleteUser(userId);
     }
   };
 
@@ -129,8 +136,7 @@ export default function Admin() {
                      <td className="py-3 px-6 text-left">{user.address}</td>
                      <td className="py-3 px-6 text-left">{user.signupDate}</td>
                      <td className="py-3 px-6 text-center">
-                       <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs mr-2 cursor-pointer">수정</button>
-                       <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-xs cursor-pointer">삭제</button>
+                       <button onClick={() => handleDeleteUser(user.id)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-xs cursor-pointer">삭제</button>
                      </td>
                    </tr>
                  ))}
