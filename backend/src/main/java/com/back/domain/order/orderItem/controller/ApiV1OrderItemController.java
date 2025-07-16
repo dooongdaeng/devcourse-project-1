@@ -131,4 +131,20 @@ public class ApiV1OrderItemController {
         );
     }
 
+    @DeleteMapping("/{id}")
+    @Transactional
+    @Operation(summary = "주문 아이템 삭제")
+    public RsData<Void> delete(
+            @PathVariable int id
+    ) {
+        OrderItem orderItem = orderItemService.findById(id).get();
+
+        orderItemService.delete(orderItem);
+
+        return new RsData<>(
+                "200-1",
+                "%d번 주문 아이템이 삭제되었습니다.".formatted(id)
+        );
+    }
+
 }

@@ -234,7 +234,7 @@ public class ApiV1OrderItemControllerTest {
     @Test
     @DisplayName("주문 아이템 삭제 테스트")
     @WithMockUser
-    void t13() throws Exception {
+    void t10() throws Exception {
 
         ResultActions resultActions = mvc
                 .perform(
@@ -251,6 +251,24 @@ public class ApiV1OrderItemControllerTest {
                 .andExpect(jsonPath("$.msg").value("1번 주문 아이템이 삭제되었습니다."));
 
     }
+
+    @Test
+    @DisplayName("존재하지 않는 주문 아이템 삭제 테스트")
+    @WithMockUser
+    void t11() throws Exception {
+        ResultActions resultActions = mvc
+                .perform(
+                        delete("/api/v1/orderItems/999")
+                                .with(csrf())
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1OrderItemController.class))
+                .andExpect(handler().methodName("delete"))
+                .andExpect(status().isNotFound());
+    }
+
 
 }
 

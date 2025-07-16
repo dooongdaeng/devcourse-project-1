@@ -78,7 +78,7 @@ public class BaseInitData {
         if (orderItemService.count() > 0) return;
 
         // Order ID 1의 OrderItem들
-        orderItemService.create(1, 2, 15000, 1); // 상품1 2개
+        orderItemService.create(1, 2, 10000, 1); // 상품1 2개
         orderItemService.create(1, 1, 15000, 2); // 상품2 1개
 
         // Order ID 2의 OrderItem들

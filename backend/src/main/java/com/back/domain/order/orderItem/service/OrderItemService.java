@@ -56,9 +56,11 @@ public class OrderItemService {
     }
 
     public void update(OrderItem orderItem, int quantity, int unitPrice, int productId) {
-        // totalPrice 자동 계산
         int totalPrice = quantity * unitPrice;
         orderItem.update(quantity, unitPrice, totalPrice, productId);
     }
 
+    public void delete(OrderItem orderItem) {
+        orderItemRepository.delete(orderItem);
+    }
 }
