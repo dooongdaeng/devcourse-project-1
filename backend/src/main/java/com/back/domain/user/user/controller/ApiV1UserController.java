@@ -5,6 +5,7 @@ import com.back.domain.user.user.entity.User;
 import com.back.domain.user.user.service.UserService;
 import com.back.global.rq.Rq;
 import com.back.global.rsData.RsData;
+import com.back.global.security.UserSecurityUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,6 +14,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -58,9 +60,6 @@ public class ApiV1UserController {
 
         userService.checkPassword(user, reqBody.password());
 
-        // 로그인 세션 설정 (기존 세션 기반 로그인 유지)
-        rq.login(user.getId());
-
         // JWT accessToken 생성
         String accessToken = userService.genAccessToken(user);
 
@@ -74,19 +73,24 @@ public class ApiV1UserController {
     @DeleteMapping("/logout")
     @Operation(summary = "로그아웃")
     public RsData<Void> logout() {
-        rq.logout();
+
+        rq.deleteCookie("accessToken");
+        rq.deleteCookie("apiKey");
+
         return new RsData<>("200", "로그아웃 되었습니다.");
     }
 
     @GetMapping("/me")
     @Operation(summary = "내 정보 조회")
     @SecurityRequirement(name = "bearerAuth")
-    public RsData<UserDto> me() {
-        if (!rq.isLogined()) {
-            return new RsData<>("401-1", "로그인이 필요합니다.");
-        }
+    // @AuthenticationPrincipal 어노테이션을 사용하여 로그인된 사용자 정보 주입
+    public RsData<UserDto> me(@AuthenticationPrincipal UserSecurityUser userSecurityUser) {
 
-        Integer userId = rq.getLoginedUserId();
+        // @AuthenticationPrincipal로 주입된 UserSecurityUser 객체에서 사용자 정보 가져옴
+        if (userSecurityUser == null) {
+            return new RsData<>("401-1", "로그인이 필요합니다."); // JWT가 없거나 유효하지 않을 경우
+        }
+        int userId = userSecurityUser.getId(); // UserSecurityUser에서 ID 가져오기
 
         User user = userService.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자 정보가 존재하지 않습니다."));
