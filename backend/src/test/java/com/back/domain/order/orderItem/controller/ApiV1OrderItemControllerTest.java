@@ -230,6 +230,28 @@ public class ApiV1OrderItemControllerTest {
                 .andExpect(handler().methodName("update"))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    @DisplayName("주문 아이템 삭제 테스트")
+    @WithMockUser
+    void t13() throws Exception {
+
+        ResultActions resultActions = mvc
+                .perform(
+                        delete("/api/v1/orderItems/1")
+                                .with(csrf())
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1OrderItemController.class))
+                .andExpect(handler().methodName("delete"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value("200-1"))
+                .andExpect(jsonPath("$.msg").value("1번 주문 아이템이 삭제되었습니다."));
+
+    }
+
 }
 
 
