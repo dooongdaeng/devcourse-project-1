@@ -1,0 +1,160 @@
+package com.back.domain.wishList.wishList.controller;
+
+import com.back.domain.product.product.entity.Product;
+import com.back.domain.product.product.service.ProductService;
+import com.back.domain.user.user.entity.User;
+import com.back.domain.user.user.service.UserService;
+import com.back.domain.wishList.wishList.entity.WishList;
+import com.back.domain.wishList.wishList.service.WishListService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@ActiveProfiles("test")
+@SpringBootTest
+@AutoConfigureMockMvc
+@Transactional
+public class ApiV1WishListControllerTest {
+    @Autowired
+    private MockMvc mvc;
+
+    @Autowired
+    private WishListService wishListService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private ProductService productService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @BeforeEach
+    void setup() {
+        // 초기 데이터 설정
+        if (userService.count() == 0) {
+            userService.create("testuser1", "password", "abc111@test.com", List.of("ROLE_USER"), "서울시 강남구");
+            userService.create("testuser2", "password", "abc222@test.com", List.of("ROLE_USER"), "서울시 서초구");
+            userService.create("testuser3", "password", "abc333@test.com", List.of("ROLE_USER"), "부산시 남구");
+        }
+
+        if (productService.count() == 0) {
+            productService.create("상품1",  10000, "상품1 설명",5);
+            productService.create("상품2",  20000, "상품2 설명",10);
+            productService.create("상품3",  30000, "상품3 설명",15);
+            productService.create("상품4",  40000, "상품4 설명",0);
+        }
+
+    }
+
+    @Test
+    @DisplayName("위시리스트 목록 조회")
+    @WithMockUser(username = "testuser1", roles = {"USER"})
+    void getWishList() throws Exception {
+
+        User user = userService.findByUsername("testuser1").get();
+        Product product = productService.findAll().get(0);
+        wishListService.addToWishList(user.getId(), product.getId());
+
+        mvc.perform(get("/api/v1/wish-lists"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value("200"))
+                .andExpect(jsonPath("$.msg").value("위시리스트 조회 성공"))
+                .andExpect(jsonPath("$.data.length()").value(1))
+                .andExpect(jsonPath("$.data[0].product.name").value("상품1"))
+                .andExpect(jsonPath("$.data[0].user.username").value("testuser1"));
+    }
+
+    @Test
+    @DisplayName("위시리스트 상품 삭제")
+    @WithMockUser(username= "testuser1", roles = {"USER"})
+    void removeFromWishList() throws Exception {
+        User user = userService.findByUsername("testuser1").get();
+        Product product = productService.findAll().get(0);
+        wishListService.addToWishList(user.getId(), product.getId());
+
+        mvc.perform(delete("/api/v1/wish-lists/" + product.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value("200"))
+                .andExpect(jsonPath("$.msg").value("위시리스트에서 삭제했습니다."))
+                .andExpect(jsonPath("$.data.product.name").value("상품1"))
+                .andExpect(jsonPath("$.data.user.username").value("testuser1"));
+    }
+
+    @Test
+    @DisplayName("위시리스트 단건 조회")
+    @WithMockUser(username = "testuser1", roles = {"USER"})
+    void getWishListById() throws Exception {
+        User user = userService.findByUsername("testuser1").get();
+        Product product = productService.findAll().get(0);
+        WishList wishList = wishListService.addToWishList(user.getId(), product.getId());
+
+        mvc.perform(get("/api/v1/wish-lists/" + product.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value("200"))
+                .andExpect(jsonPath("$.msg").value("위시리스트 조회 성공"))
+                .andExpect(jsonPath("$.data").value(true));
+    }
+
+    @Test
+    @DisplayName("위시리스트에 상품 추가")
+    @WithMockUser(username = "testuser1", roles = {"USER"})
+    void addToWishList() throws Exception {
+        Product product = productService.findAll().get(0);
+
+        String requestBody = objectMapper.writeValueAsString(
+                Map.of("productId", product.getId(), "quantity", 1)
+        );
+
+        mvc.perform(post("/api/v1/wish-lists")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value("201"))
+                .andExpect(jsonPath("$.msg").value("위시리스트에 추가했습니다."))
+                .andExpect(jsonPath("$.data.product.name").value("상품1"))
+                .andExpect(jsonPath("$.data.user.username").value("testuser1"));
+    }
+
+    @Test
+    @DisplayName("위시리스트 수량 업데이트")
+    @WithMockUser(username = "testuser1", roles = {"USER"})
+    void updateWishListQuantity() throws Exception {
+        User user = userService.findByUsername("testuser1").get();
+        Product product = productService.findAll().get(0);
+        wishListService.addToWishList(user.getId(), product.getId());
+
+        String requestBody = objectMapper.writeValueAsString(
+                Map.of("quantity", 3)
+        );
+
+        mvc.perform(put("/api/v1/wish-lists/" + product.getId() + "/quantity")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value("200"))
+                .andExpect(jsonPath("$.msg").value("위시리스트 수량을 업데이트했습니다."))
+                .andExpect(jsonPath("$.data.product.name").value("상품1"))
+                .andExpect(jsonPath("$.data.user.username").value("testuser1"))
+                .andExpect(jsonPath("$.data.quantity").value(3));
+    }
+}
