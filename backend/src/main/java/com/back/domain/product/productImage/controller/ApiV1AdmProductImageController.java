@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/adm/products/{productId}/images")
 @RequiredArgsConstructor
-@Tag(name = "ApiV1AdmProductController", description = "API 관리자용 상품 이미지 컨트롤러")
+@Tag(name = "ApiV1AdmProductImageController", description = "API 관리자용 상품 이미지 컨트롤러")
 public class ApiV1AdmProductImageController {
     private final ProductService productService;
 

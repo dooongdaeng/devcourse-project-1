@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/products/{productId}/images")
 @RequiredArgsConstructor
-@Tag(name = "ApiV1ProductController", description = "API 상품 이미지 컨트롤러")
+@Tag(name = "ApiV1ProductImageController", description = "API 상품 이미지 컨트롤러")
 public class ApiV1ProductImageController {
     private final ProductService productService;
 
