@@ -2,7 +2,6 @@ package com.back.domain.product.product.controller;
 
 import com.back.domain.product.product.entity.Product;
 import com.back.domain.product.product.service.ProductService;
-import com.back.domain.user.user.service.UserService;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,8 +29,6 @@ public class ApiV1AdmProductControllerTest {
     private MockMvc mvc;
     @Autowired
     private ProductService productService;
-    @Autowired
-    private UserService userService;
 
     @Test
     @DisplayName("상품 등록")
@@ -217,7 +214,7 @@ public class ApiV1AdmProductControllerTest {
         resultActions
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.resultCode").value("403-1"))
-                .andExpect(jsonPath("$.msg").value("관리자만 접근할 수 있습니다."));
+                .andExpect(jsonPath("$.msg").value("권한이 없습니다."));
     }
 
     @Test
