@@ -2,6 +2,7 @@ package com.back.domain.order.orders.entity;
 
 import com.back.domain.order.orderItem.entity.OrderItem;
 import com.back.domain.user.user.entity.User;
+import com.back.global.exception.ServiceException;
 import com.back.global.jpa.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -43,6 +44,18 @@ public class Orders extends BaseEntity {
         this.totalPrice = totalPrice;
         this.paymentMethod = paymentMethod;
         this.paymentStatus = paymentStatus;
+    }
+
+    public void checkCanUpdate(int currentUserId) {
+        if (this.user.getId() != currentUserId) {
+            throw new ServiceException("403-1", "본인의 주문만 수정할 수 있습니다.");
+        }
+    }
+
+    public void checkCanDelete(int currentUserId) {
+        if (this.user.getId() != currentUserId) {
+            throw new ServiceException("403-1", "본인의 주문만 삭제할 수 있습니다.");
+        }
     }
 
 }
