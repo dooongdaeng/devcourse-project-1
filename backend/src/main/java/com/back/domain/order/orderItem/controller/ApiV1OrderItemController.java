@@ -79,9 +79,18 @@ public class ApiV1OrderItemController {
     }
 
     @GetMapping("/order/{orderId}")
-    @Operation(summary = "특정 주문의 아이템 목록 조회")
+    @Operation(summary = "특정 주문의 아이템 목록 조회 (adm으로 옮기자)")
     public List<OrderItemDto> getOrderItemsByOrderId(@PathVariable int orderId) {
         List<OrderItem> orderItems = orderItemService.findByOrderId(orderId);
+        return orderItems.stream()
+                .map(OrderItemDto::new)
+                .toList();
+    }
+
+    @GetMapping("/product/{productId}")
+    @Operation(summary = "특정 상품의 주문 아이템 목록 조회")
+    public List<OrderItemDto> getOrderItemsByProductId(@PathVariable int productId) {
+        List<OrderItem> orderItems = orderItemService.findByProductId(productId);
         return orderItems.stream()
                 .map(OrderItemDto::new)
                 .toList();

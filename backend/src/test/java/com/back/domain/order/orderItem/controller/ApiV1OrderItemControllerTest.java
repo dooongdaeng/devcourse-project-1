@@ -110,7 +110,7 @@ public class ApiV1OrderItemControllerTest {
     }
 
     @Test
-    @DisplayName("특정 주문의 아이템 목록 조회 테스트")
+    @DisplayName("특정 주문의 아이템 목록 조회 테스트 (추후 adm으로 옮겨야함)")
     @WithMockUser
     void t4() throws Exception {
         mvc.perform(
@@ -129,7 +129,7 @@ public class ApiV1OrderItemControllerTest {
     @Test
     @DisplayName("특정 상품의 주문 아이템 목록 조회 테스트")
     @WithMockUser
-    void t6() throws Exception {
+    void t5() throws Exception {
         mvc.perform(
                         get("/api/v1/orderItems/product/1")
                                 .with(csrf())
@@ -142,6 +142,20 @@ public class ApiV1OrderItemControllerTest {
                 .andExpect(jsonPath("$[0].productId").value(1))
                 .andExpect(jsonPath("$[1].productId").value(1))
                 .andExpect(jsonPath("$[2].productId").value(1));
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 주문 아이템 조회 테스트")
+    @WithMockUser
+    void t6() throws Exception {
+        mvc.perform(
+                        get("/api/v1/orderItems/999")
+                                .with(csrf())
+                )
+                .andDo(print())
+                .andExpect(handler().handlerType(ApiV1OrderItemController.class))
+                .andExpect(handler().methodName("getOrderItem"))
+                .andExpect(status().isNotFound()); // RuntimeException 발생으로 500 에러
     }
 
 }

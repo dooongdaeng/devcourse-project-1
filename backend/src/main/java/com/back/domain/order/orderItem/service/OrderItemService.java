@@ -51,4 +51,8 @@ public class OrderItemService {
         return orderItemRepository.findByOrderId(orderId);
     }
 
+    public List<OrderItem> findByProductId(int productId) {
+        return orderItemRepository.findByProductId(productId);
+    }
+
 }
