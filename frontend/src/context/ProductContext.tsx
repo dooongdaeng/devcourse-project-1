@@ -21,6 +21,21 @@ export type User = {
   signupDate: string;
 };
 
+export type OrderItem = {
+  productId: number;
+  name: string;
+  price: string;
+  quantity: number;
+  imageUrl: string;
+};
+
+export type Order = {
+  id: number;
+  date: string;
+  items: OrderItem[];
+  totalPrice: number;
+};
+
 // Context가 제공할 값들의 타입 정의
 type ProductContextType = {
   products: Product[];
@@ -32,6 +47,8 @@ type ProductContextType = {
   users: User[];
   addUser: (user: Omit<User, 'id' | 'signupDate'>) => void;
   deleteUser: (userId: number) => void;
+  orderHistory: Order[];
+  addOrder: (items: OrderItem[], totalPrice: number) => void;
 };
 
 // Context 생성 (초기값은 undefined)
@@ -102,6 +119,20 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [favoriteProducts]);
 
+  const [orderHistory, setOrderHistory] = useState<Order[]>(() => {
+    if (typeof window !== 'undefined') {
+      const savedOrderHistory = sessionStorage.getItem('orderHistory');
+      return savedOrderHistory ? JSON.parse(savedOrderHistory) : [];
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('orderHistory', JSON.stringify(orderHistory));
+    }
+  }, [orderHistory]);
+
   const toggleFavorite = (productId: number) => {
     setFavoriteProducts(prevFavorites => ({
       ...prevFavorites,
@@ -147,6 +178,21 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     setUsers(prev => prev.filter(u => u.id !== userId));
   };
 
+  const addOrder = (items: OrderItem[], totalPrice: number) => {
+    setOrderHistory(prev => {
+      const newId = prev.length > 0 ? Math.max(...prev.map(o => o.id)) + 1 : 1;
+      const today = new Date();
+      const orderDate = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+      const newOrder: Order = {
+        id: newId,
+        date: orderDate,
+        items,
+        totalPrice,
+      };
+      return [...prev, newOrder];
+    });
+  };
+
   const value = {
     products,
     addProduct,
@@ -157,6 +203,8 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     users,
     addUser,
     deleteUser,
+    orderHistory,
+    addOrder,
   };
 
   return (

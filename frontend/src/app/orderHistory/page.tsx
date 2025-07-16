@@ -1,50 +1,40 @@
 "use client";
 
+import { useProducts } from '@/context/ProductContext';
+
 export default function OrderHistory() {
-  const orders = [
-    {
-      id: 'ORD001',
-      date: '2024-07-10',
-      total: '23,000원',
-      items: ['Columbia Nariñó (2개)', 'Brazil Serra Do Caparaó (1개)'],
-    },
-    {
-      id: 'ORD002',
-      date: '2024-07-05',
-      total: '15,000원',
-      items: ['Ethiopia Yirgacheffe (1개)', 'Columbia Nariñó (1개)'],
-    },
-    {
-      id: 'ORD003',
-      date: '2024-06-28',
-      total: '10,000원',
-      items: ['Brazil Serra Do Caparaó (2개)'],
-    },
-  ];
+  const { orderHistory } = useProducts();
 
   return (
     <main className="flex min-h-screen flex-col items-center p-4 md:p-24">
-      <div className="w-full max-w-3xl bg-white rounded-lg shadow-md p-8">
+      <div className="w-full max-w-5xl bg-white rounded-xl shadow-lg p-8">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">주문 내역</h2>
 
-        {orders.length === 0 ? (
-          <p className="text-center text-gray-600">주문 내역이 없습니다.</p>
+        {orderHistory.length === 0 ? (
+          <p className="text-center text-gray-500 text-lg">주문 내역이 없습니다.</p>
         ) : (
-          <div className="space-y-4">
-            {orders.map((order) => (
-              <div key={order.id} className="border border-gray-200 rounded-md p-4 shadow-sm">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="text-lg font-semibold text-gray-700">주문 번호: {order.id}</h3>
-                  <span className="text-sm text-gray-500">{order.date}</span>
+          <div className="space-y-8">
+            {orderHistory.map(order => (
+              <div key={order.id} className="border border-gray-200 rounded-md p-6 bg-gray-50">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-xl font-semibold text-gray-700">주문 번호: {order.id}</h3>
+                  <span className="text-gray-600">주문일: {order.date}</span>
                 </div>
-                <div className="mb-2">
-                  <p className="text-gray-700">총 금액: <span className="font-bold">{order.total}</span></p>
-                </div>
-                <ul className="list-disc list-inside text-gray-600">
-                  {order.items.map((item, index) => (
-                    <li key={index}>{item}</li>
+                <div className="space-y-3">
+                  {order.items.map(item => (
+                    <div key={item.productId} className="flex items-center border-b border-gray-100 pb-3">
+                      <img src={item.imageUrl} alt={item.name} className="w-16 h-16 object-cover rounded-md mr-4" />
+                      <div className="flex-grow">
+                        <p className="font-medium text-gray-800">{item.name}</p>
+                        <p className="text-sm text-gray-600">{parseInt(item.price).toLocaleString()}원 x {item.quantity}개</p>
+                      </div>
+                      <span className="font-semibold text-gray-800">{(parseInt(item.price) * item.quantity).toLocaleString()}원</span>
+                    </div>
                   ))}
-                </ul>
+                </div>
+                <div className="flex justify-end items-center pt-4 mt-4 border-t border-gray-200">
+                  <h4 className="text-lg font-bold text-gray-800">총 결제 금액: {order.totalPrice.toLocaleString()}원</h4>
+                </div>
               </div>
             ))}
           </div>
