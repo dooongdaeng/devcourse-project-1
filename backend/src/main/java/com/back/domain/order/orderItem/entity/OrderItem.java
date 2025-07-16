@@ -6,10 +6,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 public class OrderItem extends BaseEntity {
     private int quantity;
@@ -22,6 +24,13 @@ public class OrderItem extends BaseEntity {
 
     public OrderItem(Integer quantity, Integer unitPrice,
                      Integer totalPrice, Integer productId) {
+        this.quantity = quantity;
+        this.unitPrice = unitPrice;
+        this.totalPrice = totalPrice;
+        this.productId = productId;
+    }
+
+    public void update(int quantity, int unitPrice, int totalPrice, int productId) {
         this.quantity = quantity;
         this.unitPrice = unitPrice;
         this.totalPrice = totalPrice;
