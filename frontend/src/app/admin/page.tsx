@@ -197,23 +197,23 @@ export default function Admin() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">상품명</label>
-                  <input type="text" name="name" id="name" value={editingProduct ? editingProduct.name : newProduct.name} onChange={editingProduct ? handleEditInputChange : handleInputChange} className="w-full p-2 border border-gray-300 rounded-md" />
+                  <input type="text" name="name" id="name" value={editingProduct ? editingProduct.name : newProduct.name} onChange={editingProduct ? handleEditInputChange : handleInputChange} className="w-full p-2 border border-gray-300 rounded-md text-gray-900" />
                 </div>
                 <div>
                   <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">가격 (원)</label>
-                  <input type="number" name="price" id="price" value={editingProduct ? editingProduct.price : newProduct.price} onChange={editingProduct ? handleEditInputChange : handleInputChange} className="w-full p-2 border border-gray-300 rounded-md" />
+                  <input type="number" name="price" id="price" value={editingProduct ? editingProduct.price : newProduct.price} onChange={editingProduct ? handleEditInputChange : handleInputChange} className="w-full p-2 border border-gray-300 rounded-md text-gray-900" />
                 </div>
                 <div>
                   <label htmlFor="stock" className="block text-sm font-medium text-gray-700 mb-1">재고</label>
-                  <input type="number" name="stock" id="stock" value={editingProduct ? editingProduct.stock : newProduct.stock} onChange={editingProduct ? handleEditInputChange : handleInputChange} className="w-full p-2 border border-gray-300 rounded-md" />
+                  <input type="number" name="stock" id="stock" value={editingProduct ? editingProduct.stock : newProduct.stock} onChange={editingProduct ? handleEditInputChange : handleInputChange} className="w-full p-2 border border-gray-300 rounded-md text-gray-900" />
                 </div>
                 <div>
                   <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 mb-1">상품 이미지</label>
-                  <input type="file" name="imageUrl" id="imageUrl" onChange={editingProduct ? handleEditFileChange : handleFileChange} className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+                  <input type="file" name="imageUrl" id="imageUrl" onChange={editingProduct ? handleEditFileChange : handleFileChange} className="w-full text-sm text-gray-900 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
                 </div>
                 <div className="md:col-span-2">
                   <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">상품 설명</label>
-                  <textarea name="description" id="description" value={editingProduct ? editingProduct.description : newProduct.description} onChange={editingProduct ? handleEditInputChange : handleInputChange} rows={3} className="w-full p-2 border border-gray-300 rounded-md"></textarea>
+                  <textarea name="description" id="description" value={editingProduct ? editingProduct.description : newProduct.description} onChange={editingProduct ? handleEditInputChange : handleInputChange} rows={3} className="w-full p-2 border border-gray-300 rounded-md text-gray-900"></textarea>
                 </div>
               </div>
               <div className="mt-6 flex justify-end space-x-4">
