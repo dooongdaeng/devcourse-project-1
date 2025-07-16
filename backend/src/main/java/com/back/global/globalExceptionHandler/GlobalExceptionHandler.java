@@ -114,4 +114,17 @@ public class GlobalExceptionHandler {
 
         return rsData;
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<RsData<Void>> handleRuntimeException(RuntimeException ex) {
+        // RuntimeException 발생 시 BAD_REQUEST (400) 응답과 함께 예외 메시지를 반환합니다.
+        // 필요에 따라 resultCode는 더 구체적인 코드로 변경할 수 있습니다.
+        return new ResponseEntity<>(
+                new RsData<>(
+                        "400-0", // 일반 RuntimeException을 위한 새로운 resultCode (예: "400-0")
+                        ex.getMessage() // 서비스에서 던진 "이미 존재하는 아이디입니다." 메시지
+                ),
+                BAD_REQUEST
+        );
+    }
 }

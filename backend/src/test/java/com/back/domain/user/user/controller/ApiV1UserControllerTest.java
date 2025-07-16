@@ -1,7 +1,11 @@
 package com.back.domain.user.user.controller;
 
-import com.back.domain.user.user.service.UserService;
+import com.back.domain.order.orderItem.repository.OrderItemRepository;
+import com.back.domain.order.orders.repository.OrderRepository;
+import com.back.domain.product.product.repository.ProductRepository;
 import com.back.domain.user.user.repository.UserRepository;
+import com.back.domain.user.user.service.UserService;
+import com.back.domain.wishList.wishList.repository.WishListRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -41,8 +45,17 @@ public class ApiV1UserControllerTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired private OrderRepository orderRepository; // Order Repository
+    @Autowired private OrderItemRepository orderItemRepository; // OrderItem Repository
+    @Autowired private ProductRepository productRepository; // Product Repository
+    @Autowired private WishListRepository wishListRepository;
+
     @BeforeEach
     void setup() {
+        wishListRepository.deleteAll();
+        orderItemRepository.deleteAll();
+        orderRepository.deleteAll();
+        productRepository.deleteAll();
         userRepository.deleteAll();
         if (userService.count() == 0) {
             userService.create("user1", "1234", "user1@test.com", List.of("ROLE_USER"), "서울시 강남구");
@@ -144,7 +157,7 @@ public class ApiV1UserControllerTest {
                         .content(objectMapper.writeValueAsString(reqBody))
                 )
                 .andExpect(status().isBadRequest()) // 400 Bad Request
-                .andExpect(jsonPath("$.resultCode", is("400-1"))) // 적절한 에러 코드
-                .andExpect(jsonPath("$.msg", containsString("이미 사용중인 아이디입니다."))); // 서비스에서 반환하는 메시지
+                .andExpect(jsonPath("$.resultCode", is("400-0"))) // 적절한 에러 코드
+                .andExpect(jsonPath("$.msg", containsString("이미 존재하는 아이디입니다."))); // 서비스에서 반환하는 메시지
     }
 }
