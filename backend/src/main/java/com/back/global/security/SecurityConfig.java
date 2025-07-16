@@ -11,11 +11,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig {
+    private final CustomAuthenticationFilter customAuthenticationFilter;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(
@@ -34,6 +37,11 @@ public class SecurityConfig {
                                         HeadersConfigurer.FrameOptionsConfig::sameOrigin
                                 )
                 ).csrf(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+//                .sessionManagement(AbstractHttpConfigurer::disable)
+                .addFilterBefore(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(
                         exceptionHandling -> exceptionHandling
                                 .authenticationEntryPoint(

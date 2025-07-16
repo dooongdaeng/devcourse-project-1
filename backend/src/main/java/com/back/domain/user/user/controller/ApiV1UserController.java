@@ -5,6 +5,9 @@ import com.back.domain.user.user.entity.User;
 import com.back.domain.user.user.service.UserService;
 import com.back.global.rq.Rq;
 import com.back.global.rsData.RsData;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
+@Tag(name = "사용자 API")
 public class ApiV1UserController {
     private final UserService userService;
     private final Rq rq;
@@ -28,6 +32,7 @@ public class ApiV1UserController {
     ) {}
 
     @PostMapping
+    @Operation(summary = "회원가입")
     public RsData<UserDto> join(@Valid @RequestBody UserJoinReqBody reqBody) {
         User user = userService.join(
                 reqBody.username(),
@@ -46,24 +51,36 @@ public class ApiV1UserController {
     ) {}
 
     @PostMapping("/login")
+    @Operation(summary = "로그인")
     public RsData<UserDto> login(@Valid @RequestBody UserLoginReqBody reqBody) {
         User user = userService.findByUsername(reqBody.username())
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 아이디입니다."));
 
         userService.checkPassword(user, reqBody.password());
 
+        // 로그인 세션 설정 (기존 세션 기반 로그인 유지)
         rq.login(user.getId());
+
+        // JWT accessToken 생성
+        String accessToken = userService.genAccessToken(user);
+
+        // JWT, apiKey 쿠키 세팅
+        rq.setCookie("accessToken", accessToken);
+        rq.setCookie("apiKey", user.getApiKey());
 
         return new RsData<>("200", "로그인 성공", new UserDto(user));
     }
 
     @DeleteMapping("/logout")
+    @Operation(summary = "로그아웃")
     public RsData<Void> logout() {
         rq.logout();
         return new RsData<>("200", "로그아웃 되었습니다.");
     }
 
     @GetMapping("/me")
+    @Operation(summary = "내 정보 조회")
+    @SecurityRequirement(name = "bearerAuth")
     public RsData<UserDto> me() {
         if (!rq.isLogined()) {
             return new RsData<>("401-1", "로그인이 필요합니다.");
@@ -78,12 +95,14 @@ public class ApiV1UserController {
     }
 
     @GetMapping("/check-username")
+    @Operation(summary = "사용자명 중복 확인")
     public ResponseEntity<Boolean> checkUsername(@RequestParam String username) {
         boolean isAvailable = userService.isUsernameAvailable(username);
         return ResponseEntity.ok(isAvailable);
     }
 
     @GetMapping("/check-email")
+    @Operation(summary = "이메일 중복 확인")
     public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
         boolean isAvailable = userService.isEmailAvailable(email);
         return ResponseEntity.ok(isAvailable);
