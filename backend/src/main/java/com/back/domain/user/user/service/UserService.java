@@ -12,6 +12,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    private final UserAuthTokenService userAuthTokenService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -23,14 +24,8 @@ public class UserService {
         User user = new User(username, encoded, nickname, email, address);
         return userRepository.save(user);
     }
-
-    public User login(String username, String rawPassword) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 아이디입니다."));
-        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
-            throw new RuntimeException("비밀번호가 틀렸습니다.");
-        }
-        return user;
+    public String genAccessToken(User user) {
+        return userAuthTokenService.genAccessToken(user);
     }
 
     public Optional<User> findByUsername(String username) {
