@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,9 +85,9 @@ public class ApiV1UserControllerTest {
     }
 
     @Test
-    @DisplayName("내 정보 조회 성공 (WithMockUser 사용)")
-    @WithMockUser(username = "user1", roles = {"USER"}) // "user1"이라는 사용자명과 "USER" 역할을 가진 모의 사용자 설정
-    void testMeSuccess_withMockUser() throws Exception {
+    @DisplayName("내 정보 조회 성공")
+    @WithUserDetails("user1")
+    void testMeSuccess() throws Exception {
         mvc.perform(get("/api/v1/users/me"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode", anyOf(is("200-1"), is("200"))))
