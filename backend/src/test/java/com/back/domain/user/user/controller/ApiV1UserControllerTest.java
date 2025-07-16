@@ -199,6 +199,70 @@ public class ApiV1UserControllerTest {
                 .andExpect(jsonPath("$.msg", containsString("이미 존재하는 아이디입니다."))); // 서비스에서 반환하는 메시지
     }
 
+    @Test
+    @DisplayName("회원가입 실패 - 필수 필드 누락 (username)")
+    void testJoinFail_MissingUsername() throws Exception {
+        Map<String, Object> reqBody = Map.of(
+                // "username", "missingfield", // username 필드 누락
+                "password", "1234",
+                "nickname", "Missing",
+                "email", "missing@test.com",
+                "address", "서울시 강남구"
+        );
 
+        mvc.perform(post("/api/v1/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(reqBody))
+                )
+                .andDo(print())
+                // NOTE: 실제 API 응답 코드와 메시지에 맞춰 수정하세요.
+                .andExpect(status().isBadRequest()) // 400 Bad Request
+                .andExpect(jsonPath("$.resultCode", anyOf(is("400-0"), is("400-1")))) // 유효성 검증 실패 에러 코드
+                .andExpect(jsonPath("$.msg", containsString("username"))); // "username" 필드 관련 에러 메시지 포함 확인
+    }
+
+    @Test
+    @DisplayName("회원가입 실패 - 필수 필드 누락 (password)")
+    void testJoinFail_MissingPassword() throws Exception {
+        Map<String, Object> reqBody = Map.of(
+                "username", "nopass",
+                // "password", "1234", // password 필드 누락
+                "nickname", "NoPass",
+                "email", "nopass@test.com",
+                "address", "서울시 강남구"
+        );
+
+        mvc.perform(post("/api/v1/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(reqBody))
+                )
+                .andDo(print())
+                // NOTE: 실제 API 응답 코드와 메시지에 맞춰 수정하세요.
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.resultCode", anyOf(is("400-0"), is("400-1"))))
+                .andExpect(jsonPath("$.msg", containsString("password")));
+    }
+
+    @Test
+    @DisplayName("회원가입 실패 - 필수 필드 누락 (email)")
+    void testJoinFail_MissingEmail() throws Exception {
+        Map<String, Object> reqBody = Map.of(
+                "username", "noemail",
+                "password", "1234",
+                "nickname", "NoEmail",
+                // "email", "noemail@test.com", // email 필드 누락
+                "address", "서울시 강남구"
+        );
+
+        mvc.perform(post("/api/v1/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(reqBody))
+                )
+                .andDo(print())
+                // NOTE: 실제 API 응답 코드와 메시지에 맞춰 수정하세요.
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.resultCode", anyOf(is("400-0"), is("400-1"))))
+                .andExpect(jsonPath("$.msg", containsString("email")));
+    }
 
 }
