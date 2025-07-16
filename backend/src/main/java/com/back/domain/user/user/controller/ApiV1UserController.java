@@ -52,7 +52,15 @@ public class ApiV1UserController {
 
         userService.checkPassword(user, reqBody.password());
 
+        // 로그인 세션 설정 (기존 세션 기반 로그인 유지)
         rq.login(user.getId());
+
+        // JWT accessToken 생성
+        String accessToken = userService.genAccessToken(user);
+
+        // JWT, apiKey 쿠키 세팅
+        rq.setCookie("accessToken", accessToken);
+        rq.setCookie("apiKey", user.getApiKey());
 
         return new RsData<>("200", "로그인 성공", new UserDto(user));
     }
