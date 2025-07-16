@@ -11,4 +11,6 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
 
     Optional<OrderItem> findFirstByOrderByIdDesc();
 
+    List<OrderItem> findByOrderId(int orderId);
+
 }

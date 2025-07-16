@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/orderItems")
 @RequiredArgsConstructor
@@ -65,6 +67,24 @@ public class ApiV1OrderItemController {
         OrderItem orderItem = orderItemService.findById(id).get();
 
         return new OrderItemDto(orderItem);
+    }
+
+    @GetMapping
+    @Operation(summary = "주문 아이템 다건 조회")
+    public List<OrderItemDto> getOrderItems() {
+        List<OrderItem> orderItems = orderItemService.findAll();
+        return orderItems.stream()
+                .map(OrderItemDto::new)
+                .toList();
+    }
+
+    @GetMapping("/order/{orderId}")
+    @Operation(summary = "특정 주문의 아이템 목록 조회")
+    public List<OrderItemDto> getOrderItemsByOrderId(@PathVariable int orderId) {
+        List<OrderItem> orderItems = orderItemService.findByOrderId(orderId);
+        return orderItems.stream()
+                .map(OrderItemDto::new)
+                .toList();
     }
 
 }

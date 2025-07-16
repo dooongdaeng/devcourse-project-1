@@ -8,6 +8,7 @@ import com.back.domain.order.orders.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -41,4 +42,13 @@ public class OrderItemService {
     public Optional<OrderItem> findById(int id) {
         return orderItemRepository.findById(id);
     }
+
+    public List<OrderItem> findAll() {
+        return orderItemRepository.findAll();
+    }
+
+    public List<OrderItem> findByOrderId(int orderId) {
+        return orderItemRepository.findByOrderId(orderId);
+    }
+
 }
