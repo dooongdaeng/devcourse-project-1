@@ -41,16 +41,16 @@ public class BaseInitData {
         if (productService.count() > 0) return;
 
         Product product1 = productService.create("상품1", 10000, "상품1입니다.", 100);
-        product1.addProductImage("/images/coffee_1.jpg");
+        product1.addProductImage("http://localhost:8080/images/coffee_1.jpg");
 
         Product product2 = productService.create("상품2", 10000, "상품2입니다.", 100);
-        product2.addProductImage("/images/coffee_2.jpg");
+        product2.addProductImage("http://localhost:8080/images/coffee_2.jpg");
 
         Product product3 = productService.create("상품3", 10000, "상품3입니다.", 100);
-        product3.addProductImage("/images/coffee_3.jpg");
+        product3.addProductImage("http://localhost:8080/images/coffee_3.jpg");
 
         Product product4 = productService.create("상품4", 10000, "상품4입니다.", 100);
-        product4.addProductImage("/images/coffee_4.jpg");
+        product4.addProductImage("http://localhost:8080/images/coffee_4.jpg");
     }
 
     @Transactional
