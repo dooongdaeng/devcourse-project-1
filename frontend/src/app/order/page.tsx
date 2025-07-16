@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useProducts, Product } from '@/context/ProductContext';
+import { useProducts, Product, OrderItem } from '@/context/ProductContext';
 
 // Define a type for cart items, which includes quantity
 type CartItem = Product & {
@@ -11,7 +11,7 @@ type CartItem = Product & {
 
 export default function Order() {
   const router = useRouter();
-  const { products, favoriteProducts } = useProducts(); // 전역 상품 목록과 찜 목록 가져오기
+  const { products, favoriteProducts, addOrder } = useProducts(); // 전역 상품 목록과 찜 목록 가져오기
 
   const favoritedProductsList = products.filter(product => favoriteProducts[product.id]);
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
@@ -67,8 +67,25 @@ export default function Order() {
   const handleCheckout = () => {
     const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
     if (isLoggedIn) {
-      alert('결제를 진행합니다.');
-      // Proceed with actual checkout logic
+      if (window.confirm('결제를 진행합니다.')) {
+        if (cartItems.length === 0) {
+          alert('장바구니가 비어있습니다.');
+          return;
+        }
+
+        const orderItems: OrderItem[] = cartItems.map(item => ({
+          productId: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          imageUrl: item.imageUrl,
+        }));
+
+        addOrder(orderItems, totalPrice);
+        setCartItems([]); // 장바구니 비우기
+        alert('결제가 완료되었습니다. 주문 내역에서 확인해주세요.');
+        router.push('/orderHistory');
+      }
     } else {
       alert('로그인을 해야합니다.');
       router.push('/login');
