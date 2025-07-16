@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, ChangeEvent } from 'react';
-import { useProducts, Product } from '@/context/ProductContext';
+import { useProducts, Product, User } from '@/context/ProductContext';
 
 // Define a type for the new/edit product form state
 type ProductFormState = {
@@ -13,7 +13,7 @@ type ProductFormState = {
 };
 
 export default function Admin() {
-  const { products, addProduct, updateProduct, deleteProduct } = useProducts();
+  const { products, addProduct, updateProduct, deleteProduct, users } = useProducts();
 
   const initialProductFormState: ProductFormState = {
     name: '',
@@ -113,31 +113,27 @@ export default function Admin() {
                    <th className="py-3 px-6 text-left">ID</th>
                    <th className="py-3 px-6 text-left">이메일</th>
                    <th className="py-3 px-6 text-left">이름</th>
+                   <th className="py-3 px-6 text-left">우편번호</th>
+                   <th className="py-3 px-6 text-left">주소</th>
                    <th className="py-3 px-6 text-left">가입일</th>
                    <th className="py-3 px-6 text-center">액션</th>
                  </tr>
                </thead>
                <tbody className="text-gray-600 text-sm">
-                 <tr className="border-b border-gray-200 hover:bg-gray-50">
-                   <td className="py-3 px-6 text-left whitespace-nowrap">1</td>
-                   <td className="py-3 px-6 text-left">user1@example.com</td>
-                   <td className="py-3 px-6 text-left">김철수</td>
-                   <td className="py-3 px-6 text-left">2023-01-15</td>
-                   <td className="py-3 px-6 text-center">
-                     <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs mr-2 cursor-pointer">수정</button>
-                     <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-xs cursor-pointer">삭제</button>
-                   </td>
-                 </tr>
-                 <tr className="border-b border-gray-200 hover:bg-gray-50">
-                   <td className="py-3 px-6 text-left whitespace-nowrap">2</td>
-                   <td className="py-3 px-6 text-left">user2@example.com</td>
-                   <td className="py-3 px-6 text-left">이영희</td>
-                   <td className="py-3 px-6 text-left">2023-03-20</td>
-                   <td className="py-3 px-6 text-center">
-                     <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs mr-2 cursor-pointer">수정</button>
-                     <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-xs cursor-pointer">삭제</button>
-                   </td>
-                 </tr>
+                 {users.map(user => (
+                   <tr key={user.id} className="border-b border-gray-200 hover:bg-gray-50">
+                     <td className="py-3 px-6 text-left whitespace-nowrap">{user.id}</td>
+                     <td className="py-3 px-6 text-left">{user.email}</td>
+                     <td className="py-3 px-6 text-left">{user.name}</td>
+                     <td className="py-3 px-6 text-left">{user.postalCode}</td>
+                     <td className="py-3 px-6 text-left">{user.address}</td>
+                     <td className="py-3 px-6 text-left">{user.signupDate}</td>
+                     <td className="py-3 px-6 text-center">
+                       <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs mr-2 cursor-pointer">수정</button>
+                       <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-xs cursor-pointer">삭제</button>
+                     </td>
+                   </tr>
+                 ))}
                </tbody>
              </table>
            </div>
