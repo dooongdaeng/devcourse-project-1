@@ -300,9 +300,30 @@ public class ApiV1UserControllerTest {
                 .andDo(print())
                 // UserService.findByUsername에서 사용자를 찾지 못하면 RuntimeException 발생,
                 // GlobalExceptionHandler가 400 BAD_REQUEST로 처리
-                .andExpect(status().isBadRequest()) // <-- 401 대신 400을 기대
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.resultCode", is("400-0")))
                 .andExpect(jsonPath("$.msg", containsString("존재하지 않는 아이디입니다.")));
+    }
+
+    @Test
+    @DisplayName("내 정보 조회 실패 - 비인증 (로그인 필요)")
+    void testMeFail_Unauthorized() throws Exception {
+        mvc.perform(get("/api/v1/users/me"))
+                .andDo(print())
+                // NOTE: 실제 API 응답 코드와 메시지에 맞춰 수정하세요.
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.resultCode", is("401-1")))
+                .andExpect(jsonPath("$.msg", containsString("로그인 후 이용해주세요."))); // 또는 "로그인이 필요합니다." 등
+    }
+
+    @Test
+    @DisplayName("로그아웃 실패 - 비인증 (로그인 필요)")
+    void testLogoutFail_Unauthorized() throws Exception {
+        mvc.perform(delete("/api/v1/users/logout"))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.resultCode", is("401-1")))
+                .andExpect(jsonPath("$.msg", containsString("로그인 후 이용해주세요."))); // 또는 "로그인이 필요합니다." 등
     }
 
 }
