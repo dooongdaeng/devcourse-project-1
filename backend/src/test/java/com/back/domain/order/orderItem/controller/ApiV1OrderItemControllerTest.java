@@ -1,6 +1,7 @@
 package com.back.domain.order.orderItem.controller;
 
 
+import com.back.domain.order.orderItem.entity.OrderItem;
 import com.back.domain.order.orderItem.service.OrderItemService;
 import com.back.domain.order.orders.service.OrderService;
 import org.junit.jupiter.api.DisplayName;
@@ -156,6 +157,50 @@ public class ApiV1OrderItemControllerTest {
                 .andExpect(handler().handlerType(ApiV1OrderItemController.class))
                 .andExpect(handler().methodName("getOrderItem"))
                 .andExpect(status().isNotFound()); // RuntimeException 발생으로 500 에러
+    }
+
+
+    @Test
+    @DisplayName("주문 아이템 수정 테스트")
+    @WithMockUser
+    void t8() throws Exception {
+        // 수정 전 데이터 확인
+        OrderItem beforeUpdate = orderItemService.findById(1).get();
+        System.out.println("수정 전 - quantity: " + beforeUpdate.getQuantity() +
+                ", unitPrice: " + beforeUpdate.getUnitPrice() +
+                ", totalPrice: " + beforeUpdate.getTotalPrice());
+
+        mvc.perform(
+                        put("/api/v1/orderItems/1")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                    {
+                                        "quantity": 5,
+                                        "unitPrice": 20000,
+                                        "productId": 2
+                                    }
+                                    """)
+                                .with(csrf())
+                )
+                .andDo(print())
+                .andExpect(handler().handlerType(ApiV1OrderItemController.class))
+                .andExpect(handler().methodName("update"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value("200-1"))
+                .andExpect(jsonPath("$.msg").value("1번 주문 아이템이 수정되었습니다."))
+                .andExpect(jsonPath("$.data.id").value(1))
+                .andExpect(jsonPath("$.data.quantity").value(5))
+                .andExpect(jsonPath("$.data.unitPrice").value(20000))
+                .andExpect(jsonPath("$.data.totalPrice").value(100000)) // 5 * 20000
+                .andExpect(jsonPath("$.data.productId").value(2))
+                .andExpect(jsonPath("$.data.orderId").value(1)); // orderId는 그대로
+
+        // 수정 후 데이터베이스에서 다시 조회해서 확인
+        OrderItem afterUpdate = orderItemService.findById(1).get();
+        assertThat(afterUpdate.getQuantity()).isEqualTo(5);
+        assertThat(afterUpdate.getUnitPrice()).isEqualTo(20000);
+        assertThat(afterUpdate.getTotalPrice()).isEqualTo(100000);
+        assertThat(afterUpdate.getProductId()).isEqualTo(2);
     }
 
 }
