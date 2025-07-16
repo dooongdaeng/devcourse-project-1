@@ -27,8 +27,25 @@ public class WishList extends BaseEntity {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
+    @Column(nullable = false)
+    private int quantity = 1; // 기본값은 1로 설정
+
     public WishList(User user, Product product) {
         this.user = user;
         this.product = product;
+        this.quantity = 1;
+    }
+
+    public WishList(User user, Product product, int quantity) {
+        this.user = user;
+        this.product = product;
+        this.quantity = quantity;
+    }
+
+    public void updateQuantity(int quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("수량은 1 이상이어야 합니다.");
+        }
+        this.quantity = quantity;
     }
 }
