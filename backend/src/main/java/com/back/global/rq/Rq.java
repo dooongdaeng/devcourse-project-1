@@ -9,6 +9,7 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 @Component
 @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -45,6 +46,23 @@ public class Rq {
 
     public void deleteCookie(String name) {
         setCookie(name, null);
+    }
+
+    public String getHeader(String name, String defaultValue) {
+        return Optional
+                .ofNullable(req.getHeader(name))
+                .filter(headerValue -> !headerValue.isBlank())
+                .orElse(defaultValue);
+    }
+
+    public void setHeader(String name, String value) {
+        if (value == null) value = "";
+
+        if (value.isBlank()) {
+            res.setHeader(name, value); // 빈 문자열로 설정하여 헤더 값을 제거하는 효과
+        } else {
+            res.setHeader(name, value);
+        }
     }
 
 }
