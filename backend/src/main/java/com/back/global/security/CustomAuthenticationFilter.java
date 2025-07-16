@@ -14,15 +14,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 
 @Component
@@ -124,18 +121,7 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
 
         User user = userService.findById(rq.getLoginedUserId()).get();
 
-        Boolean isAdmin = user.getUsername().equals("admin");
-
-        Collection<? extends GrantedAuthority> authorities = isAdmin ?
-                List.of(new SimpleGrantedAuthority("ROLE_ADMIN")) : List.of();
-
-        UserDetails userDetails = new SecurityUser(
-                user.getId(),
-                user.getUsername(),
-                "",
-                user.getNickname(),
-                authorities
-        );
+        UserDetails userDetails = new UserSecurityUser(user);
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 userDetails,
