@@ -14,7 +14,7 @@ public class UserAuthTokenService{
     @Value("${custom.jwt.secretKey}")
     private String jwtSecretKey;
 
-    @Value("${custom.jwt.expireSeconds}")
+    @Value("${custom.accessToken.expirationSeconds}")
     private int expireSeconds;
 
     public String genAccessToken(User user) {
