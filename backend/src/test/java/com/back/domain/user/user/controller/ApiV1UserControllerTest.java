@@ -1,6 +1,7 @@
 package com.back.domain.user.user.controller;
 
 import com.back.domain.user.user.service.UserService;
+import com.back.domain.user.user.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,8 +38,12 @@ public class ApiV1UserControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @BeforeEach
     void setup() {
+        userRepository.deleteAll();
         if (userService.count() == 0) {
             userService.create("user1", "1234", "user1@test.com", List.of("ROLE_USER"), "서울시 강남구");
         }
@@ -120,5 +125,26 @@ public class ApiV1UserControllerTest {
                         .param("email", "user1@test.com"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("false")); // 이미 존재하는 이메일
+    }
+
+    @Test
+    @DisplayName("회원가입 실패 - 중복된 사용자명")
+    void testJoinFail_DuplicateUsername() throws Exception {
+        // setup()에서 user1이 생성되므로, user1으로 다시 시도
+        Map<String, Object> reqBody = Map.of(
+                "username", "user1", // 중복된 사용자명
+                "password", "newpass",
+                "nickname", "DupUser",
+                "email", "dupuser@test.com",
+                "address", "서울시 동작구"
+        );
+
+        mvc.perform(post("/api/v1/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(reqBody))
+                )
+                .andExpect(status().isBadRequest()) // 400 Bad Request
+                .andExpect(jsonPath("$.resultCode", is("400-1"))) // 적절한 에러 코드
+                .andExpect(jsonPath("$.msg", containsString("이미 사용중인 아이디입니다."))); // 서비스에서 반환하는 메시지
     }
 }
