@@ -18,6 +18,8 @@ type ProductContextType = {
   addProduct: (product: Omit<Product, 'id'>) => void;
   updateProduct: (product: Product) => void;
   deleteProduct: (productId: number) => void;
+  favoriteProducts: { [key: number]: boolean };
+  toggleFavorite: (productId: number) => void;
 };
 
 // Context 생성 (초기값은 undefined)
@@ -49,11 +51,32 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     return initialProducts;
   });
 
+  const [favoriteProducts, setFavoriteProducts] = useState<{ [key: number]: boolean }>(() => {
+    if (typeof window !== 'undefined') {
+      const savedFavorites = sessionStorage.getItem('favoriteProducts');
+      return savedFavorites ? JSON.parse(savedFavorites) : {};
+    }
+    return {};
+  });
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('products', JSON.stringify(products));
     }
   }, [products]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('favoriteProducts', JSON.stringify(favoriteProducts));
+    }
+  }, [favoriteProducts]);
+
+  const toggleFavorite = (productId: number) => {
+    setFavoriteProducts(prevFavorites => ({
+      ...prevFavorites,
+      [productId]: !prevFavorites[productId]
+    }));
+  };
 
   const addProduct = (productData: Omit<Product, 'id'>) => {
     setProducts(prev => {
@@ -80,6 +103,8 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     addProduct,
     updateProduct,
     deleteProduct,
+    favoriteProducts,
+    toggleFavorite,
   };
 
   return (

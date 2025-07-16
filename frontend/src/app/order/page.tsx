@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useProducts, Product } from '@/context/ProductContext';
 
@@ -11,21 +11,22 @@ type CartItem = Product & {
 
 export default function Order() {
   const router = useRouter();
-  const { products } = useProducts(); // 전역 상품 목록 가져오기
+  const { products, favoriteProducts } = useProducts(); // 전역 상품 목록과 찜 목록 가져오기
 
-  const initialWishlist: Product[] = [
-    { id: 4, name: '콜롬비아 나리뇨', price: '5000', imageUrl: 'https://i.imgur.com/HKOFQYa.jpeg', description:"", stock:0 },
-    { id: 5, name: '브라질 세하도', price: '6000', imageUrl: 'https://i.imgur.com/HKOFQYa.jpeg', description:"", stock:0 },
-  ];
-  
-  const initialCart: CartItem[] = [
-      { id: 1, name: '콜롬비아 나리뇨', price: '5000', imageUrl: 'https://i.imgur.com/HKOFQYa.jpeg', quantity: 2, description:"", stock:0 },
-      { id: 2, name: '브라질 세하도', price: '6000', imageUrl: 'https://i.imgur.com/HKOFQYa.jpeg', quantity: 1, description:"", stock:0 },
-  ]
+  const favoritedProductsList = products.filter(product => favoriteProducts[product.id]);
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+    if (typeof window !== 'undefined') {
+      const savedCart = sessionStorage.getItem('cartItems');
+      return savedCart ? JSON.parse(savedCart) : [];
+    }
+    return [];
+  });
 
-  // State management for wishlist and cart
-  const [wishlistItems, setWishlistItems] = useState<Product[]>(initialWishlist);
-  const [cartItems, setCartItems] = useState<CartItem[]>(initialCart);
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('cartItems', JSON.stringify(cartItems));
+    }
+  }, [cartItems]);
 
   // Function to add items to the cart
   const handleAddToCart = (productToAdd: Product) => {
@@ -109,7 +110,7 @@ export default function Order() {
             <div className="mt-8 w-full flex flex-col items-start">
               <h5 className="text-2xl font-bold mb-4">찜목록</h5>
               <ul className="w-full">
-                {wishlistItems.map(item => (
+                {favoritedProductsList.map(item => (
                   <li key={item.id} className="flex items-center mt-3 p-2 border-b border-gray-200">
                     <div className="w-1/5 md:w-1/6 flex-shrink-0">
                       <img className="w-14 h-14 object-cover rounded" src={item.imageUrl} alt={item.name} />

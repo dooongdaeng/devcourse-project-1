@@ -1,20 +1,11 @@
 "use client";
 
 import { useProducts } from "@/context/ProductContext";
-import { useState } from "react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 
 
 export default function Home() {
-  const { products } = useProducts();
-  const [favoriteProducts, setFavoriteProducts] = useState<{ [key: string]: boolean }>({});
-
-  const toggleFavorite = (productId: string) => {
-    setFavoriteProducts(prevFavorites => ({
-      ...prevFavorites,
-      [productId]: !prevFavorites[productId]
-    }));
-  };
+  const { products, favoriteProducts, toggleFavorite } = useProducts();
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-4 md:p-24">
