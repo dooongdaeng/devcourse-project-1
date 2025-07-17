@@ -1,19 +1,41 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { User } from '@/context/ProductContext'; // User 타입을 가져옵니다.
 
 export default function Login() {
   const router = useRouter();
+  const [userId, setUserId] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    sessionStorage.setItem('isLoggedIn', 'true');
-    router.push('/');
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault(); // 폼 제출 시 페이지 새로고침 방지
+
+    if (typeof window !== 'undefined') {
+      const savedUsers = sessionStorage.getItem('users');
+      const users: User[] = savedUsers ? JSON.parse(savedUsers) : [];
+
+      const foundUser = users.find(
+        (user) => user.userId === userId && user.password === password
+      );
+
+      if (foundUser) {
+        sessionStorage.setItem('isLoggedIn', 'true');
+        sessionStorage.setItem('loggedInUser', JSON.stringify(foundUser)); // 로그인한 사용자 정보 저장
+        alert('로그인 성공!');
+        router.push('/');
+      } else {
+        alert('사용자 ID 또는 비밀번호가 올바르지 않습니다.');
+      }
+    }
   };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4 md:p-24">
       <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">로그인</h2>
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={handleLogin}> {/* onSubmit 핸들러 추가 */}
           <div>
             <label htmlFor="userId" className="block text-sm font-medium text-gray-700 mb-1">
               사용자 ID
@@ -22,6 +44,8 @@ export default function Login() {
               type="text"
               id="userId"
               name="userId"
+              value={userId}
+              onChange={(e) => setUserId(e.target.value)}
               className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-700"
               placeholder="사용자 ID를 입력하세요"
             />
@@ -34,13 +58,14 @@ export default function Login() {
               type="password"
               id="password"
               name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-700"
               placeholder="비밀번호를 입력하세요"
             />
           </div>
           <button
-            type="button"
-            onClick={handleLogin}
+            type="submit" // type을 submit으로 변경
             className="w-full bg-gray-800 text-white py-3 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 cursor-pointer"
           >
             로그인
