@@ -34,6 +34,7 @@ export type Order = {
   date: string;
   items: OrderItem[];
   totalPrice: number;
+  status: string;
 };
 
 // Context가 제공할 값들의 타입 정의
@@ -49,6 +50,8 @@ type ProductContextType = {
   deleteUser: (userId: number) => void;
   orderHistory: Order[];
   addOrder: (items: OrderItem[], totalPrice: number) => void;
+  cancelOrder: (orderId: number) => void;
+  updateOrderStatus: (orderId: number, newStatus: string) => void;
 };
 
 // Context 생성 (초기값은 undefined)
@@ -188,9 +191,22 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
         date: orderDate,
         items,
         totalPrice,
+        status: '처리중',
       };
       return [...prev, newOrder];
     });
+  };
+
+  const cancelOrder = (orderId: number) => {
+    setOrderHistory(prev => prev.filter(order => order.id !== orderId));
+  };
+
+  const updateOrderStatus = (orderId: number, newStatus: string) => {
+    setOrderHistory(prev =>
+      prev.map(order =>
+        order.id === orderId ? { ...order, status: newStatus } : order
+      )
+    );
   };
 
   const value = {
@@ -205,6 +221,8 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     deleteUser,
     orderHistory,
     addOrder,
+    cancelOrder,
+    updateOrderStatus,
   };
 
   return (

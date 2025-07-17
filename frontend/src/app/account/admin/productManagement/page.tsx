@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, ChangeEvent } from 'react';
-import { useProducts, Product, User } from '@/context/ProductContext';
+import { useProducts, Product } from '@/context/ProductContext';
 
 // Define a type for the new/edit product form state
 type ProductFormState = {
@@ -12,8 +12,8 @@ type ProductFormState = {
   imageUrl: string;
 };
 
-export default function Admin() {
-  const { products, addProduct, updateProduct, deleteProduct, users, deleteUser } = useProducts();
+export default function ProductManagement() {
+  const { products, addProduct, updateProduct, deleteProduct } = useProducts();
 
   const initialProductFormState: ProductFormState = {
     name: '',
@@ -31,13 +31,6 @@ export default function Admin() {
   const handleDeleteProduct = (productId: number) => {
     if (window.confirm('정말로 이 상품을 삭제하시겠습니까?')) {
       deleteProduct(productId);
-    }
-  };
-
-  // --- Handlers for User Management ---
-  const handleDeleteUser = (userId: number) => {
-    if (window.confirm('정말로 이 회원을 삭제하시겠습니까?')) {
-      deleteUser(userId);
     }
   };
 
@@ -108,47 +101,12 @@ export default function Admin() {
   return (
     <main className="flex min-h-screen flex-col items-center p-4 md:p-24">
       <div className="w-full max-w-5xl bg-white rounded-xl shadow-lg p-8">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">관리자 페이지</h2>
-
-        {/* 회원 정보 조회 UI (Omitted for brevity) */}
-        <section className="mb-12">
-           <h3 className="text-2xl font-semibold text-gray-700 mb-6">회원 정보 조회</h3>
-           <div className="overflow-x-auto">
-             <table className="min-w-full bg-white border border-gray-200 rounded-md">
-               <thead>
-                 <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-                   <th className="py-3 px-6 text-left">ID</th>
-                   <th className="py-3 px-6 text-left">이메일</th>
-                   <th className="py-3 px-6 text-left">이름</th>
-                   <th className="py-3 px-6 text-left">우편번호</th>
-                   <th className="py-3 px-6 text-left">주소</th>
-                   <th className="py-3 px-6 text-left">가입일</th>
-                   <th className="py-3 px-6 text-center">액션</th>
-                 </tr>
-               </thead>
-               <tbody className="text-gray-600 text-sm">
-                 {users.map(user => (
-                   <tr key={user.id} className="border-b border-gray-200 hover:bg-gray-50">
-                     <td className="py-3 px-6 text-left whitespace-nowrap">{user.id}</td>
-                     <td className="py-3 px-6 text-left">{user.email}</td>
-                     <td className="py-3 px-6 text-left">{user.name}</td>
-                     <td className="py-3 px-6 text-left">{user.postalCode}</td>
-                     <td className="py-3 px-6 text-left">{user.address}</td>
-                     <td className="py-3 px-6 text-left">{user.signupDate}</td>
-                     <td className="py-3 px-6 text-center">
-                       <button onClick={() => handleDeleteUser(user.id)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-xs cursor-pointer">삭제</button>
-                     </td>
-                   </tr>
-                 ))}
-               </tbody>
-             </table>
-           </div>
-         </section>
+        <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">상품 관리</h2>
 
         {/* 상품 관리 UI */}
         <section>
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-2xl font-semibold text-gray-700">상품 관리</h3>
+            <h3 className="text-2xl font-semibold text-gray-700">상품 목록</h3>
             <button
               onClick={handleAddNewClick}
               className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded cursor-pointer"
@@ -231,4 +189,3 @@ export default function Admin() {
     </main>
   );
 }
-
