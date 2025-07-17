@@ -80,7 +80,7 @@ public class UserService {
         return !userRepository.existsByEmail(email);
     }
 
-    public User create(String username, String rawPassword, String email, List<String> roles, String address) {
+    public User create(String username, String rawPassword, String email, String nickname, List<String> roles, String address) {
         String encodedPassword = passwordEncoder.encode(rawPassword);
 
         String role = roles.isEmpty() ? "ROLE_USER" : roles.get(0); // 가장 첫 번째 role 사용
@@ -88,7 +88,7 @@ public class UserService {
         User user = User.builder()
                 .username(username)
                 .password(encodedPassword)
-                .nickname(username)
+                .nickname(nickname)
                 .email(email)
                 .address(address)
                 .role(role)
