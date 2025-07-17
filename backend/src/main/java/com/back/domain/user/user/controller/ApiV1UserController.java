@@ -3,6 +3,7 @@ package com.back.domain.user.user.controller;
 import com.back.domain.user.user.dto.UserDto;
 import com.back.domain.user.user.entity.User;
 import com.back.domain.user.user.service.UserService;
+import com.back.global.exception.ServiceException;
 import com.back.global.rq.Rq;
 import com.back.global.rsData.RsData;
 import com.back.global.security.UserSecurityUser;
@@ -56,7 +57,7 @@ public class ApiV1UserController {
     @Operation(summary = "로그인")
     public RsData<UserDto> login(@Valid @RequestBody UserLoginReqBody reqBody) {
         User user = userService.findByUsername(reqBody.username())
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 아이디입니다."));
+                .orElseThrow(() -> new ServiceException("401-1", "존재하지 않는 아이디입니다."));
 
 
         userService.checkPassword(user, reqBody.password());
@@ -95,7 +96,7 @@ public class ApiV1UserController {
         int userId = userSecurityUser.getId(); // UserSecurityUser에서 ID 가져오기
 
         User user = userService.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자 정보가 존재하지 않습니다."));
+                .orElseThrow(() -> new ServiceException("404-1", "사용자 정보가 존재하지 않습니다."));
 
         return new RsData<>("200-1", "내 정보 조회 성공", new UserDto(user));
     }
