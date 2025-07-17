@@ -22,7 +22,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -66,12 +65,6 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        // 인증, 인가가 필요없는 API 요청이라면 패스
-        if (List.of("/api/v1/users/login", "/api/v1/users/logout", "/api/v1/users", "/api/v1/users/token/refresh").contains(request.getRequestURI())) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         String apiKey;
         String accessToken;
         String refreshToken;
@@ -92,10 +85,6 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
         }
         refreshToken = rq.getCookieValue("refreshToken", "");
 
-        logger.debug("apiKey : " + apiKey);
-        logger.debug("accessToken : " + accessToken);
-        logger.debug("refreshToken : " + refreshToken);
-
         User user = null;
         boolean isAccessTokenValid = false;
 
@@ -106,9 +95,9 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
                 // 액세스 토큰이 유효하면 사용자 정보를 추출하고 인증 상태 설정 준비
                 int id = (int) payload.get("id");
                 String username = (String) payload.get("username");
-                String nickName = (String) payload.get("nickname"); // DTO와 일관성 유지 (nickName -> nickname)
+                String nickname = (String) payload.get("nickname"); // DTO와 일관성 유지 (nickName -> nickname)
                 String role = (String) payload.get("role");
-                user = new User(id, username, nickName, role);
+                user = new User(id, username, nickname, role);
                 isAccessTokenValid = true;
                 logger.debug("Access Token is valid for user: " + username);
             } else {
