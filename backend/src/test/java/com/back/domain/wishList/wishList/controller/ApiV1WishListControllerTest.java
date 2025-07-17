@@ -14,7 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.TestExecutionEvent;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,24 +50,20 @@ public class ApiV1WishListControllerTest {
     @BeforeEach
     void setup() {
         // 초기 데이터 설정
-        if (userService.count() == 0) {
-            userService.create("testuser1", "password", "abc111@test.com", List.of("ROLE_USER"), "서울시 강남구");
-            userService.create("testuser2", "password", "abc222@test.com", List.of("ROLE_USER"), "서울시 서초구");
-            userService.create("testuser3", "password", "abc333@test.com", List.of("ROLE_USER"), "부산시 남구");
-        }
+        userService.create("testuser1", "password", "abc111@test.com", List.of("ROLE_USER"), "서울시 강남구");
+        userService.create("testuser2", "password", "abc222@test.com", List.of("ROLE_USER"), "서울시 서초구");
+        userService.create("testuser3", "password", "abc333@test.com", List.of("ROLE_USER"), "부산시 남구");
 
-        if (productService.count() == 0) {
-            productService.create("상품1",  10000, "상품1 설명",5);
-            productService.create("상품2",  20000, "상품2 설명",10);
-            productService.create("상품3",  30000, "상품3 설명",15);
-            productService.create("상품4",  40000, "상품4 설명",0);
-        }
 
+        productService.create("상품1",  10000, "상품1 설명",5);
+        productService.create("상품2",  20000, "상품2 설명",10);
+        productService.create("상품3",  30000, "상품3 설명",15);
+        productService.create("상품4",  40000, "상품4 설명",0);
     }
 
     @Test
-    @DisplayName("위시리스트 목록 조회")
-    @WithMockUser(username = "testuser1", roles = {"USER"})
+    @DisplayName("사용자 위시리스트 목록 조회")
+    @WithUserDetails(value="testuser1",setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void getWishList() throws Exception {
 
         User user = userService.findByUsername("testuser1").get();
@@ -78,13 +75,12 @@ public class ApiV1WishListControllerTest {
                 .andExpect(jsonPath("$.resultCode").value("200"))
                 .andExpect(jsonPath("$.msg").value("위시리스트 조회 성공"))
                 .andExpect(jsonPath("$.data.length()").value(1))
-                .andExpect(jsonPath("$.data[0].product.name").value("상품1"))
-                .andExpect(jsonPath("$.data[0].user.username").value("testuser1"));
+                .andExpect(jsonPath("$.data[0].productId").value(1));
     }
 
     @Test
     @DisplayName("위시리스트 상품 삭제")
-    @WithMockUser(username= "testuser1", roles = {"USER"})
+    @WithUserDetails(value="testuser1",setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void removeFromWishList() throws Exception {
         User user = userService.findByUsername("testuser1").get();
         Product product = productService.findAll().get(0);
@@ -94,13 +90,12 @@ public class ApiV1WishListControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200"))
                 .andExpect(jsonPath("$.msg").value("위시리스트에서 삭제했습니다."))
-                .andExpect(jsonPath("$.data.product.name").value("상품1"))
-                .andExpect(jsonPath("$.data.user.username").value("testuser1"));
+                .andExpect(jsonPath("$.data.productId").value(1));
     }
 
     @Test
     @DisplayName("위시리스트 단건 조회")
-    @WithMockUser(username = "testuser1", roles = {"USER"})
+    @WithUserDetails(value="testuser1",setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void getWishListById() throws Exception {
         User user = userService.findByUsername("testuser1").get();
         Product product = productService.findAll().get(0);
@@ -115,7 +110,7 @@ public class ApiV1WishListControllerTest {
 
     @Test
     @DisplayName("위시리스트에 상품 추가")
-    @WithMockUser(username = "testuser1", roles = {"USER"})
+    @WithUserDetails(value="testuser1",setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void addToWishList() throws Exception {
         Product product = productService.findAll().get(0);
 
@@ -127,16 +122,15 @@ public class ApiV1WishListControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
                 )
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.resultCode").value("201"))
                 .andExpect(jsonPath("$.msg").value("위시리스트에 추가했습니다."))
-                .andExpect(jsonPath("$.data.product.name").value("상품1"))
-                .andExpect(jsonPath("$.data.user.username").value("testuser1"));
+                .andExpect(jsonPath("$.data.productName").value("상품1"));
     }
 
     @Test
     @DisplayName("위시리스트 수량 업데이트")
-    @WithMockUser(username = "testuser1", roles = {"USER"})
+    @WithUserDetails(value="testuser1",setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void updateWishListQuantity() throws Exception {
         User user = userService.findByUsername("testuser1").get();
         Product product = productService.findAll().get(0);
@@ -153,8 +147,7 @@ public class ApiV1WishListControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200"))
                 .andExpect(jsonPath("$.msg").value("위시리스트 수량을 업데이트했습니다."))
-                .andExpect(jsonPath("$.data.product.name").value("상품1"))
-                .andExpect(jsonPath("$.data.user.username").value("testuser1"))
+                .andExpect(jsonPath("$.data.productName").value("상품1"))
                 .andExpect(jsonPath("$.data.quantity").value(3));
     }
 }
