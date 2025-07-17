@@ -28,6 +28,8 @@ public class User extends BaseEntity {
 
     private String address;
 
+    private String postalCode;
+
     @Column(nullable = false)
     private String role;  // ex: "ROLE_USER", "ROLE_ADMIN"
 
@@ -37,24 +39,26 @@ public class User extends BaseEntity {
     @Column(length = 500)
     private String refreshToken;
 
-    public User(String username, String password, String nickname, String email, String address) {
+    public User(String username, String password, String nickname, String email, String address, String postalCode) {
         this.username = username;
         this.password = password;
         this.nickname = nickname;
         this.email = email;
         this.address = address;
+        this.postalCode = postalCode;
         this.role = "ROLE_USER";
         this.apiKey = generateApiKey();
         this.refreshToken = null;
     }
 
     @Builder
-    public User(String username, String password, String nickname, String email, String address, String role, String apiKey, String refreshToken) {
+    public User(String username, String password, String nickname, String email, String address, String postalCode, String role, String apiKey, String refreshToken) {
         this.username = username;
         this.password = password;
         this.nickname = nickname;
         this.email = email;
         this.address = address;
+        this.postalCode = postalCode;
         this.role = role;
         this.apiKey = (apiKey != null && !apiKey.isBlank()) ? apiKey : generateApiKey();
         this.refreshToken = refreshToken;

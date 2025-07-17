@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { User } from '@/context/ProductContext';
+import { useProducts, User } from '@/context/ProductContext';
 
 export default function UserInfoPage() {
+  const { currentUser } = useProducts();
   const [user, setUser] = useState<User | null>(null);
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingPostalCode, setIsEditingPostalCode] = useState(false);
@@ -13,20 +14,13 @@ export default function UserInfoPage() {
   const [editedAddress, setEditedAddress] = useState('');
 
   useEffect(() => {
-    // 임시 하드코딩된 사용자 정보
-    const dummyUser: User = {
-      id: 1,
-      userId: 'testuser',
-      name: '테스트 사용자',
-      postalCode: '12345',
-      address: '서울시 강남구 테스트동 123-45',
-      signupDate: '2023-01-01',
-    };
-    setUser(dummyUser);
-    setEditedName(dummyUser.name);
-    setEditedPostalCode(dummyUser.postalCode);
-    setEditedAddress(dummyUser.address);
-  }, []);
+    if (currentUser) {
+      setUser(currentUser);
+      setEditedName(currentUser.name);
+      setEditedPostalCode(currentUser.postalCode);
+      setEditedAddress(currentUser.address);
+    }
+  }, [currentUser]);
 
   const handleEdit = (field: string) => {
     if (field === 'name') {
@@ -64,7 +58,8 @@ export default function UserInfoPage() {
       setIsEditingAddress(false);
     }
     setUser(updatedUser);
-    // 실제 애플리케이션에서는 여기서 백엔드 API 호출하여 사용자 정보 업데이트
+    // In a real application, you would call a function from your context to update the user in the global state.
+    // e.g., updateUser(updatedUser);
     alert(`${field} 정보가 업데이트되었습니다.`);
   };
 
