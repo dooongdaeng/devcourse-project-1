@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, ChangeEvent } from 'react';
-import { useProducts, Product } from '@/context/ProductContext';
+import { useProductItem, useProduct } from '@/context/ProductsContext';
+import type { components } from '@/lib/backend/apiV1/schema';
+
+type Product = components['schemas']['ProductWithImageUrlDto'];
 
 // Define a type for the new/edit product form state
 type ProductFormState = {
@@ -12,8 +15,16 @@ type ProductFormState = {
   imageUrl: string;
 };
 
+function ProductItem(id: number) {
+  return (
+    <>
+    </>
+  );
+}
+
 export default function ProductManagement() {
-  const { products, addProduct, updateProduct, deleteProduct } = useProducts();
+  const { products, addProduct } = useProduct();
+  const { modifyProduct, deleteProduct } = useProductItem();
 
   const initialProductFormState: ProductFormState = {
     name: '',
@@ -81,7 +92,7 @@ export default function ProductManagement() {
       return;
     }
 
-    updateProduct(editingProduct);
+    modifyProduct(editingProduct);
     setEditingProduct(null);
   };
 
