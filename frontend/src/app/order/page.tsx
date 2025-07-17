@@ -9,11 +9,7 @@ type CartItem = Product & {
   quantity: number;
 };
 
-export default function Order() {
-  const router = useRouter();
-  const { products, favoriteProducts, addOrder } = useProducts(); // 전역 상품 목록과 찜 목록 가져오기
-
-  const favoritedProductsList = products.filter(product => favoriteProducts[product.id]);
+function useCart() {
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     if (typeof window !== 'undefined') {
       const savedCart = sessionStorage.getItem('cartItems');
@@ -28,6 +24,7 @@ export default function Order() {
     }
   }, [cartItems]);
 
+  
   // Function to add items to the cart
   const handleAddToCart = (productToAdd: Product) => {
     setCartItems(prevItems => {
@@ -63,6 +60,115 @@ export default function Order() {
     setCartItems(prevItems => prevItems.filter(item => item.id !== productIdToRemove));
   };
 
+  return {cartItems, setCartItems, handleAddToCart, handleUpdateQuantity, handleRemoveFromCart};
+}
+
+function ProductList() {
+  const { products } = useProducts(); // 전역 상품 목록과 찜 목록 가져오기
+  const {handleAddToCart} = useCart();
+
+  return (
+    <>
+      <h5 className="text-2xl font-bold mb-4">상품 목록</h5>
+      <ul className="w-full">
+        {products.map(product => (
+          <li key={product.id} className="flex items-center mt-3 p-2 border-b border-gray-200">
+            <div className="w-1/5 md:w-1/6 flex-shrink-0">
+              <img className="w-14 h-14 object-cover rounded" src={product.imageUrl} alt={product.name} />
+            </div>
+            <div className="flex-grow ml-4">
+              <div className="font-semibold">{product.name}</div>
+            </div>
+            <div className="text-center font-medium w-1/5 md:w-1/6">{parseInt(product.price).toLocaleString()}원</div>
+            <div className="text-right w-1/5 md:w-1/6">
+              <button
+                onClick={() => handleAddToCart(product)}
+                className="px-3 py-1 border border-gray-800 text-gray-800 rounded hover:bg-gray-800 hover:text-white text-sm cursor-pointer"
+              >
+                추가
+              </button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+function WishList() {
+  const { products, favoriteProducts } = useProducts(); // 전역 상품 목록과 찜 목록 가져오기
+  const favoritedProductsList = products.filter(product => favoriteProducts[product.id]);
+  const { handleAddToCart } = useCart();
+
+  return (
+    <>
+      <div className="mt-8 w-full flex flex-col items-start">
+        <h5 className="text-2xl font-bold mb-4">찜목록</h5>
+        <ul className="w-full">
+          {favoritedProductsList.length === 0 ? (
+            <p className="text-gray-500">찜 목록이 비어있습니다.</p>
+          ) : (
+            favoritedProductsList.map(item => (
+              <li key={item.id} className="flex items-center mt-3 p-2 border-b border-gray-200">
+                <div className="w-1/5 md:w-1/6 flex-shrink-0">
+                  <img className="w-14 h-14 object-cover rounded" src={item.imageUrl} alt={item.name} />
+                </div>
+                <div className="flex-grow ml-4">
+                  <div className="font-semibold">{item.name}</div>
+                </div>
+                <div className="text-center font-medium w-1/5 md:w-1/6">{parseInt(item.price).toLocaleString()}원</div>
+                <div className="text-right w-1/5 md:w-1/6">
+                  <button
+                    onClick={() => handleAddToCart(item)}
+                    className="px-3 py-1 border border-gray-800 text-gray-800 rounded hover:bg-gray-800 hover:text-white text-sm cursor-pointer"
+                  >
+                    추가
+                  </button>
+                </div>
+              </li>
+            ))
+          )}
+        </ul>
+      </div>
+    </>
+  );
+}
+
+function OrderList() {
+  const {cartItems} = useCart();
+  const {handleUpdateQuantity, handleRemoveFromCart} = useCart();
+
+  return (
+    <>
+      <div className="mb-4 flex-grow">
+        {cartItems.length === 0 ? (
+          <p className="text-gray-500">장바구니가 비어있습니다.</p>
+        ) : (
+          cartItems.map(item => (
+            <div key={item.id} className="flex justify-between items-center mb-2">
+              <span className="text-base truncate pr-2">{item.name}</span>
+              <div className="flex items-center">
+                <button onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)} className="px-2 py-1 border rounded hover:bg-gray-800 hover:text-white cursor-pointer">-</button>
+                <span className="px-3">{item.quantity}</span>
+                <button onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)} className="px-2 py-1 border rounded hover:bg-gray-800 hover:text-white cursor-pointer">+</button>
+                <button onClick={() => handleRemoveFromCart(item.id)} className="ml-3 px-2 py-1 border border-gray-800 text-gray-800 rounded hover:bg-gray-800 hover:text-white text-sm cursor-pointer">삭제</button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </>
+  );
+}
+
+function CheckOut() {
+  const { addOrder } = useProducts(); // 전역 상품 목록과 찜 목록 가져오기
+  const {cartItems, setCartItems} = useCart();
+  const router = useRouter();
+
+  // Calculate total price dynamically
+  const totalPrice = cartItems.reduce((sum, item) => sum + parseInt(item.price) * item.quantity, 0);
+
   // Function to handle the checkout process
   const handleCheckout = () => {
     const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
@@ -92,66 +198,32 @@ export default function Order() {
     }
   };
 
-  // Calculate total price dynamically
-  const totalPrice = cartItems.reduce((sum, item) => sum + parseInt(item.price) * item.quantity, 0);
+  return (
+    <>
+      <div className="flex justify-between items-center pt-4 pb-2 border-t border-gray-300">
+        <h5 className="text-lg font-bold">총금액</h5>
+        <h5 className="text-lg font-bold">{totalPrice.toLocaleString()}원</h5>
+      </div>
+      <button
+        onClick={handleCheckout}
+        className="w-full bg-gray-800 text-white py-3 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 cursor-pointer"
+      >
+        결제하기
+      </button>
+    </>
+  );
+}
 
+export default function Order() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-4 md:p-24">
       <div className="w-full max-w-5xl bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="flex flex-col md:flex-row text-gray-700">
+
           {/* Product List Section */}
           <div className="md:w-2/3 p-4 md:p-6 flex flex-col items-start">
-            <h5 className="text-2xl font-bold mb-4">상품 목록</h5>
-            <ul className="w-full">
-              {products.map(product => (
-                <li key={product.id} className="flex items-center mt-3 p-2 border-b border-gray-200">
-                  <div className="w-1/5 md:w-1/6 flex-shrink-0">
-                    <img className="w-14 h-14 object-cover rounded" src={product.imageUrl} alt={product.name} />
-                  </div>
-                  <div className="flex-grow ml-4">
-                    <div className="font-semibold">{product.name}</div>
-                  </div>
-                  <div className="text-center font-medium w-1/5 md:w-1/6">{parseInt(product.price).toLocaleString()}원</div>
-                  <div className="text-right w-1/5 md:w-1/6">
-                    <button
-                      onClick={() => handleAddToCart(product)}
-                      className="px-3 py-1 border border-gray-800 text-gray-800 rounded hover:bg-gray-800 hover:text-white text-sm cursor-pointer"
-                    >
-                      추가
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            {/* Wishlist Section */}
-            <div className="mt-8 w-full flex flex-col items-start">
-              <h5 className="text-2xl font-bold mb-4">찜목록</h5>
-              <ul className="w-full">
-                {favoritedProductsList.length === 0 ? (
-                  <p className="text-gray-500">찜 목록이 비어있습니다.</p>
-                ) : (
-                  favoritedProductsList.map(item => (
-                  <li key={item.id} className="flex items-center mt-3 p-2 border-b border-gray-200">
-                    <div className="w-1/5 md:w-1/6 flex-shrink-0">
-                      <img className="w-14 h-14 object-cover rounded" src={item.imageUrl} alt={item.name} />
-                    </div>
-                    <div className="flex-grow ml-4">
-                      <div className="font-semibold">{item.name}</div>
-                    </div>
-                    <div className="text-center font-medium w-1/5 md:w-1/6">{parseInt(item.price).toLocaleString()}원</div>
-                    <div className="text-right w-1/5 md:w-1/6">
-                      <button
-                        onClick={() => handleAddToCart(item)}
-                        className="px-3 py-1 border border-gray-800 text-gray-800 rounded hover:bg-gray-800 hover:text-white text-sm cursor-pointer"
-                      >
-                        추가
-                      </button>
-                    </div>
-                  </li>
-                  ))
-                )}
-              </ul>
-            </div>
+            <ProductList></ProductList>
+            <WishList></WishList>
           </div>
 
           {/* Summary Section */}
@@ -160,23 +232,7 @@ export default function Order() {
             <hr className="my-4 border-gray-300" />
 
             {/* Order Items */}
-            <div className="mb-4 flex-grow">
-              {cartItems.length === 0 ? (
-                <p className="text-gray-500">장바구니가 비어있습니다.</p>
-              ) : (
-                cartItems.map(item => (
-                  <div key={item.id} className="flex justify-between items-center mb-2">
-                    <span className="text-base truncate pr-2">{item.name}</span>
-                    <div className="flex items-center">
-                      <button onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)} className="px-2 py-1 border rounded hover:bg-gray-800 hover:text-white cursor-pointer">-</button>
-                      <span className="px-3">{item.quantity}</span>
-                      <button onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)} className="px-2 py-1 border rounded hover:bg-gray-800 hover:text-white cursor-pointer">+</button>
-                      <button onClick={() => handleRemoveFromCart(item.id)} className="ml-3 px-2 py-1 border border-gray-800 text-gray-800 rounded hover:bg-gray-800 hover:text-white text-sm cursor-pointer">삭제</button>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
+            <OrderList></OrderList>
 
             {/* Bottom Section */}
             <div>
@@ -186,16 +242,7 @@ export default function Order() {
               </div>
 
               {/* Total and Checkout */}
-              <div className="flex justify-between items-center pt-4 pb-2 border-t border-gray-300">
-                <h5 className="text-lg font-bold">총금액</h5>
-                <h5 className="text-lg font-bold">{totalPrice.toLocaleString()}원</h5>
-              </div>
-              <button
-                onClick={handleCheckout}
-                className="w-full bg-gray-800 text-white py-3 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 cursor-pointer"
-              >
-                결제하기
-              </button>
+              <CheckOut></CheckOut>
             </div>
           </div>
         </div>
