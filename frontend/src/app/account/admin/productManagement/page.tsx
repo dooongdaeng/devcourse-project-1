@@ -58,13 +58,43 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
     const stock = parseInt(formState.stock, 10);
     const imageUrl = formState.imageUrl;
 
-    if (!name || !description || isNaN(price) || price <= 0 || isNaN(stock) || stock < 0) {
-      alert('모든 필드를 올바르게 입력해주세요.');
+    if (name.length < 2 || name.length > 100) {
+      alert("상품명은 2자 이상 100자 이하로 입력해주세요.");
+      return;
+    }
+
+    if (description.length < 2 || description.length > 500) {
+      alert("상품 설명은 2자 이상 500자 이하로 입력해주세요.");
+      return;
+    }
+
+    if (isNaN(price) ) {
+      alert("상품 가격은 숫자로만 입력해주세요.");
+      return;
+    }
+
+    if (price < 100 || price > 1000000) {
+      alert("상품 가격은 100원 이상 1,000,000원 이하로 입력해주세요.");
+      return;
+    }
+
+    if (isNaN(stock) ) {
+      alert("상품 재고는 숫자로만 입력해주세요.");
+      return;
+    }
+
+    if (stock < 100 || stock > 1000000) {
+      alert("상품 재고는 1 이상 10000 이하로 입력해주세요.");
+      return;
+    }
+
+    if (imageUrl.length <= 0) {
+      alert("상품 이미지 URL을 입력해주세요.");
       return;
     }
 
     if (editingProduct) {
-      modifyProduct({name, price, description, stock, onSuccess: (res) => alert(res.msg)});
+      modifyProduct({name, price, description, stock, imageUrl, onSuccess: (res) => alert(res.msg)});
     } else {
       addProduct({name, price, description, stock, imageUrl, onSuccess: (res) => alert(res.msg)});
     }

@@ -84,7 +84,9 @@ public class ApiV1AdmProductController {
             String description,
             @Min(1)
             @Max(10000)
-            int stock
+            int stock,
+            @NotBlank
+            String imageUrl
     ) {}
 
 
@@ -97,6 +99,7 @@ public class ApiV1AdmProductController {
     ) {
         Product product = productService.findById(id).get();
         productService.modify(product, reqBody.name, reqBody.price, reqBody.description, reqBody.stock);
+        productService.modifyProductImage(product.findProductImageById(1).get(), reqBody.imageUrl);
 
         return new RsData<>(
                 "200-1",

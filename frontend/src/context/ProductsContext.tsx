@@ -56,17 +56,18 @@ export const useProductItem = (id: number) => {
     });
   };
 
-  const modifyProduct = ({name, price, description, stock, onSuccess}: {
+  const modifyProduct = ({name, price, description, stock, imageUrl, onSuccess}: {
     name: string,
     price: number,
     description: string,
     stock: number,
+    imageUrl: string,
     onSuccess:(data: any) => void
   }) => {
     apiFetch(`/api/v1/adm/products/${id}`, {
       method: "PUT",
       body: JSON.stringify({
-        name, price, description, stock
+        name, price, description, stock, imageUrl
       }),
     }).then(onSuccess)
     .catch((error) => {
