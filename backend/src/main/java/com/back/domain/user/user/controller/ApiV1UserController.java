@@ -58,6 +58,7 @@ public class ApiV1UserController {
         User user = userService.findByUsername(reqBody.username())
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 아이디입니다."));
 
+
         userService.checkPassword(user, reqBody.password());
 
         // JWT accessToken 생성
