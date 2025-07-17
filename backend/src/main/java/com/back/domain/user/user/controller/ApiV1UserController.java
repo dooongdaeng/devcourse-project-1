@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
@@ -33,10 +35,11 @@ public class ApiV1UserController {
             @NotBlank @Size(min = 2, max = 30) String password,
             @NotBlank @Size(min = 2, max = 30) String nickname,
             @NotBlank String email,
-            @NotBlank String address
+            @NotBlank String address,
+            @NotBlank String postalCode
     ) {}
 
-    @PostMapping
+    @PostMapping(value = "", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "회원가입")
     public RsData<UserDto> join(@Valid @RequestBody UserJoinReqBody reqBody) {
         User user = userService.join(
@@ -44,7 +47,8 @@ public class ApiV1UserController {
                 reqBody.password(),
                 reqBody.nickname(),
                 reqBody.email(),
-                reqBody.address()
+                reqBody.address(),
+                reqBody.postalCode()
         );
 
         return new RsData<>("201", "회원가입 완료", new UserDto(user));
