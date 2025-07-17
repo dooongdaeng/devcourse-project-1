@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useProducts, OrderItem } from '@/context/ProductContext';
 import { useProduct } from '@/context/ProductsContext';
+import { useProductImage } from '@/context/ProductImageContext';
 import { components } from '@/lib/backend/apiV1/schema';
 
 type Product = components['schemas']['ProductDto'];
@@ -69,16 +70,31 @@ function useCart() {
 
 function ProductList({cartState} : {cartState: ReturnType<typeof useCart>}) {
   const products = useProduct();
-  const {handleAddToCart} = cartState;
 
   return (
     <>
       <h5 className="text-2xl font-bold mb-4">상품 목록</h5>
       <ul className="w-full">
         {products?.map(product => (
-          <li key={product.id} className="flex items-center mt-3 p-2 border-b border-gray-200">
-            <div className="w-1/5 md:w-1/6 flex-shrink-0">
-              <img className="w-14 h-14 object-cover rounded" src={product.imageUrl} alt={product.name} />
+          <ProductItem key={product.id} product={product} cartState={cartState}></ProductItem>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+function ProductItem({cartState, product} : {
+  cartState: ReturnType<typeof useCart>;
+  product: Product;
+}) {
+  const productImage = useProductImage(product.id);
+  const {handleAddToCart} = cartState;
+
+  return (
+    <>
+      <li className="flex items-center mt-3 p-2 border-b border-gray-200">
+        <div className="w-1/5 md:w-1/6 flex-shrink-0">
+              <img className="w-14 h-14 object-cover rounded" src={productImage} alt={product.name} />
             </div>
             <div className="flex-grow ml-4">
               <div className="font-semibold">{product.name}</div>
@@ -93,8 +109,6 @@ function ProductList({cartState} : {cartState: ReturnType<typeof useCart>}) {
               </button>
             </div>
           </li>
-        ))}
-      </ul>
     </>
   );
 }

@@ -3,22 +3,10 @@
 import { useProducts } from "@/context/ProductContext";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { components } from "@/lib/backend/apiV1/schema";
-import { useState, useEffect } from "react";
-import { apiFetch } from "@/lib/backend/client";
 import { useProduct } from "@/context/ProductsContext"
+import { useProductImage } from "@/context/ProductImageContext";
 
 type Product = components['schemas']['ProductDto'];
-type ProductImage = components['schemas']['ProductImageDto'];
-
-function useProductImage(productId: number) {
-  const [productImages, setProductImages] = useState<ProductImage[] | null>(null);
-
-  useEffect(() => {
-    apiFetch(`/api/v1/products/${productId}/images`).then(setProductImages);
-  }, []);
-
-  return productImages?.[0]?.url;
-}
 
 function ProductCard({ product }: { product: Product }) {
   const imageUrl = useProductImage(product.id);
