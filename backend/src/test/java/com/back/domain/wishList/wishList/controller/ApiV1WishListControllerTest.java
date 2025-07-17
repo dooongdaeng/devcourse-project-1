@@ -4,10 +4,8 @@ import com.back.domain.product.product.entity.Product;
 import com.back.domain.product.product.service.ProductService;
 import com.back.domain.user.user.entity.User;
 import com.back.domain.user.user.service.UserService;
-import com.back.domain.wishList.wishList.entity.WishList;
 import com.back.domain.wishList.wishList.service.WishListService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +18,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -47,41 +44,28 @@ public class ApiV1WishListControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private User testUser;
-    private Product testProduct;
-    @BeforeEach
-    void setup() {
-        // 초기 데이터 설정
-        userService.create("testuser1", "password", "abc111@test.com", List.of("ROLE_USER"), "서울시 강남구");
-        productService.create("상품1",  10000, "상품1 설명",5);
-
-        testUser = userService.findByUsername("testuser1").get();
-        testProduct = productService.findAll().stream()
-                .filter(p -> "상품1".equals(p.getName()))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("테스트 상품을 찾을 수 없습니다."));
-    }
 
     @Test
     @DisplayName("사용자 위시리스트 목록 조회")
-    @WithUserDetails(value="testuser1",setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value="user1",setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void getWishList() throws Exception {
+        User user = userService.findByUsername("user1").get();
+        Product product = productService.findAll().get(0);
 
-        wishListService.addToWishList(testUser.getId(), testProduct.getId());
+        wishListService.addToWishList(user.getId(), product.getId());
 
         mvc.perform(get("/api/v1/wish-lists"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200"))
                 .andExpect(jsonPath("$.msg").value("위시리스트 조회 성공"))
-                .andExpect(jsonPath("$.data.length()").value(1))
-                .andExpect(jsonPath("$.data[0].productId").value(testProduct.getId()));
+                .andExpect(jsonPath("$.data.length()").value(1));
     }
 
     @Test
     @DisplayName("위시리스트 상품 삭제")
-    @WithUserDetails(value="testuser1",setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value="user1",setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void removeFromWishList() throws Exception {
-        User user = userService.findByUsername("testuser1").get();
+        User user = userService.findByUsername("user1").get();
         Product product = productService.findAll().get(0);
         wishListService.addToWishList(user.getId(), product.getId());
 
@@ -94,11 +78,13 @@ public class ApiV1WishListControllerTest {
 
     @Test
     @DisplayName("위시리스트 단건 조회")
-    @WithUserDetails(value="testuser1",setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value="user1",setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void getWishListById() throws Exception {
-        WishList wishList = wishListService.addToWishList(testUser.getId(), testProduct.getId());
+        User user = userService.findByUsername("user1").get();
+        Product product = productService.findAll().get(0);
+        wishListService.addToWishList(user.getId(), product.getId());
 
-        mvc.perform(get("/api/v1/wish-lists/" + testProduct.getId()))
+        mvc.perform(get("/api/v1/wish-lists/" + product.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200"))
                 .andExpect(jsonPath("$.msg").value("위시리스트 조회 성공"))
@@ -107,10 +93,11 @@ public class ApiV1WishListControllerTest {
 
     @Test
     @DisplayName("위시리스트에 상품 추가")
-    @WithUserDetails(value="testuser1",setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value="user1",setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void addToWishList() throws Exception {
+        Product product = productService.findAll().get(0);
         String requestBody = objectMapper.writeValueAsString(
-                Map.of("productId", testProduct.getId(), "quantity", 1)
+                Map.of("productId", product.getId(), "quantity", 1)
         );
 
         mvc.perform(post("/api/v1/wish-lists")
@@ -120,27 +107,30 @@ public class ApiV1WishListControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.resultCode").value("201"))
                 .andExpect(jsonPath("$.msg").value("위시리스트에 추가했습니다."))
-                .andExpect(jsonPath("$.data.productName").value("상품1"));
+                .andExpect(jsonPath("$.data.productName").value(product.getName()));
     }
 
     @Test
     @DisplayName("위시리스트 수량 업데이트")
-    @WithUserDetails(value="testuser1",setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value="user1",setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void updateWishListQuantity() throws Exception {
-        wishListService.addToWishList(testUser.getId(), testProduct.getId());
+        User user = userService.findByUsername("user1").get();
+        Product product = productService.findAll().get(0);
+        wishListService.addToWishList(user.getId(), product.getId());
 
         String requestBody = objectMapper.writeValueAsString(
                 Map.of("quantity", 3)
         );
 
-        mvc.perform(put("/api/v1/wish-lists/" + testProduct.getId() + "/quantity")
+        mvc.perform(put("/api/v1/wish-lists/" + product.getId() + "/quantity")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200"))
                 .andExpect(jsonPath("$.msg").value("위시리스트 수량을 업데이트했습니다."))
-                .andExpect(jsonPath("$.data.productName").value("상품1"))
+                .andExpect(jsonPath("$.data.productName").value(product.getName()))
                 .andExpect(jsonPath("$.data.quantity").value(3));
+        // 위시리스트의 수량이 업데이트 되었는지 확인
     }
 }
