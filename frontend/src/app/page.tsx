@@ -14,7 +14,7 @@ function useProductImage(productId: number) {
 
   useEffect(() => {
     apiFetch(`/api/v1/products/${productId}/images`).then(setProductImages);
-  }, [productId]);
+  }, []);
 
   return productImages?.[0]?.url;
 }
@@ -22,7 +22,6 @@ function useProductImage(productId: number) {
 function ProductCard({ product }: { product: Product }) {
   const imageUrl = useProductImage(product.id);
   const { favoriteProducts, toggleFavorite } = useProducts();
-
 
   return (
     <div className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30">
