@@ -3,10 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useProducts, OrderItem } from '@/context/ProductContext';
-import { useProduct, useProductImage } from '@/context/ProductsContext';
+import { useProduct } from '@/context/ProductsContext';
 import { components } from '@/lib/backend/apiV1/schema';
-import { useCreateOrder, CreateOrderRequest } from '@/context/OrderContext'; 
-
 
 type Product = components['schemas']['ProductWithImageUrlDto'];
 
@@ -70,7 +68,7 @@ function useCart() {
 }
 
 function ProductList({cartState} : {cartState: ReturnType<typeof useCart>}) {
-  const products = useProduct();
+  const {products} = useProduct();
 
   return (
     <>
@@ -114,7 +112,7 @@ function ProductItem({cartState, product} : {
 }
 
 function WishList({cartState} : {cartState: ReturnType<typeof useCart>}) {
-  const products = useProduct();
+  const {products} = useProduct();
 
   const { favoriteProducts } = useProducts(); // 전역 상품 목록과 찜 목록 가져오기
 
@@ -195,17 +193,15 @@ function OrderList({cartState} : {cartState: ReturnType<typeof useCart>}) {
 }
 
 function CheckOut() {
-  const { cartItems, setCartItems } = useCart();
+  const { addOrder } = useProducts(); // 전역 상품 목록과 찜 목록 가져오기
+  const {cartItems, setCartItems} = useCart();
   const router = useRouter();
-  
-  // 커스텀 훅 사용
-  const { processCompleteOrder, isLoading, error } = useCreateOrder();
 
   // Calculate total price dynamically
   const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   // Function to handle the checkout process
-  const handleCheckout = async () => {
+  const handleCheckout = () => {
     const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
     if (isLoggedIn) {
       if (window.confirm('결제를 진행합니다.')) {
@@ -214,32 +210,18 @@ function CheckOut() {
           return;
         }
 
-        try {
-          // 사용자 ID 가져오기 (실제 구현에 맞게 수정 필요)
-          const userId = parseInt(sessionStorage.getItem('userId') || '1');
-          
-          // 주문 데이터 생성
-          const orderData: CreateOrderRequest = {
-            orderCount: cartItems.length,
-            totalPrice: totalPrice,
-            paymentMethod: 'CARD', // 또는 사용자가 선택한 결제 방법
-            paymentStatus: 'COMPLETED',
-            userId: userId
-          };
+        const orderItems: OrderItem[] = cartItems.map(item => ({
+          productId: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          imageUrl: item.imageUrl,
+        }));
 
-          // 백엔드 API를 통한 주문 생성
-          const result = await processCompleteOrder(orderData, cartItems);
-          
-          // 장바구니 비우기
-          setCartItems([]);
-          
-          alert('결제가 완료되었습니다. 주문 내역에서 확인해주세요.');
-          router.push('/orderHistory');
-          
-        } catch (error) {
-          console.error('주문 처리 중 오류:', error);
-          alert(`결제 처리 중 오류가 발생했습니다: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
-        }
+        addOrder(orderItems, totalPrice);
+        setCartItems([]); // 장바구니 비우기
+        alert('결제가 완료되었습니다. 주문 내역에서 확인해주세요.');
+        router.push('/orderHistory');
       }
     } else {
       alert('로그인을 해야합니다.');
@@ -253,21 +235,11 @@ function CheckOut() {
         <h5 className="text-lg font-bold">총금액</h5>
         <h5 className="text-lg font-bold">{totalPrice.toLocaleString()}원</h5>
       </div>
-      {error && (
-        <div className="text-red-500 text-sm mb-2">
-          오류: {error}
-        </div>
-      )}
       <button
         onClick={handleCheckout}
-        disabled={isLoading}
-        className={`w-full py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 cursor-pointer ${
-          isLoading 
-            ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
-            : 'bg-gray-800 text-white hover:bg-gray-700'
-        }`}
+        className="w-full bg-gray-800 text-white py-3 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 cursor-pointer"
       >
-        {isLoading ? '결제 처리 중...' : '결제하기'}
+        결제하기
       </button>
     </>
   );

@@ -28,7 +28,7 @@ function ProductCard({ product }: { product: Product }) {
 }
 
 export default function Home() {
-  const products = useProduct();
+  const {products} = useProduct();
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-4 md:p-24">
