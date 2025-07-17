@@ -20,6 +20,7 @@ export type User = {
   postalCode: string;
   address: string;
   signupDate: string;
+  role: 'admin' | 'user';
 };
 
 export type OrderItem = {
@@ -53,6 +54,9 @@ type ProductContextType = {
   addOrder: (items: OrderItem[], totalPrice: number) => void;
   cancelOrder: (orderId: number) => void;
   updateOrderStatus: (orderId: number, newStatus: string) => void;
+  currentUser: User | null;
+  login: (userId: string, password: string) => boolean;
+  logout: () => void;
 };
 
 // Context 생성 (초기값은 undefined)
@@ -77,8 +81,9 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
   ];
 
   const initialUsers: User[] = [
-    { id: 1, userId: 'user1', password: '123', name: '김철수', postalCode: '01234', address: '서울시 강남구 테헤란로 123', signupDate: '2023-01-15' },
-    { id: 2, userId: 'user2', password: '123', name: '이영희', postalCode: '56789', address: '부산시 해운대구 센텀중앙로 99', signupDate: '2023-03-20' },
+    { id: 1, userId: 'user1', password: '123', name: '김철수', postalCode: '01234', address: '서울시 강남구 테헤란로 123', signupDate: '2023-01-15', role: 'user' },
+    { id: 2, userId: 'user2', password: '123', name: '이영희', postalCode: '56789', address: '부산시 해운대구 센텀중앙로 99', signupDate: '2023-03-20', role: 'user' },
+    { id: 3, userId: 'admin', password: 'admin', name: '관리자', postalCode: '-', address: '-', signupDate: '2023-01-01', role: 'admin' },
   ];
 
   const [products, setProducts] = useState<Product[]>(() => {
@@ -164,7 +169,7 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     setProducts(prev => prev.filter(p => p.id !== productId));
   };
 
-  const addUser = (userData: Omit<User, 'id' | 'signupDate' | 'email'>) => {
+  const addUser = (userData: Omit<User, 'id' | 'signupDate' | 'role'>) => {
     setUsers(prev => {
       const newId = prev.length > 0 ? Math.max(...prev.map(u => u.id)) + 1 : 1;
       const today = new Date();
@@ -173,6 +178,7 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
         id: newId,
         ...userData,
         signupDate,
+        role: 'user',
       };
       return [...prev, newUser];
     });
@@ -210,6 +216,36 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedUser = sessionStorage.getItem('currentUser');
+      if (savedUser) {
+        setCurrentUser(JSON.parse(savedUser));
+      }
+    }
+  }, []);
+
+  const login = (userId: string, password: string): boolean => {
+    const user = users.find(u => u.userId === userId && u.password === password);
+    if (user) {
+      setCurrentUser(user);
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('currentUser', JSON.stringify(user));
+      }
+      return true;
+    }
+    return false;
+  };
+
+  const logout = () => {
+    setCurrentUser(null);
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('currentUser');
+    }
+  };
+
   const value = {
     products,
     addProduct,
@@ -224,6 +260,9 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     addOrder,
     cancelOrder,
     updateOrderStatus,
+    currentUser,
+    login,
+    logout,
   };
 
   return (
