@@ -2,7 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useProducts, Product, OrderItem } from '@/context/ProductContext';
+import { useProducts, OrderItem } from '@/context/ProductContext';
+import { useProduct, useProductImage } from '@/context/ProductsContext';
+import { components } from '@/lib/backend/apiV1/schema';
+
+type Product = components['schemas']['ProductDto'];
 
 // Define a type for cart items, which includes quantity
 type CartItem = Product & {
@@ -64,41 +68,57 @@ function useCart() {
 }
 
 function ProductList({cartState} : {cartState: ReturnType<typeof useCart>}) {
-  const { products } = useProducts(); // 전역 상품 목록과 찜 목록 가져오기
-  const {handleAddToCart} = cartState;
+  const products = useProduct();
 
   return (
     <>
       <h5 className="text-2xl font-bold mb-4">상품 목록</h5>
       <ul className="w-full">
-        {products.map(product => (
-          <li key={product.id} className="flex items-center mt-3 p-2 border-b border-gray-200">
-            <div className="w-1/5 md:w-1/6 flex-shrink-0">
-              <img className="w-14 h-14 object-cover rounded" src={product.imageUrl} alt={product.name} />
-            </div>
-            <div className="flex-grow ml-4">
-              <div className="font-semibold">{product.name}</div>
-            </div>
-            <div className="text-center font-medium w-1/5 md:w-1/6">{parseInt(product.price).toLocaleString()}원</div>
-            <div className="text-right w-1/5 md:w-1/6">
-              <button
-                onClick={() => handleAddToCart(product)}
-                className="px-3 py-1 border border-gray-800 text-gray-800 rounded hover:bg-gray-800 hover:text-white text-sm cursor-pointer"
-              >
-                추가
-              </button>
-            </div>
-          </li>
+        {products?.map(product => (
+          <ProductItem key={product.id} product={product} cartState={cartState}></ProductItem>
         ))}
       </ul>
     </>
   );
 }
 
+function ProductItem({cartState, product} : {
+  cartState: ReturnType<typeof useCart>;
+  product: Product;
+}) {
+  const productImage = useProductImage(product.id);
+  const {handleAddToCart} = cartState;
+
+  return (
+    <>
+      <li className="flex items-center mt-3 p-2 border-b border-gray-200">
+        <div className="w-1/5 md:w-1/6 flex-shrink-0">
+          <img className="w-14 h-14 object-cover rounded" src={productImage} alt={product.name} />
+        </div>
+        <div className="flex-grow ml-4 w-0 flex-grow">
+          <div className="font-semibold">{product.name}</div>
+        </div>
+        <div className="text-center font-medium w-1/5 md:w-1/6">{product.price.toLocaleString()}원</div>
+        <div className="text-right w-1/5 md:w-1/6">
+          <button
+            onClick={() => handleAddToCart(product)}
+            className="px-3 py-1 border border-gray-800 text-gray-800 rounded hover:bg-gray-800 hover:text-white text-sm cursor-pointer"
+          >
+            추가
+          </button>
+        </div>
+      </li>
+    </>
+  );
+}
+
 function WishList({cartState} : {cartState: ReturnType<typeof useCart>}) {
-  const { products, favoriteProducts } = useProducts(); // 전역 상품 목록과 찜 목록 가져오기
-  const favoritedProductsList = products.filter(product => favoriteProducts[product.id]);
-  const { handleAddToCart } = cartState;
+  const products = useProduct();
+
+  const { favoriteProducts } = useProducts(); // 전역 상품 목록과 찜 목록 가져오기
+
+  if(products == null) return <div>로딩 중...</div>
+  const favoritedProductsList = products?.filter(product => favoriteProducts[product.id]);
 
   return (
     <>
@@ -109,27 +129,41 @@ function WishList({cartState} : {cartState: ReturnType<typeof useCart>}) {
             <p className="text-gray-500">찜 목록이 비어있습니다.</p>
           ) : (
             favoritedProductsList.map(item => (
-              <li key={item.id} className="flex items-center mt-3 p-2 border-b border-gray-200">
-                <div className="w-1/5 md:w-1/6 flex-shrink-0">
-                  <img className="w-14 h-14 object-cover rounded" src={item.imageUrl} alt={item.name} />
-                </div>
-                <div className="flex-grow ml-4">
-                  <div className="font-semibold">{item.name}</div>
-                </div>
-                <div className="text-center font-medium w-1/5 md:w-1/6">{parseInt(item.price).toLocaleString()}원</div>
-                <div className="text-right w-1/5 md:w-1/6">
-                  <button
-                    onClick={() => handleAddToCart(item)}
-                    className="px-3 py-1 border border-gray-800 text-gray-800 rounded hover:bg-gray-800 hover:text-white text-sm cursor-pointer"
-                  >
-                    추가
-                  </button>
-                </div>
-              </li>
+              <WishListItem key={item.id} item={item} cartState={cartState}></WishListItem>
             ))
           )}
         </ul>
       </div>
+    </>
+  );
+}
+
+function WishListItem({cartState, item} : {
+  cartState: ReturnType<typeof useCart>;
+  item: Product;
+}){
+  const itemImage = useProductImage(item.id);
+  const { handleAddToCart } = cartState;
+
+  return (
+    <>
+      <li key={item.id} className="flex items-center mt-3 p-2 border-b border-gray-200">
+        <div className="w-1/5 md:w-1/6 flex-shrink-0">
+          <img className="w-14 h-14 object-cover rounded" src={itemImage} alt={item.name} />
+        </div>
+        <div className="flex-grow ml-4 w-0 flex-grow">
+          <div className="font-semibold">{item.name}</div>
+        </div>
+        <div className="text-center font-medium w-1/5 md:w-1/6">{item.price.toLocaleString()}원</div>
+        <div className="text-right w-1/5 md:w-1/6">
+          <button
+            onClick={() => handleAddToCart(item)}
+            className="px-3 py-1 border border-gray-800 text-gray-800 rounded hover:bg-gray-800 hover:text-white text-sm cursor-pointer"
+          >
+            추가
+          </button>
+        </div>
+      </li>
     </>
   );
 }
@@ -150,7 +184,7 @@ function OrderList({cartState} : {cartState: ReturnType<typeof useCart>}) {
                 <button onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)} className="px-2 py-1 border rounded hover:bg-gray-800 hover:text-white cursor-pointer">-</button>
                 <span className="px-3">{item.quantity}</span>
                 <button onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)} className="px-2 py-1 border rounded hover:bg-gray-800 hover:text-white cursor-pointer">+</button>
-                <button onClick={() => handleRemoveFromCart(item.id)} className="ml-3 px-2 py-1 border border-gray-800 text-gray-800 rounded hover:bg-gray-800 hover:text-white text-sm cursor-pointer">삭제</button>
+                <button onClick={() => handleRemoveFromCart(item.id)} className="ml-3 px-2 py-1 border border-gray-800 text-gray-800 rounded hover:bg-gray-800 hover:text-white text-sm cursor-pointer whitespace-nowrap">삭제</button>
               </div>
             </div>
           ))
@@ -166,7 +200,7 @@ function CheckOut() {
   const router = useRouter();
 
   // Calculate total price dynamically
-  const totalPrice = cartItems.reduce((sum, item) => sum + parseInt(item.price) * item.quantity, 0);
+  const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   // Function to handle the checkout process
   const handleCheckout = () => {
