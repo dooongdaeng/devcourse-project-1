@@ -37,7 +37,7 @@ export const useProduct = () => {
     });
   }
 
-  return {products, addProduct};
+  return {products, setProducts, addProduct};
 };
 
 export const useProductItem = (id: number) => {

@@ -41,7 +41,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
       : initialProductFormState
   );
 
-  const { addProduct } = useProduct();
+  const { addProduct, products, setProducts } = useProduct();
   const { modifyProduct } = useProductItem((editingProduct != null) ? editingProduct.id : 1);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -94,9 +94,18 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
     }
 
     if (editingProduct) {
-      modifyProduct({name, price, description, stock, imageUrl, onSuccess: (res) => alert(res.msg)});
+      modifyProduct({name, price, description, stock, imageUrl, onSuccess: (res) => {
+        alert(res.msg);
+        if(products == null) return;
+        const updatedProduct = res.data;
+        setProducts(products.map((product) => product.id === updatedProduct.id ? updatedProduct : product));
+      }});
     } else {
-      addProduct({name, price, description, stock, imageUrl, onSuccess: (res) => alert(res.msg)});
+      addProduct({name, price, description, stock, imageUrl, onSuccess: (res) => {
+        alert(res.msg);
+        if(products == null) return;
+        setProducts([...products, res.data]);
+      }});
     }
 
     onSubmit();
@@ -208,10 +217,15 @@ function ProductList({ onEditClick }: { onEditClick: (product: Product) => void 
 
 function DeleteButton({ productId }: { productId: number }) {
   const { deleteProduct } = useProductItem(productId);
+  const { products, setProducts } = useProduct();
 
   const handleDelete = () => {
     if (window.confirm('정말로 이 상품을 삭제하시겠습니까?')) {
-      deleteProduct((res) => alert(res.msg));
+      deleteProduct((res) => {
+        alert(res.msg);
+        if(products == null) return;
+        setProducts(products.filter((product) => product.id ! == productId));
+      });
     }
   };
 
