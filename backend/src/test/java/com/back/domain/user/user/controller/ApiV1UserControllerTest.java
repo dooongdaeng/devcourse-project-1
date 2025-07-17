@@ -195,7 +195,7 @@ public class ApiV1UserControllerTest {
                 )
                 .andDo(print()) // 요청/응답 내용 출력
                 .andExpect(status().isBadRequest()) // 400 Bad Request
-                .andExpect(jsonPath("$.resultCode", is("400-0"))) // 적절한 에러 코드 (예상 결과에 따라 수정)
+                .andExpect(jsonPath("$.resultCode", is("400-1"))) // 적절한 에러 코드 (예상 결과에 따라 수정)
                 .andExpect(jsonPath("$.msg", containsString("이미 존재하는 아이디입니다."))); // 서비스에서 반환하는 메시지
     }
 
@@ -280,8 +280,8 @@ public class ApiV1UserControllerTest {
                 .andDo(print())
                 // 비밀번호 불일치 시 UserService.checkPassword에서 RuntimeException 발생,
                 // GlobalExceptionHandler가 400 BAD_REQUEST로 처리
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.resultCode", is("400-0")))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.resultCode", is("401-2")))
                 .andExpect(jsonPath("$.msg", containsString("비밀번호가 일치하지 않습니다.")));
     }
 
@@ -300,8 +300,8 @@ public class ApiV1UserControllerTest {
                 .andDo(print())
                 // UserService.findByUsername에서 사용자를 찾지 못하면 RuntimeException 발생,
                 // GlobalExceptionHandler가 400 BAD_REQUEST로 처리
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.resultCode", is("400-0")))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.resultCode", is("401-1")))
                 .andExpect(jsonPath("$.msg", containsString("존재하지 않는 아이디입니다.")));
     }
 
