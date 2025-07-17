@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -47,7 +46,7 @@ public class ApiV1WishListControllerTest {
 
     @Test
     @DisplayName("사용자 위시리스트 목록 조회")
-    @WithUserDetails(value="user1",setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails("user1")
     void getWishList() throws Exception {
         User user = userService.findByUsername("user1").get();
         Product product = productService.findAll().get(0);
@@ -63,7 +62,7 @@ public class ApiV1WishListControllerTest {
 
     @Test
     @DisplayName("위시리스트 상품 삭제")
-    @WithUserDetails(value="user1",setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails("user1")
     void removeFromWishList() throws Exception {
         User user = userService.findByUsername("user1").get();
         Product product = productService.findAll().get(0);
@@ -78,7 +77,7 @@ public class ApiV1WishListControllerTest {
 
     @Test
     @DisplayName("위시리스트 단건 조회")
-    @WithUserDetails(value="user1",setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails("user1")
     void getWishListById() throws Exception {
         User user = userService.findByUsername("user1").get();
         Product product = productService.findAll().get(0);
@@ -93,7 +92,7 @@ public class ApiV1WishListControllerTest {
 
     @Test
     @DisplayName("위시리스트에 상품 추가")
-    @WithUserDetails(value="user1",setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails("user1")
     void addToWishList() throws Exception {
         Product product = productService.findAll().get(0);
         String requestBody = objectMapper.writeValueAsString(
@@ -112,7 +111,7 @@ public class ApiV1WishListControllerTest {
 
     @Test
     @DisplayName("위시리스트 수량 업데이트")
-    @WithUserDetails(value="user1",setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails("user1")
     void updateWishListQuantity() throws Exception {
         User user = userService.findByUsername("user1").get();
         Product product = productService.findAll().get(0);
