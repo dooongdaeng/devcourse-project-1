@@ -56,6 +56,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
     const description = formState.description;
     const price = parseInt(formState.price, 10);
     const stock = parseInt(formState.stock, 10);
+    const imageUrl = formState.imageUrl;
 
     if (!name || !description || isNaN(price) || price <= 0 || isNaN(stock) || stock < 0) {
       alert('모든 필드를 올바르게 입력해주세요.');
@@ -65,7 +66,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
     if (editingProduct) {
       modifyProduct({name, price, description, stock, onSuccess: (res) => alert(res.msg)});
     } else {
-      addProduct({name, price, description, stock, onSuccess: (res) => alert(res.msg)});
+      addProduct({name, price, description, stock, imageUrl, onSuccess: (res) => alert(res.msg)});
     }
 
     onSubmit();

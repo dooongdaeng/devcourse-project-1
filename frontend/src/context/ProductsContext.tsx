@@ -18,17 +18,18 @@ export const useProduct = () => {
       });
   }, []);
 
-  const addProduct = ({name, price, description, stock, onSuccess}: {
+  const addProduct = ({name, price, description, stock, imageUrl, onSuccess}: {
     name: string,
     price: number,
     description: string,
     stock: number,
+    imageUrl: string,
     onSuccess:(data: any) => void
   }) => {
     apiFetch(`/api/v1/adm/products`, {
       method: "POST",
       body: JSON.stringify({
-        name, price, description, stock
+        name, price, description, stock, imageUrl
       }),
     }).then(onSuccess)
     .catch((error) => {

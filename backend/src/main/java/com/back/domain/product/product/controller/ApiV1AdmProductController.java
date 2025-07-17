@@ -36,7 +36,9 @@ public class ApiV1AdmProductController {
             String description,
             @Min(1)
             @Max(10000)
-            int stock
+            int stock,
+            @NotBlank
+            String imageUrl
     ) {}
 
     @PostMapping
@@ -46,6 +48,7 @@ public class ApiV1AdmProductController {
             @Valid @RequestBody ProductCreateReqBody reqBody
     ) {
         Product product = productService.create(reqBody.name, reqBody.price, reqBody.description, reqBody.stock);
+        productService.createProductImage(product, reqBody.imageUrl);
 
         return new RsData<>(
                 "201-1",
