@@ -22,7 +22,7 @@ export default function AccountManagement() {
             <thead>
               <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
                 <th className="py-3 px-6 text-left">ID</th>
-                <th className="py-3 px-6 text-left">이메일</th>
+                <th className="py-3 px-6 text-left">사용자 ID</th>
                 <th className="py-3 px-6 text-left">이름</th>
                 <th className="py-3 px-6 text-left">우편번호</th>
                 <th className="py-3 px-6 text-left">주소</th>
@@ -34,7 +34,7 @@ export default function AccountManagement() {
               {users.map(user => (
                 <tr key={user.id} className="border-b border-gray-200 hover:bg-gray-50">
                   <td className="py-3 px-6 text-left whitespace-nowrap">{user.id}</td>
-                  <td className="py-3 px-6 text-left">{user.email}</td>
+                  <td className="py-3 px-6 text-left">{user.userId}</td>
                   <td className="py-3 px-6 text-left">{user.name}</td>
                   <td className="py-3 px-6 text-left">{user.postalCode}</td>
                   <td className="py-3 px-6 text-left">{user.address}</td>
