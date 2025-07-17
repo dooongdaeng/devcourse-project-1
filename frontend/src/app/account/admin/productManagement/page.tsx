@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, ChangeEvent } from 'react';
+import { useState, ChangeEvent, useRef } from 'react';
 import { useProductItem, useProduct } from '@/context/ProductsContext';
 import type { components } from '@/lib/backend/apiV1/schema';
 
@@ -21,6 +21,12 @@ type ProductFormProps = {
 };
 
 function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const priceInputRef = useRef<HTMLInputElement>(null);
+  const stockInputRef = useRef<HTMLInputElement>(null);
+  const urlInputRef = useRef<HTMLInputElement>(null);
+  const descriptionInputRef = useRef<HTMLInputElement>(null);
+
   const initialProductFormState: ProductFormState = {
     name: '',
     description: '',
@@ -60,36 +66,43 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
 
     if (name.length < 2 || name.length > 100) {
       alert("상품명은 2자 이상 100자 이하로 입력해주세요.");
+      nameInputRef.current?.focus();
       return;
     }
 
     if (description.length < 2 || description.length > 500) {
       alert("상품 설명은 2자 이상 500자 이하로 입력해주세요.");
+      descriptionInputRef.current?.focus();
       return;
     }
 
     if (isNaN(price) ) {
       alert("상품 가격은 숫자로만 입력해주세요.");
+      priceInputRef.current?.focus();
       return;
     }
 
     if (price < 100 || price > 1000000) {
       alert("상품 가격은 100원 이상 1,000,000원 이하로 입력해주세요.");
+      priceInputRef.current?.focus();
       return;
     }
 
     if (isNaN(stock) ) {
       alert("상품 재고는 숫자로만 입력해주세요.");
+      stockInputRef.current?.focus();
       return;
     }
 
     if (stock < 1 || stock > 10000) {
       alert("상품 재고는 1 이상 10000 이하로 입력해주세요.");
+      stockInputRef.current?.focus();
       return;
     }
 
     if (imageUrl.length <= 0) {
       alert("상품 이미지 URL을 입력해주세요.");
+      urlInputRef.current?.focus();
       return;
     }
 
@@ -119,7 +132,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">상품명</label>
-            <input type="text" name="name" id="name"
+            <input type="text" name="name" id="name" ref={nameInputRef}
               value={formState.name}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md text-gray-900"
@@ -127,7 +140,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
           </div>
           <div>
             <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">가격 (원)</label>
-            <input type="number" name="price" id="price"
+            <input type="number" name="price" id="price" ref={priceInputRef}
               value={formState.price}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md text-gray-900"
@@ -135,7 +148,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
           </div>
           <div>
             <label htmlFor="stock" className="block text-sm font-medium text-gray-700 mb-1">재고</label>
-            <input type="number" name="stock" id="stock"
+            <input type="number" name="stock" id="stock" ref={stockInputRef}
               value={formState.stock}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md text-gray-900"
@@ -143,7 +156,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
           </div>
           <div>
             <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 mb-1">상품 이미지 URL</label>
-            <input type="text" name="imageUrl" id="imageUrl" placeholder="https://example.com/image.png"
+            <input type="text" name="imageUrl" id="imageUrl" placeholder="https://example.com/image.png" ref={urlInputRef}
               value={formState.imageUrl}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md text-gray-900"
@@ -152,9 +165,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
           <div className="md:col-span-2">
             <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">상품 설명</label>
             <textarea
-              name="description"
-              id="description"
-              rows={3}
+              name="description" id="description" rows={3} ref={descriptionInputRef}
               value={formState.description}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md text-gray-900"
