@@ -64,7 +64,7 @@ function useCart() {
 }
 
 function ProductList({cartState} : {cartState: ReturnType<typeof useCart>}) {
-  const { products } = useProducts(); // 전역 상품 목록과 찜 목록 가져오기
+  const { products } = useProducts();
   const {handleAddToCart} = cartState;
 
   return (

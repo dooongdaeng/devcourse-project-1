@@ -5,6 +5,7 @@ import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { components } from "@/lib/backend/apiV1/schema";
 import { useState, useEffect } from "react";
 import { apiFetch } from "@/lib/backend/client";
+import { useProduct } from "@/context/ProductsContext"
 
 type Product = components['schemas']['ProductDto'];
 type ProductImage = components['schemas']['ProductImageDto'];
@@ -41,11 +42,7 @@ function ProductCard({ product }: { product: Product }) {
 }
 
 export default function Home() {
-  const [products, setProducts] = useState<Product[] | null>(null);
-
-  useEffect(() => {
-    apiFetch('/api/v1/products').then(setProducts);
-  }, []);
+  const products = useProduct();
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-4 md:p-24">
