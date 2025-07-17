@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useProducts, OrderItem } from '@/context/ProductContext';
-import { useProduct, useProductImage } from '@/context/ProductsContext';
+import { useProduct } from '@/context/ProductsContext';
 import { components } from '@/lib/backend/apiV1/schema';
 import { useCreateOrder, CreateOrderRequest } from '@/context/OrderContext';
 
@@ -70,7 +70,7 @@ function useCart() {
 }
 
 function ProductList({cartState} : {cartState: ReturnType<typeof useCart>}) {
-  const products = useProduct();
+  const { products } = useProduct();
 
   return (
     <>
@@ -114,7 +114,7 @@ function ProductItem({cartState, product} : {
 }
 
 function WishList({cartState} : {cartState: ReturnType<typeof useCart>}) {
-  const products = useProduct();
+  const { products } = useProduct();
 
   const { favoriteProducts } = useProducts(); // 전역 상품 목록과 찜 목록 가져오기
 
@@ -194,8 +194,8 @@ function OrderList({cartState} : {cartState: ReturnType<typeof useCart>}) {
   );
 }
 
-function CheckOut() {
-  const { cartItems, setCartItems } = useCart();
+function CheckOut({cartState} : {cartState : ReturnType<typeof useCart>}) {
+  const { cartItems, setCartItems } = cartState;
   const router = useRouter();
 
   // 커스텀 훅 사용
