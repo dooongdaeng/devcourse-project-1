@@ -8,7 +8,8 @@ public record UserDto(
         @NonNull String username,
         @NonNull String nickname,
         @NonNull String email,
-        @NonNull String address
+        @NonNull String address,
+        @NonNull String postalCode
 ) {
     public UserDto(User user) {
         this(
@@ -16,7 +17,8 @@ public record UserDto(
                 user.getUsername(),
                 user.getNickname(),
                 user.getEmail(),
-                user.getAddress()
+                user.getAddress(),
+                user.getPostalCode()
         );
     }
 }
