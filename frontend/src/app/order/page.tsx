@@ -83,7 +83,7 @@ function ProductList({cartState} : {cartState: ReturnType<typeof useCart>}) {
             <div className="flex-grow ml-4">
               <div className="font-semibold">{product.name}</div>
             </div>
-            <div className="text-center font-medium w-1/5 md:w-1/6">{parseInt(product.price).toLocaleString()}원</div>
+            <div className="text-center font-medium w-1/5 md:w-1/6">{product.price.toLocaleString()}원</div>
             <div className="text-right w-1/5 md:w-1/6">
               <button
                 onClick={() => handleAddToCart(product)}
