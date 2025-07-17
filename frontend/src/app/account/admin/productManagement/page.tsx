@@ -83,7 +83,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
       return;
     }
 
-    if (stock < 100 || stock > 1000000) {
+    if (stock < 1 || stock > 10000) {
       alert("상품 재고는 1 이상 10000 이하로 입력해주세요.");
       return;
     }

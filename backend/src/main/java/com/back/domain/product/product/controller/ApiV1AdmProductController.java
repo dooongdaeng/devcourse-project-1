@@ -99,7 +99,7 @@ public class ApiV1AdmProductController {
     ) {
         Product product = productService.findById(id).get();
         productService.modify(product, reqBody.name, reqBody.price, reqBody.description, reqBody.stock);
-        productService.modifyProductImage(product.findProductImageById(1).get(), reqBody.imageUrl);
+        productService.modifyProductImage(product.getProductImages().get(0), reqBody.imageUrl);
 
         return new RsData<>(
                 "200-1",
