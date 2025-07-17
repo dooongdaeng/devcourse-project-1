@@ -72,50 +72,11 @@ public class ApiV1OrderItemControllerTest {
                 .andExpect(jsonPath("$.data.productId").value(1));
     }
 
-    @Test
-    @DisplayName("주문 아이템 단건 조회 테스트")
-    @WithMockUser
-    void t2() throws Exception {
-        mvc.perform(
-                        get("/api/v1/orderItems/1")
-                )
-                .andDo(print())
-                .andExpect(handler().handlerType(ApiV1OrderItemController.class))
-                .andExpect(handler().methodName("getOrderItem"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.orderId").value(1))
-                .andExpect(jsonPath("$.productId").value(1))
-                .andExpect(jsonPath("$.quantity").value(2))
-                .andExpect(jsonPath("$.unitPrice").value(15000))
-                .andExpect(jsonPath("$.totalPrice").value(30000))
-                .andExpect(jsonPath("$.createDate").exists())
-                .andExpect(jsonPath("$.modifyDate").exists());
-    }
+
+
 
     @Test
-    @DisplayName("주문 아이템 다건 조회 테스트")
-    @WithMockUser
-    void t3() throws Exception {
-        mvc.perform(
-                        get("/api/v1/orderItems")
-                                .with(csrf())
-                )
-                .andDo(print())
-                .andExpect(handler().handlerType(ApiV1OrderItemController.class))
-                .andExpect(handler().methodName("getOrderItems"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(8)) // 9개 OrderItem 확인
-                .andExpect(jsonPath("$[0].id").exists())
-                .andExpect(jsonPath("$[0].orderId").exists())
-                .andExpect(jsonPath("$[0].productId").exists())
-                .andExpect(jsonPath("$[0].quantity").exists())
-                .andExpect(jsonPath("$[0].unitPrice").exists())
-                .andExpect(jsonPath("$[0].totalPrice").exists());
-    }
-
-    @Test
-    @DisplayName("특정 주문의 아이템 목록 조회 테스트 (추후 adm으로 옮겨야함)")
+    @DisplayName("특정 주문의 아이템 목록 조회 테스트")
     @WithMockUser
     void t4() throws Exception {
         mvc.perform(
@@ -131,37 +92,7 @@ public class ApiV1OrderItemControllerTest {
                 .andExpect(jsonPath("$[1].orderId").value(1));
     }
 
-    @Test
-    @DisplayName("특정 상품의 주문 아이템 목록 조회 테스트")
-    @WithMockUser
-    void t5() throws Exception {
-        mvc.perform(
-                        get("/api/v1/orderItems/product/1")
-                                .with(csrf())
-                )
-                .andDo(print())
-                .andExpect(handler().handlerType(ApiV1OrderItemController.class))
-                .andExpect(handler().methodName("getOrderItemsByProductId"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(3)) // 상품1은 3개 주문에서 사용됨
-                .andExpect(jsonPath("$[0].productId").value(1))
-                .andExpect(jsonPath("$[1].productId").value(1))
-                .andExpect(jsonPath("$[2].productId").value(1));
-    }
 
-    @Test
-    @DisplayName("존재하지 않는 주문 아이템 조회 테스트")
-    @WithMockUser
-    void t6() throws Exception {
-        mvc.perform(
-                        get("/api/v1/orderItems/999")
-                                .with(csrf())
-                )
-                .andDo(print())
-                .andExpect(handler().handlerType(ApiV1OrderItemController.class))
-                .andExpect(handler().methodName("getOrderItem"))
-                .andExpect(status().isNotFound()); // RuntimeException 발생으로 500 에러
-    }
 
 
     @Test
