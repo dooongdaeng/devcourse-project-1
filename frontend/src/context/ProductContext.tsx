@@ -14,7 +14,7 @@ export type Product = {
 
 export type User = {
   id: number;
-  email: string;
+  userId: string;
   name: string;
   postalCode: string;
   address: string;
@@ -76,8 +76,8 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
   ];
 
   const initialUsers: User[] = [
-    { id: 1, email: 'user1@example.com', name: '김철수', postalCode: '01234', address: '서울시 강남구 테헤란로 123', signupDate: '2023-01-15' },
-    { id: 2, email: 'user2@example.com', name: '이영희', postalCode: '56789', address: '부산시 해운대구 센텀중앙로 99', signupDate: '2023-03-20' },
+    { id: 1, userId: 'user1', name: '김철수', postalCode: '01234', address: '서울시 강남구 테헤란로 123', signupDate: '2023-01-15' },
+    { id: 2, userId: 'user2', name: '이영희', postalCode: '56789', address: '부산시 해운대구 센텀중앙로 99', signupDate: '2023-03-20' },
   ];
 
   const [products, setProducts] = useState<Product[]>(() => {
@@ -163,7 +163,7 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     setProducts(prev => prev.filter(p => p.id !== productId));
   };
 
-  const addUser = (userData: Omit<User, 'id' | 'signupDate'>) => {
+  const addUser = (userData: Omit<User, 'id' | 'signupDate' | 'email'>) => {
     setUsers(prev => {
       const newId = prev.length > 0 ? Math.max(...prev.map(u => u.id)) + 1 : 1;
       const today = new Date();

@@ -15,15 +15,15 @@ export default function Login() {
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">로그인</h2>
         <form className="space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              이메일
+            <label htmlFor="userId" className="block text-sm font-medium text-gray-700 mb-1">
+              사용자 ID
             </label>
             <input
               type="text"
-              id="email"
-              name="email"
+              id="userId"
+              name="userId"
               className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-700"
-              placeholder="이메일을 입력하세요"
+              placeholder="사용자 ID를 입력하세요"
             />
           </div>
           <div>

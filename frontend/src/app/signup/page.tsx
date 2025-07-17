@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useProducts } from '@/context/ProductContext';
 
 export default function Signup() {
-  const [email, setEmail] = useState('');
+  const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
@@ -22,13 +22,13 @@ export default function Signup() {
       return;
     }
 
-    if (!email || !password || !name || !postalCode || !address) {
+    if (!userId || !password || !name || !postalCode || !address) {
       alert('모든 필드를 입력해주세요.');
       return;
     }
 
     addUser({
-      email,
+      userId,
       name,
       postalCode,
       address,
@@ -44,17 +44,17 @@ export default function Signup() {
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">회원가입</h2>
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              이메일
+            <label htmlFor="userId" className="block text-sm font-medium text-gray-700 mb-1">
+              사용자 ID
             </label>
             <input
-              type="email"
-              id="email"
-              name="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              id="userId"
+              name="userId"
+              value={userId}
+              onChange={(e) => setUserId(e.target.value)}
               className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-700"
-              placeholder="이메일을 입력하세요"
+              placeholder="사용자 ID를 입력하세요"
             />
           </div>
           <div>
