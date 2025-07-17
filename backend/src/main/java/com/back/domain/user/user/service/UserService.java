@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -29,6 +30,28 @@ public class UserService {
     }
     public String genAccessToken(User user) {
         return userAuthTokenService.genAccessToken(user);
+    }
+
+    public String genRefreshToken(User user) {
+        return userAuthTokenService.genRefreshToken(user);
+    }
+
+    public void updateRefreshToken(User user, String refreshToken) {
+        user.updateRefreshToken(refreshToken);
+        userRepository.save(user);
+    }
+
+    public Map<String, Object> verifyRefreshToken(String refreshToken) {
+        Map<String, Object> payload = userAuthTokenService.payloadRefreshToken(refreshToken);
+        if (payload == null) {
+            throw new ServiceException("401-5", "리프레시 토큰이 유효하지 않거나 만료되었습니다.");
+        }
+        return payload;
+    }
+
+    public void invalidateRefreshToken(User user) {
+        user.updateRefreshToken(null);
+        userRepository.save(user);
     }
 
     public Optional<User> findByUsername(String username) {
