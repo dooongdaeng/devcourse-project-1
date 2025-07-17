@@ -89,6 +89,26 @@ export default function RootLayout({
                           관리자
                         </Link>
                       </li>
+                      <li>
+                        <Link href="/account/client" className="hover:text-gray-300">
+                          회원정보
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/account/admin/accountManagement" className="hover:text-gray-300">
+                          회원관리
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/account/admin/productManagement" className="hover:text-gray-300">
+                          상품관리
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/account/admin/orderManagement" className="hover:text-gray-300">
+                          주문관리
+                        </Link>
+                      </li>
                     </>
                   )}
                   <li>
