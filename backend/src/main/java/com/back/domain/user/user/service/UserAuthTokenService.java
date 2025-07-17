@@ -1,6 +1,7 @@
 package com.back.domain.user.user.service;
 
 import com.back.domain.user.user.entity.User;
+import com.back.global.exception.ServiceException;
 import com.back.standard.util.Ut;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,7 +50,7 @@ public class UserAuthTokenService{
     public Map<String, Object> payload(String accessToken) {
         Map<String, Object> parsedPayload = Ut.jwt.payload(jwtSecretKey, accessToken);
 
-        if (parsedPayload == null) return null;
+        if (parsedPayload == null) throw new ServiceException("401-2", "액세스 토큰이 유효하지 않거나 만료되었습니다.");
 
         try {
             int id = (int) parsedPayload.get("id");
@@ -63,8 +64,8 @@ public class UserAuthTokenService{
                     "nickname", nickname,
                     "role", role
             );
-        } catch (Exception e) {
-            return null; // 잘못된 payload 처리
+        } catch (ClassCastException  e) {
+            throw new ServiceException("401-2", "액세스 토큰 페이로드 형식이 올바르지 않습니다.");
         }
     }
 
@@ -83,8 +84,8 @@ public class UserAuthTokenService{
                     "nickname", nickname,
                     "role", role
             );
-        } catch (Exception e) {
-            return null;
+        } catch (ClassCastException  e) {
+            throw new ServiceException("401-5", "리프레시 토큰 페이로드 형식이 올바르지 않습니다.");
         }
     }
 }
