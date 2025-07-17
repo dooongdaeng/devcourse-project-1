@@ -22,10 +22,8 @@ function ProductItem(id: number) {
   );
 }
 
-export default function ProductManagement() {
-  const { products, addProduct } = useProduct();
-  const { modifyProduct, deleteProduct } = useProductItem();
-
+function Form() {
+  const [newProduct, setNewProduct] = useState<ProductFormState>(initialProductFormState);
   const initialProductFormState: ProductFormState = {
     name: '',
     description: '',
@@ -34,22 +32,8 @@ export default function ProductManagement() {
     imageUrl: ''
   };
 
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [newProduct, setNewProduct] = useState<ProductFormState>(initialProductFormState);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-
-  // --- Handlers for Deleting Products ---
-  const handleDeleteProduct = (productId: number) => {
-    if (window.confirm('정말로 이 상품을 삭제하시겠습니까?')) {
-      deleteProduct(productId);
-    }
-  };
-
-  // --- Handlers for Adding Products ---
-  const handleAddNewClick = () => {
-    setShowAddForm(true);
-    setEditingProduct(null);
-  };
+  const { addProduct } = useProduct();
+  const { modifyProduct } = useProductItem();
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -72,12 +56,6 @@ export default function ProductManagement() {
     });
 
     setNewProduct(initialProductFormState);
-    setShowAddForm(false);
-  };
-
-  // --- Handlers for Editing Products ---
-  const handleEditClick = (product: Product) => {
-    setEditingProduct(product);
     setShowAddForm(false);
   };
 
@@ -109,6 +87,119 @@ export default function ProductManagement() {
     setNewProduct(initialProductFormState);
   };
 
+
+  return (
+    <>
+      <div className="mt-6 mb-6 p-6 bg-gray-50 rounded-md border border-gray-200">
+        <h4 className="text-xl font-semibold text-gray-700 mb-4">
+          {editingProduct ? '상품 정보 수정' : '새 상품 정보 입력'}
+        </h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">상품명</label>
+            <input type="text" name="name" id="name" value={editingProduct ? editingProduct.name : newProduct.name} onChange={editingProduct ? handleEditInputChange : handleInputChange} className="w-full p-2 border border-gray-300 rounded-md text-gray-900" />
+          </div>
+          <div>
+            <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">가격 (원)</label>
+            <input type="number" name="price" id="price" value={editingProduct ? editingProduct.price : newProduct.price} onChange={editingProduct ? handleEditInputChange : handleInputChange} className="w-full p-2 border border-gray-300 rounded-md text-gray-900" />
+          </div>
+          <div>
+            <label htmlFor="stock" className="block text-sm font-medium text-gray-700 mb-1">재고</label>
+            <input type="number" name="stock" id="stock" value={editingProduct ? editingProduct.stock : newProduct.stock} onChange={editingProduct ? handleEditInputChange : handleInputChange} className="w-full p-2 border border-gray-300 rounded-md text-gray-900" />
+          </div>
+          <div>
+            <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 mb-1">상품 이미지 URL</label>
+            <input type="text" name="imageUrl" id="imageUrl" placeholder="https://example.com/image.png" value={editingProduct ? editingProduct.imageUrl : newProduct.imageUrl} onChange={editingProduct ? handleEditInputChange : handleInputChange} className="w-full p-2 border border-gray-300 rounded-md text-gray-900" />
+          </div>
+          <div className="md:col-span-2">
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">상품 설명</label>
+            <textarea name="description" id="description" value={editingProduct ? editingProduct.description : newProduct.description} onChange={editingProduct ? handleEditInputChange : handleInputChange} rows={3} className="w-full p-2 border border-gray-300 rounded-md text-gray-900"></textarea>
+          </div>
+        </div>
+        <div className="mt-6 flex justify-end space-x-4">
+          <button onClick={editingProduct ? handleUpdateProduct : handleSaveNewProduct} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
+            {editingProduct ? '수정 완료' : '저장'}
+          </button>
+          <button onClick={handleCancel} className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded cursor-pointer">취소</button>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function ProductList() {
+  const { products } = useProduct();
+  const { deleteProduct } = useProductItem();
+
+  // --- Handlers for Deleting Products ---
+  const handleDeleteProduct = (productId: number) => {
+    if (window.confirm('정말로 이 상품을 삭제하시겠습니까?')) {
+      deleteProduct(productId);
+    }
+  };
+const handleEditClick = (product: Product) => {
+    setEditingProduct(product);
+    setShowAddForm(false);
+  };
+
+  return (
+    <>
+      <div className="overflow-x-auto">
+            <table className="min-w-full bg-white border border-gray-200 rounded-md">
+              <thead>
+                <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                  <th className="py-3 px-6 text-left">ID</th>
+                  <th className="py-3 px-6 text-left">상품명</th>
+                  <th className="py-3 px-6 text-left">가격</th>
+                  <th className="py-3 px-6 text-left">재고</th>
+                  <th className="py-3 px-6 text-center">액션</th>
+                </tr>
+              </thead>
+              <tbody className="text-gray-600 text-sm">
+                {products?.map(product => (
+                  <tr key={product.id} className="border-b border-gray-200 hover:bg-gray-50">
+                    <td className="py-3 px-6 text-left whitespace-nowrap">{product.id}</td>
+                    <td className="py-3 px-6 text-left">{product.name}</td>
+                    <td className="py-3 px-6 text-left">{product.price}원</td>
+                    <td className="py-3 px-6 text-left">{product.stock}</td>
+                    <td className="py-3 px-6 text-center">
+                      <button
+                        onClick={() => handleEditClick(product)}
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs mr-2 cursor-pointer"
+                      >
+                        수정
+                      </button>
+                      <button
+                        onClick={() => handleDeleteProduct(product.id)}
+                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-xs cursor-pointer"
+                      >
+                        삭제
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+    </>
+  );
+}
+
+export default function ProductManagement() {
+
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  
+  // --- Handlers for Adding Products ---
+  const handleAddNewClick = () => {
+    setShowAddForm(true);
+    setEditingProduct(null);
+  };
+
+  // --- Handlers for Editing Products ---
+  
+  
   return (
     <main className="flex min-h-screen flex-col items-center p-4 md:p-24">
       <div className="w-full max-w-5xl bg-white rounded-xl shadow-lg p-8">
@@ -128,73 +219,10 @@ export default function ProductManagement() {
 
           {/* Add/Edit Form Section */}
           {(showAddForm || editingProduct) && (
-            <div className="mt-6 mb-6 p-6 bg-gray-50 rounded-md border border-gray-200">
-              <h4 className="text-xl font-semibold text-gray-700 mb-4">
-                {editingProduct ? '상품 정보 수정' : '새 상품 정보 입력'}
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">상품명</label>
-                  <input type="text" name="name" id="name" value={editingProduct ? editingProduct.name : newProduct.name} onChange={editingProduct ? handleEditInputChange : handleInputChange} className="w-full p-2 border border-gray-300 rounded-md text-gray-900" />
-                </div>
-                <div>
-                  <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">가격 (원)</label>
-                  <input type="number" name="price" id="price" value={editingProduct ? editingProduct.price : newProduct.price} onChange={editingProduct ? handleEditInputChange : handleInputChange} className="w-full p-2 border border-gray-300 rounded-md text-gray-900" />
-                </div>
-                <div>
-                  <label htmlFor="stock" className="block text-sm font-medium text-gray-700 mb-1">재고</label>
-                  <input type="number" name="stock" id="stock" value={editingProduct ? editingProduct.stock : newProduct.stock} onChange={editingProduct ? handleEditInputChange : handleInputChange} className="w-full p-2 border border-gray-300 rounded-md text-gray-900" />
-                </div>
-                <div>
-                  <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 mb-1">상품 이미지 URL</label>
-                  <input type="text" name="imageUrl" id="imageUrl" placeholder="https://example.com/image.png" value={editingProduct ? editingProduct.imageUrl : newProduct.imageUrl} onChange={editingProduct ? handleEditInputChange : handleInputChange} className="w-full p-2 border border-gray-300 rounded-md text-gray-900" />
-                </div>
-                <div className="md:col-span-2">
-                  <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">상품 설명</label>
-                  <textarea name="description" id="description" value={editingProduct ? editingProduct.description : newProduct.description} onChange={editingProduct ? handleEditInputChange : handleInputChange} rows={3} className="w-full p-2 border border-gray-300 rounded-md text-gray-900"></textarea>
-                </div>
-              </div>
-              <div className="mt-6 flex justify-end space-x-4">
-                <button onClick={editingProduct ? handleUpdateProduct : handleSaveNewProduct} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
-                  {editingProduct ? '수정 완료' : '저장'}
-                </button>
-                <button onClick={handleCancel} className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded cursor-pointer">취소</button>
-              </div>
-            </div>
+            <Form></Form>
           )}
 
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white border border-gray-200 rounded-md">
-              <thead>
-                <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-                  <th className="py-3 px-6 text-left">ID</th>
-                  <th className="py-3 px-6 text-left">상품명</th>
-                  <th className="py-3 px-6 text-left">가격</th>
-                  <th className="py-3 px-6 text-left">재고</th>
-                  <th className="py-3 px-6 text-center">액션</th>
-                </tr>
-              </thead>
-              <tbody className="text-gray-600 text-sm">
-                {products.map(product => (
-                  <tr key={product.id} className="border-b border-gray-200 hover:bg-gray-50">
-                    <td className="py-3 px-6 text-left whitespace-nowrap">{product.id}</td>
-                    <td className="py-3 px-6 text-left">{product.name}</td>
-                    <td className="py-3 px-6 text-left">{product.price}원</td>
-                    <td className="py-3 px-6 text-left">{product.stock}</td>
-                    <td className="py-3 px-6 text-center">
-                      <button onClick={() => handleEditClick(product)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs mr-2 cursor-pointer">수정</button>
-                      <button
-                        onClick={() => handleDeleteProduct(product.id)}
-                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-xs cursor-pointer"
-                      >
-                        삭제
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ProductList></ProductList>
         </section>
       </div>
     </main>
