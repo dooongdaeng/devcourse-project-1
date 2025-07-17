@@ -6,6 +6,7 @@ import com.back.global.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,7 @@ public class UserService {
     public String genRefreshToken(User user) {
         return userAuthTokenService.genRefreshToken(user);
     }
-
+    @Transactional
     public void updateRefreshToken(User user, String refreshToken) {
         user.updateRefreshToken(refreshToken);
         userRepository.save(user);
@@ -49,6 +50,7 @@ public class UserService {
         return payload;
     }
 
+    @Transactional
     public void invalidateRefreshToken(User user) {
         user.updateRefreshToken(null);
         userRepository.save(user);
@@ -80,6 +82,7 @@ public class UserService {
         return !userRepository.existsByEmail(email);
     }
 
+    @Transactional
     public User create(String username, String rawPassword, String email, String nickname, List<String> roles, String address, String postalCode) {
         String encodedPassword = passwordEncoder.encode(rawPassword);
 
@@ -104,5 +107,12 @@ public class UserService {
 
     public Optional<User> findByApiKey(String apiKey) {
         return userRepository.findByApiKey(apiKey);
+    }
+
+    @Transactional
+    public void deleteUser(int id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ServiceException("404-3", "삭제하려는 회원이 존재하지 않습니다."));
+        userRepository.delete(user);
     }
 }
