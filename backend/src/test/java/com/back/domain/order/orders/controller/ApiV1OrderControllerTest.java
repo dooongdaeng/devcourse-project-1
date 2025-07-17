@@ -84,7 +84,6 @@ public class ApiV1OrderControllerTest {
 
     @Test
     @DisplayName("주문 수정 테스트")
-    @WithMockUser
     void t5() throws Exception {
         int id = 1;
 
@@ -153,7 +152,6 @@ public class ApiV1OrderControllerTest {
 
     @Test
     @DisplayName("주문 삭제 테스트")
-    @WithMockUser
     void t6() throws Exception {
         int id = 1;
 
