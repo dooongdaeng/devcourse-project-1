@@ -16,7 +16,6 @@ type ProductFormState = {
 };
 
 function Form(editingProduct: Product) {
-  const [newProduct, setNewProduct] = useState<ProductFormState>(initialProductFormState);
   const initialProductFormState: ProductFormState = {
     name: '',
     description: '',
@@ -24,6 +23,7 @@ function Form(editingProduct: Product) {
     stock: '',
     imageUrl: ''
   };
+  const [newProduct, setNewProduct] = useState<ProductFormState>(initialProductFormState);
 
   const { addProduct } = useProduct();
   const { modifyProduct } = useProductItem();
@@ -165,7 +165,7 @@ function ProductList() {
           </thead>
           <tbody className="text-gray-600 text-sm">
             {products?.map(product => (
-              <ProductListItem key={product.id} product={product}></ProductListItem>
+              <ProductListItem key={product.id} {...product}></ProductListItem>
             ))}
           </tbody>
         </table>
@@ -206,7 +206,7 @@ function ProductListItem(product: Product) {
             수정
           </button>
           <button
-            onClick={() => handleDeleteProduct(product.id)}
+            onClick={() => handleDeleteProduct()}
             className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-xs cursor-pointer"
           >
             삭제
@@ -218,11 +218,8 @@ function ProductListItem(product: Product) {
 }
 
 export default function ProductManagement() {
-
-  const [showAddForm, setShowAddForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
-  
   // --- Handlers for Adding Products ---
   const handleAddNewClick = () => {
     setEditingProduct(null);
@@ -246,11 +243,6 @@ export default function ProductManagement() {
               새 상품 추가
             </button>
           </div>
-
-          {/* Add/Edit Form Section */}
-          {(showAddForm || editingProduct) && (
-            <Form editingProduct={editingProduct} product={product}></Form>
-          )}
 
           <ProductList></ProductList>
         </section>
