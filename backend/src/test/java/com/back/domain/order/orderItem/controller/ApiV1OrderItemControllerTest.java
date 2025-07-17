@@ -194,6 +194,37 @@ public class ApiV1OrderItemControllerTest {
                 .andExpect(jsonPath("$.msg").value("1번 주문 아이템이 수정되었습니다."));
     }
 
+
+    @Test
+    @DisplayName("주문 아이템 수정 테스트 - 본인 주문 아이템이 아닐 때")
+    void t12() throws Exception {
+        int id = 1;
+
+        User user = userService.findByUsername("user3").get();
+        String userApiKey = user.getApiKey();
+
+        ResultActions resultActions = mvc
+                .perform(
+                        MockMvcRequestBuilders.put("/api/v1/orderItems/1")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + userApiKey)
+                                .content("""
+                                        {
+                                            "quantity": 5,
+                                            "unitPrice": 20000,
+                                            "productId": 2
+                                        }
+                                        """)
+                )
+                .andDo(print());
+        resultActions
+                .andExpect(handler().handlerType(ApiV1OrderItemController.class))
+                .andExpect(handler().methodName("update"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.resultCode").value("403-1"))
+                .andExpect(jsonPath("$.msg").value("본인의 주문만 수정할 수 있습니다."));
+    }
+
     @Test
     @DisplayName("존재하지 않는 주문 아이템 수정 테스트")
     @WithMockUser
@@ -264,6 +295,29 @@ public class ApiV1OrderItemControllerTest {
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
                 .andExpect(jsonPath("$.msg").value("1번 주문 아이템이 삭제되었습니다."));
 
+    }
+
+    @Test
+    @DisplayName("주문 아이템 삭제 테스트 - 본인 주문 아이템이 아닐 때")
+    void t13() throws Exception {
+
+        User user = userService.findByUsername("user3").get();
+        String userApiKey = user.getApiKey();
+
+        ResultActions resultActions = mvc
+                .perform(
+
+                        delete("/api/v1/orderItems/1")
+                                .header("Authorization", "Bearer " + userApiKey)
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1OrderItemController.class))
+                .andExpect(handler().methodName("delete"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.resultCode").value("403-1"))
+                .andExpect(jsonPath("$.msg").value("본인의 주문만 삭제할 수 있습니다."));
     }
 
     @Test
