@@ -35,9 +35,9 @@ public class ApiV1AdminUserControllerTest {
     @BeforeEach
     void setUp() {
         if (userService.count() == 0) {
-            userService.create("admin", "1234", "admin@test.com", List.of("ROLE_ADMIN"), "서울시 중구");
-            userService.create("user1", "1234", "user1@test.com", List.of("ROLE_USER"), "서울시 강남구");
-            userService.create("user2", "1234", "user2@test.com", List.of("ROLE_USER"), "서울시 서초구");
+            userService.create("admin", "1234", "admin@test.com", "admin",List.of("ROLE_ADMIN"), "서울시 중구");
+            userService.create("user1", "1234", "user1@test.com", "testUser1",List.of("ROLE_USER"), "서울시 강남구");
+            userService.create("user2", "1234", "user2@test.com", "testUser2",List.of("ROLE_USER"), "서울시 서초구");
         }
     }
 
@@ -51,6 +51,7 @@ public class ApiV1AdminUserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(all.size()))
                 .andExpect(jsonPath("$[0].username").value(all.get(0).getUsername()))
+                .andExpect(jsonPath("$[0].nickname").value(all.get(0).getNickname()))
                 .andExpect(jsonPath("$[0].email").value(all.get(0).getEmail()));
     }
 
@@ -64,6 +65,7 @@ public class ApiV1AdminUserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(user.getId()))
                 .andExpect(jsonPath("$.username").value(user.getUsername()))
+                .andExpect(jsonPath("$.nickname").value(user.getNickname()))
                 .andExpect(jsonPath("$.email").value(user.getEmail()))
                 .andExpect(jsonPath("$.createDate").value(startsWith(user.getCreateDate().toString().substring(0, 20))))
                 .andExpect(jsonPath("$.modifyDate").value(startsWith(user.getModifyDate().toString().substring(0, 20))))

@@ -102,10 +102,6 @@ public class ApiV1UserController {
     // @AuthenticationPrincipal 어노테이션을 사용하여 로그인된 사용자 정보 주입
     public RsData<UserDto> me(@AuthenticationPrincipal UserSecurityUser userSecurityUser) {
 
-        // @AuthenticationPrincipal로 주입된 UserSecurityUser 객체에서 사용자 정보 가져옴
-        if (userSecurityUser == null) {
-            return new RsData<>("401-1", "로그인이 필요합니다."); // JWT가 없거나 유효하지 않을 경우
-        }
         int userId = userSecurityUser.getId(); // UserSecurityUser에서 ID 가져오기
 
         User user = userService.findById(userId)
