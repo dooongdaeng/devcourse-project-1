@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useProducts, OrderItem } from '@/context/ProductContext';
 import { useProduct } from '@/context/ProductsContext';
 import { components } from '@/lib/backend/apiV1/schema';
-import { useCreateOrder, CreateOrderRequest } from '@/context/OrderContext';
+import { useCreateOrder, CreateOrderRequest } from '@/context/OrderContext'; 
 
 
 type Product = components['schemas']['ProductWithImageUrlDto'];
@@ -235,7 +235,7 @@ function CheckOut({cartState} : {cartState : ReturnType<typeof useCart>}) {
 
           alert('결제가 완료되었습니다. 주문 내역에서 확인해주세요.');
           router.push('/orderHistory');
-
+          
         } catch (error) {
           console.error('주문 처리 중 오류:', error);
           alert(`결제 처리 중 오류가 발생했습니다: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
