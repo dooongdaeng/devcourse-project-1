@@ -34,7 +34,7 @@ public class SecurityConfig {
                                 .requestMatchers("/h2-console/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/*/products", "api/*/products/{id:\\d+}", "api/*/products/{productId:\\d+}/images", "api/*/products/{productId:\\d+}/images/{id:\\d+}").permitAll()
                                 .requestMatchers("/api/*/users", "api/*/users/login", "api/*/users/check-username", "api/*/users/check-email", "/api/*/users/token/refresh").permitAll()
-                                .requestMatchers("/api/v1/users/logout").authenticated()
+                                .requestMatchers(HttpMethod.DELETE,"/api/v1/users/logout").permitAll()
                                 .requestMatchers("/api/*/adm/**").hasRole("ADMIN")
                                 .requestMatchers("/api/*/**").authenticated()
                                 .anyRequest().permitAll()
