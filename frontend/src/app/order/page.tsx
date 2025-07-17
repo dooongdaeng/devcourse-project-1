@@ -6,7 +6,7 @@ import { useProducts, OrderItem } from '@/context/ProductContext';
 import { useProduct, useProductImage } from '@/context/ProductsContext';
 import { components } from '@/lib/backend/apiV1/schema';
 
-type Product = components['schemas']['ProductDto'];
+type Product = components['schemas']['ProductWithImageUrlDto'];
 
 // Define a type for cart items, which includes quantity
 type CartItem = Product & {
@@ -86,14 +86,13 @@ function ProductItem({cartState, product} : {
   cartState: ReturnType<typeof useCart>;
   product: Product;
 }) {
-  const productImage = useProductImage(product.id);
   const {handleAddToCart} = cartState;
 
   return (
     <>
       <li className="flex items-center mt-3 p-2 border-b border-gray-200">
         <div className="w-1/5 md:w-1/6 flex-shrink-0">
-          <img className="w-14 h-14 object-cover rounded" src={productImage} alt={product.name} />
+          <img className="w-14 h-14 object-cover rounded" src={product.imageUrl} alt={product.name} />
         </div>
         <div className="flex-grow ml-4 w-0 flex-grow">
           <div className="font-semibold">{product.name}</div>
@@ -142,14 +141,13 @@ function WishListItem({cartState, item} : {
   cartState: ReturnType<typeof useCart>;
   item: Product;
 }){
-  const itemImage = useProductImage(item.id);
   const { handleAddToCart } = cartState;
 
   return (
     <>
       <li key={item.id} className="flex items-center mt-3 p-2 border-b border-gray-200">
         <div className="w-1/5 md:w-1/6 flex-shrink-0">
-          <img className="w-14 h-14 object-cover rounded" src={itemImage} alt={item.name} />
+          <img className="w-14 h-14 object-cover rounded" src={item.imageUrl} alt={item.name} />
         </div>
         <div className="flex-grow ml-4 w-0 flex-grow">
           <div className="font-semibold">{item.name}</div>

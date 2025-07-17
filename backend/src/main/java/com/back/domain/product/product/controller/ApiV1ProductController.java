@@ -1,6 +1,7 @@
 package com.back.domain.product.product.controller;
 
 import com.back.domain.product.product.dto.ProductDto;
+import com.back.domain.product.product.dto.ProductWithImageUrlDto;
 import com.back.domain.product.product.entity.Product;
 import com.back.domain.product.product.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,11 +25,11 @@ public class ApiV1ProductController {
     @GetMapping
     @Transactional(readOnly = true)
     @Operation(summary = "다건 조회")
-    public List<ProductDto> getItems() {
+    public List<ProductWithImageUrlDto> getItems() {
         List<Product> items = productService.findAll();
 
         return items.stream()
-                .map(ProductDto::new)
+                .map(ProductWithImageUrlDto::new)
                 .toList();
     }
 
