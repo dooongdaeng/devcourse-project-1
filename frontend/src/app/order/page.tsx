@@ -96,7 +96,7 @@ function ProductItem({cartState, product} : {
         <div className="w-1/5 md:w-1/6 flex-shrink-0">
           <img className="w-14 h-14 object-cover rounded" src={productImage} alt={product.name} />
         </div>
-        <div className="flex-grow ml-4">
+        <div className="flex-grow ml-4 w-0 flex-grow">
           <div className="font-semibold">{product.name}</div>
         </div>
         <div className="text-center font-medium w-1/5 md:w-1/6">{product.price.toLocaleString()}원</div>
