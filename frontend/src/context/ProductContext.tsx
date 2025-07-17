@@ -77,8 +77,8 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
   ];
 
   const initialUsers: User[] = [
-    { id: 1, userId: 'user1', password: '1234', name: '김철수', postalCode: '01234', address: '서울시 강남구 테헤란로 123', signupDate: '2023-01-15' },
-    { id: 2, userId: 'user2', password: '1234', name: '이영희', postalCode: '56789', address: '부산시 해운대구 센텀중앙로 99', signupDate: '2023-03-20' },
+    { id: 1, userId: 'user1', password: '123', name: '김철수', postalCode: '01234', address: '서울시 강남구 테헤란로 123', signupDate: '2023-01-15' },
+    { id: 2, userId: 'user2', password: '123', name: '이영희', postalCode: '56789', address: '부산시 해운대구 센텀중앙로 99', signupDate: '2023-03-20' },
   ];
 
   const [products, setProducts] = useState<Product[]>(() => {
