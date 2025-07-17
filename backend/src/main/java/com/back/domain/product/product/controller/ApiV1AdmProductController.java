@@ -93,7 +93,7 @@ public class ApiV1AdmProductController {
     @PutMapping("/{id}")
     @Transactional
     @Operation(summary = "수정")
-    public RsData<Void> update(
+    public RsData<ProductDto> update(
             @PathVariable int id,
             @Valid @RequestBody ProductUpdateReqBody reqBody
     ) {
@@ -103,7 +103,8 @@ public class ApiV1AdmProductController {
 
         return new RsData<>(
                 "200-1",
-                "%d번 상품이 수정되었습니다.".formatted(id)
+                "%d번 상품이 수정되었습니다.".formatted(id),
+                new ProductDto(product)
         );
     }
 }
