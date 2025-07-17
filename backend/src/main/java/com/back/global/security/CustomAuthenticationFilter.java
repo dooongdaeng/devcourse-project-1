@@ -22,7 +22,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -62,12 +61,6 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
     private void work(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // API 요청이 아니라면 패스
         if (!request.getRequestURI().startsWith("/api/")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        // 인증, 인가가 필요없는 API 요청이라면 패스
-        if (List.of("/api/v1/users/login", "/api/v1/users/logout", "/api/v1/users", "/api/v1/users/token/refresh").contains(request.getRequestURI())) {
             filterChain.doFilter(request, response);
             return;
         }
