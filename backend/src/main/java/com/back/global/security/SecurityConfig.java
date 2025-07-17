@@ -12,8 +12,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -34,9 +32,9 @@ public class SecurityConfig {
                         auth -> auth
                                 .requestMatchers("/favicon.ico").permitAll()
                                 .requestMatchers("/h2-console/**").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/*/products", "api/*/products/{id:\\d+}", "api/*/products/{productId:\\d+}/images", "api/*/products/{productId:\\d+}/images/{id:\\d+}").permitAll()
-                                .requestMatchers("/api/*/users", "api/*/users/login", "api/*/users/check-username", "api/*/users/check-email", "/api/*/users/token/refresh").permitAll()
-                                .requestMatchers("/api/v1/users/logout").authenticated()
+                                .requestMatchers(HttpMethod.GET, "/api/*/products", "api/*/products/{id:\\d+}", "api/*/products/{productId:\\d+}/images", "api/*/products/{productId:\\d+}/images/{id:\\d+}", "api/*/users/check-username", "api/*/users/check-email").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/api/*/users", "api/*/users/login", "/api/*/users/token/refresh").permitAll()
+                                .requestMatchers(HttpMethod.DELETE,"/api/v1/users/logout").permitAll()
                                 .requestMatchers("/api/*/adm/**").hasRole("ADMIN")
                                 .requestMatchers("/api/*/**").authenticated()
                                 .anyRequest().permitAll()
@@ -102,10 +100,5 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/api/**", configuration);
 
         return source;
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 }
