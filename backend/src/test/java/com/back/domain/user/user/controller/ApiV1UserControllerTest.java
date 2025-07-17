@@ -63,7 +63,7 @@ public class ApiV1UserControllerTest {
 
         // `testLoginSuccess`, `testMeSuccess`, `testCheckUsernameAvailable`, `testCheckEmailAvailable`,
         // `testJoinFail_DuplicateUsername` 등에서 필요한 "user1"을 여기서 생성합니다.
-        userService.create("user10", "1234", "user10@test.com", "testUser10",List.of("ROLE_USER"), "서울시 노원구");
+        userService.create("user10", "1234", "user10@test.com", "testUser10",List.of("ROLE_USER"), "서울시 노원구", "11111");
     }
 
     @Test

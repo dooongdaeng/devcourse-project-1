@@ -32,6 +32,7 @@ public class SecurityConfig {
                         auth -> auth
                                 .requestMatchers("/favicon.ico").permitAll()
                                 .requestMatchers("/h2-console/**").permitAll()
+                                .requestMatchers("/api/v1/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/*/products", "api/*/products/{id:\\d+}", "api/*/products/{productId:\\d+}/images", "api/*/products/{productId:\\d+}/images/{id:\\d+}", "api/*/users/check-username", "api/*/users/check-email").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/api/*/users", "api/*/users/login", "/api/*/users/token/refresh").permitAll()
                                 .requestMatchers(HttpMethod.DELETE,"/api/v1/users/logout").permitAll()

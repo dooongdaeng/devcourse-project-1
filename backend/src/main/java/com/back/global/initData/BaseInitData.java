@@ -57,11 +57,11 @@ public class BaseInitData {
     public void work2() {
         if (userService.count() > 0) return;
 
-        userService.create("user1", "1234", "user1@test.com", "testUser1",List.of("ROLE_USER"), "서울시 강남구");
-        userService.create("user2", "1234", "user2@test.com", "testUser2",List.of("ROLE_USER"), "서울시 서초구");
-        userService.create("user3", "1234", "user3@test.com", "testUser3",List.of("ROLE_USER"), "서울시 종로구");
-        userService.create("user4", "1234", "user4@test.com", "testUser4",List.of("ROLE_USER"), "서울시 마포구");
-        userService.create("admin", "1234", "admin@test.com", "admin",List.of("ROLE_ADMIN"), "서울시 중구");
+        userService.create("user1", "1234", "user1@test.com", "testUser1",List.of("ROLE_USER"), "서울시 강남구", "11111");
+        userService.create("user2", "1234", "user2@test.com", "testUser2",List.of("ROLE_USER"), "서울시 서초구", "22222");
+        userService.create("user3", "1234", "user3@test.com", "testUser3",List.of("ROLE_USER"), "서울시 종로구", "33333");
+        userService.create("user4", "1234", "user4@test.com", "testUser4",List.of("ROLE_USER"), "서울시 마포구", "44444");
+        userService.create("admin", "1234", "admin@test.com", "admin",List.of("ROLE_ADMIN"), "서울시 중구", "55555");
     }
 
     @Transactional

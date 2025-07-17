@@ -35,9 +35,9 @@ public class ApiV1AdminUserControllerTest {
     @BeforeEach
     void setUp() {
         if (userService.count() == 0) {
-            userService.create("admin", "1234", "admin@test.com", "admin",List.of("ROLE_ADMIN"), "서울시 중구");
-            userService.create("user1", "1234", "user1@test.com", "testUser1",List.of("ROLE_USER"), "서울시 강남구");
-            userService.create("user2", "1234", "user2@test.com", "testUser2",List.of("ROLE_USER"), "서울시 서초구");
+            userService.create("admin", "1234", "admin@test.com", "admin",List.of("ROLE_ADMIN"), "서울시 중구", "11111");
+            userService.create("user1", "1234", "user1@test.com", "testUser1",List.of("ROLE_USER"), "서울시 강남구", "22222");
+            userService.create("user2", "1234", "user2@test.com", "testUser2",List.of("ROLE_USER"), "서울시 서초구", "33333");
         }
     }
 
