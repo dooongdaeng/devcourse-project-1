@@ -2,6 +2,7 @@ package com.back.domain.user.user.service;
 
 import com.back.domain.user.user.entity.User;
 import com.back.domain.user.user.repository.UserRepository;
+import com.back.global.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,9 +19,9 @@ public class UserService {
 
     public User join(String username, String rawPassword, String nickname, String email, String address) {
         userRepository.findByUsername(username)
-                .ifPresent(u -> { throw new RuntimeException("이미 존재하는 아이디입니다."); });
+                .ifPresent(u -> { throw new ServiceException("400-1", "이미 존재하는 아이디입니다."); });
         userRepository.findByEmail(email)
-                .ifPresent(u -> { throw new RuntimeException("이미 사용 중인 이메일입니다."); });
+                .ifPresent(u -> { throw new ServiceException("400-2", "이미 사용 중인 이메일입니다."); });
 
         String encoded = passwordEncoder.encode(rawPassword);
         User user = new User(username, encoded, nickname, email, address);
@@ -36,7 +37,7 @@ public class UserService {
 
     public void checkPassword(User user, String rawPassword) {
         if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+            throw new ServiceException("401-2", "비밀번호가 일치하지 않습니다.");
         }
     }
 

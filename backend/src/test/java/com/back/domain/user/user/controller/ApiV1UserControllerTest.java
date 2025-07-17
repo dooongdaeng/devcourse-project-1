@@ -55,7 +55,6 @@ public class ApiV1UserControllerTest {
     @BeforeEach
     void setup() {
         // 모든 Repository의 데이터를 삭제하여 각 테스트의 독립성을 확보합니다.
-        // `@Transactional`이 있어도, 각 테스트 시작 전 데이터 클린업은 좋은 습관입니다.
         wishListRepository.deleteAll();
         orderItemRepository.deleteAll();
         orderRepository.deleteAll();
@@ -127,8 +126,7 @@ public class ApiV1UserControllerTest {
     // `@WithMockUser`는 `UserDetailsService`를 통하지 않고 Mock User를 생성하므로,
     // DB에 'user1'이 없어도 작동합니다. 하지만 `setup()`에서 `user1`을 이미 생성했으므로
     // 실제 DB에 있는 'user1'을 사용하게 됩니다.
-    // 만약 `@WithUserDetails`로도 충분하다면 통일하는 것을 고려할 수 있습니다.
-    @WithUserDetails(value = "user10", setupBefore = TestExecutionEvent.TEST_EXECUTION) // WithMockUser 대신 WithUserDetails 사용
+    @WithUserDetails(value = "user10", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     void testLogoutSuccess() throws Exception {
         mvc.perform(delete("/api/v1/users/logout"))
                 .andDo(print()) // 요청/응답 내용 출력
@@ -195,8 +193,8 @@ public class ApiV1UserControllerTest {
                 )
                 .andDo(print()) // 요청/응답 내용 출력
                 .andExpect(status().isBadRequest()) // 400 Bad Request
-                .andExpect(jsonPath("$.resultCode", is("400-0"))) // 적절한 에러 코드 (예상 결과에 따라 수정)
-                .andExpect(jsonPath("$.msg", containsString("이미 존재하는 아이디입니다."))); // 서비스에서 반환하는 메시지
+                .andExpect(jsonPath("$.resultCode", is("400-1")))
+                .andExpect(jsonPath("$.msg", containsString("이미 존재하는 아이디입니다.")));
     }
 
     @Test
@@ -215,7 +213,6 @@ public class ApiV1UserControllerTest {
                         .content(objectMapper.writeValueAsString(reqBody))
                 )
                 .andDo(print())
-                // NOTE: 실제 API 응답 코드와 메시지에 맞춰 수정하세요.
                 .andExpect(status().isBadRequest()) // 400 Bad Request
                 .andExpect(jsonPath("$.resultCode", anyOf(is("400-0"), is("400-1")))) // 유효성 검증 실패 에러 코드
                 .andExpect(jsonPath("$.msg", containsString("username"))); // "username" 필드 관련 에러 메시지 포함 확인
@@ -237,7 +234,6 @@ public class ApiV1UserControllerTest {
                         .content(objectMapper.writeValueAsString(reqBody))
                 )
                 .andDo(print())
-                // NOTE: 실제 API 응답 코드와 메시지에 맞춰 수정하세요.
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.resultCode", anyOf(is("400-0"), is("400-1"))))
                 .andExpect(jsonPath("$.msg", containsString("password")));
@@ -259,7 +255,6 @@ public class ApiV1UserControllerTest {
                         .content(objectMapper.writeValueAsString(reqBody))
                 )
                 .andDo(print())
-                // NOTE: 실제 API 응답 코드와 메시지에 맞춰 수정하세요.
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.resultCode", anyOf(is("400-0"), is("400-1"))))
                 .andExpect(jsonPath("$.msg", containsString("email")));
@@ -278,10 +273,8 @@ public class ApiV1UserControllerTest {
                         .content(objectMapper.writeValueAsString(reqBody))
                 )
                 .andDo(print())
-                // 비밀번호 불일치 시 UserService.checkPassword에서 RuntimeException 발생,
-                // GlobalExceptionHandler가 400 BAD_REQUEST로 처리
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.resultCode", is("400-0")))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.resultCode", is("401-2")))
                 .andExpect(jsonPath("$.msg", containsString("비밀번호가 일치하지 않습니다.")));
     }
 
@@ -298,10 +291,8 @@ public class ApiV1UserControllerTest {
                         .content(objectMapper.writeValueAsString(reqBody))
                 )
                 .andDo(print())
-                // UserService.findByUsername에서 사용자를 찾지 못하면 RuntimeException 발생,
-                // GlobalExceptionHandler가 400 BAD_REQUEST로 처리
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.resultCode", is("400-0")))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.resultCode", is("401-1")))
                 .andExpect(jsonPath("$.msg", containsString("존재하지 않는 아이디입니다.")));
     }
 
@@ -310,7 +301,6 @@ public class ApiV1UserControllerTest {
     void testMeFail_Unauthorized() throws Exception {
         mvc.perform(get("/api/v1/users/me"))
                 .andDo(print())
-                // NOTE: 실제 API 응답 코드와 메시지에 맞춰 수정하세요.
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.resultCode", is("401-1")))
                 .andExpect(jsonPath("$.msg", containsString("로그인 후 이용해주세요."))); // 또는 "로그인이 필요합니다." 등
