@@ -20,8 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
-
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
@@ -39,7 +37,7 @@ public class ApiV1UserController {
             @NotBlank String postalCode
     ) {}
 
-    @PostMapping(value = "", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping("/signup")
     @Operation(summary = "회원가입")
     public RsData<UserDto> join(@Valid @RequestBody UserJoinReqBody reqBody) {
         User user = userService.join(
