@@ -15,14 +15,7 @@ type ProductFormState = {
   imageUrl: string;
 };
 
-function ProductItem(id: number) {
-  return (
-    <>
-    </>
-  );
-}
-
-function Form() {
+function Form(editingProduct: boolean) {
   const [newProduct, setNewProduct] = useState<ProductFormState>(initialProductFormState);
   const initialProductFormState: ProductFormState = {
     name: '',
@@ -90,39 +83,66 @@ function Form() {
 
   return (
     <>
-      <div className="mt-6 mb-6 p-6 bg-gray-50 rounded-md border border-gray-200">
+      <form onSubmit={editingProduct ? handleUpdateProduct : handleSaveNewProduct}
+        className="mt-6 mb-6 p-6 bg-gray-50 rounded-md border border-gray-200"
+      >
         <h4 className="text-xl font-semibold text-gray-700 mb-4">
           {editingProduct ? '상품 정보 수정' : '새 상품 정보 입력'}
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">상품명</label>
-            <input type="text" name="name" id="name" value={editingProduct ? editingProduct.name : newProduct.name} onChange={editingProduct ? handleEditInputChange : handleInputChange} className="w-full p-2 border border-gray-300 rounded-md text-gray-900" />
+            <input type="text" name="name" id="name"
+              value={editingProduct ? editingProduct.name : newProduct.name}
+              onChange={editingProduct ? handleEditInputChange : handleInputChange}
+              className="w-full p-2 border border-gray-300 rounded-md text-gray-900"
+            />
           </div>
           <div>
             <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">가격 (원)</label>
-            <input type="number" name="price" id="price" value={editingProduct ? editingProduct.price : newProduct.price} onChange={editingProduct ? handleEditInputChange : handleInputChange} className="w-full p-2 border border-gray-300 rounded-md text-gray-900" />
+            <input type="number" name="price" id="price"
+              value={editingProduct ? editingProduct.price : newProduct.price}
+              onChange={editingProduct ? handleEditInputChange : handleInputChange}
+              className="w-full p-2 border border-gray-300 rounded-md text-gray-900"
+            />
           </div>
           <div>
             <label htmlFor="stock" className="block text-sm font-medium text-gray-700 mb-1">재고</label>
-            <input type="number" name="stock" id="stock" value={editingProduct ? editingProduct.stock : newProduct.stock} onChange={editingProduct ? handleEditInputChange : handleInputChange} className="w-full p-2 border border-gray-300 rounded-md text-gray-900" />
+            <input type="number" name="stock" id="stock"
+              value={editingProduct ? editingProduct.stock : newProduct.stock}
+              onChange={editingProduct ? handleEditInputChange : handleInputChange}
+              className="w-full p-2 border border-gray-300 rounded-md text-gray-900"
+            />
           </div>
           <div>
             <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 mb-1">상품 이미지 URL</label>
-            <input type="text" name="imageUrl" id="imageUrl" placeholder="https://example.com/image.png" value={editingProduct ? editingProduct.imageUrl : newProduct.imageUrl} onChange={editingProduct ? handleEditInputChange : handleInputChange} className="w-full p-2 border border-gray-300 rounded-md text-gray-900" />
+            <input type="text" name="imageUrl" id="imageUrl" placeholder="https://example.com/image.png"
+              value={editingProduct ? editingProduct.imageUrl : newProduct.imageUrl}
+              onChange={editingProduct ? handleEditInputChange : handleInputChange}
+              className="w-full p-2 border border-gray-300 rounded-md text-gray-900"
+            />
           </div>
           <div className="md:col-span-2">
             <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">상품 설명</label>
-            <textarea name="description" id="description" value={editingProduct ? editingProduct.description : newProduct.description} onChange={editingProduct ? handleEditInputChange : handleInputChange} rows={3} className="w-full p-2 border border-gray-300 rounded-md text-gray-900"></textarea>
+            <textarea
+              name="description"
+              id="description"
+              rows={3}
+              value={editingProduct ? editingProduct.description : newProduct.description}
+              onChange={editingProduct ? handleEditInputChange : handleInputChange}
+              className="w-full p-2 border border-gray-300 rounded-md text-gray-900"
+            />
           </div>
         </div>
         <div className="mt-6 flex justify-end space-x-4">
-          <button onClick={editingProduct ? handleUpdateProduct : handleSaveNewProduct} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
+          <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
             {editingProduct ? '수정 완료' : '저장'}
           </button>
-          <button onClick={handleCancel} className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded cursor-pointer">취소</button>
+          <button type="button" onClick={handleCancel} className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded cursor-pointer">
+            취소
+          </button>
         </div>
-      </div>
+      </form>
     </>
   );
 }
@@ -137,7 +157,8 @@ function ProductList() {
       deleteProduct(productId);
     }
   };
-const handleEditClick = (product: Product) => {
+    // --- Handlers for Editing Products ---  
+  const handleEditClick = (product: Product) => {
     setEditingProduct(product);
     setShowAddForm(false);
   };
@@ -197,8 +218,6 @@ export default function ProductManagement() {
     setEditingProduct(null);
   };
 
-  // --- Handlers for Editing Products ---
-  
   
   return (
     <main className="flex min-h-screen flex-col items-center p-4 md:p-24">
@@ -219,7 +238,7 @@ export default function ProductManagement() {
 
           {/* Add/Edit Form Section */}
           {(showAddForm || editingProduct) && (
-            <Form></Form>
+            <Form editingProduct={editingProduct}></Form>
           )}
 
           <ProductList></ProductList>
