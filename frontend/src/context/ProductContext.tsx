@@ -24,7 +24,7 @@ export type User = {
 export type OrderItem = {
   productId: number;
   name: string;
-  price: string;
+  price: number;
   quantity: number;
   imageUrl: string;
 };
