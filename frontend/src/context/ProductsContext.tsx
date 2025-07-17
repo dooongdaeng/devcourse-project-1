@@ -19,7 +19,7 @@ export const useProduct = () => {
     price: number,
     description: string,
     stock: number,
-    onSuccess:() => void
+    onSuccess:(data: any) => void
   }) => {
     apiFetch(`/api/v1/adm/products`, {
       method: "POST",
@@ -56,7 +56,7 @@ export const useProductItem = (id: number) => {
     price: number,
     description: string,
     stock: number,
-    onSuccess:() => void
+    onSuccess:(data: any) => void
   }) => {
     apiFetch(`/api/v1/adm/products/${id}`, {
       method: "PUT",

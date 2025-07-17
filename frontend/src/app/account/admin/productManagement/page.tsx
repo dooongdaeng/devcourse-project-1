@@ -42,7 +42,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
   );
 
   const { addProduct } = useProduct();
-  const { modifyProduct } = useProductItem();
+  const { modifyProduct } = useProductItem((editingProduct != null) ? editingProduct.id : 1);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -52,27 +52,20 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const priceNum = parseInt(formState.price, 10);
-    const stockNum = parseInt(formState.stock, 10);
+    const name = formState.name;
+    const description = formState.description;
+    const price = parseInt(formState.price, 10);
+    const stock = parseInt(formState.stock, 10);
 
-    if (!formState.name || !formState.description || isNaN(priceNum) || priceNum <= 0 || isNaN(stockNum) || stockNum < 0) {
+    if (!name || !description || isNaN(price) || price <= 0 || isNaN(stock) || stock < 0) {
       alert('모든 필드를 올바르게 입력해주세요.');
       return;
     }
 
     if (editingProduct) {
-      modifyProduct({
-        ...editingProduct,
-        ...formState,
-        price: priceNum,
-        stock: stockNum,
-      });
+      modifyProduct({name, price, description, stock, onSuccess: (res) => alert(res.msg)});
     } else {
-      addProduct({
-        ...formState,
-        price: priceNum.toString(),
-        stock: stockNum,
-      });
+      addProduct({name, price, description, stock, onSuccess: (res) => alert(res.msg)});
     }
 
     onSubmit();
@@ -87,7 +80,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">상품명</label>
             <input type="text" name="name" id="name"
-              value={editingProduct ? editingProduct.name : ""}
+              value={formState.name}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md text-gray-900"
             />
@@ -95,7 +88,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
           <div>
             <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">가격 (원)</label>
             <input type="number" name="price" id="price"
-              value={editingProduct ? editingProduct.price : ""}
+              value={formState.price}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md text-gray-900"
             />
@@ -103,7 +96,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
           <div>
             <label htmlFor="stock" className="block text-sm font-medium text-gray-700 mb-1">재고</label>
             <input type="number" name="stock" id="stock"
-              value={editingProduct ? editingProduct.stock : ""}
+              value={formState.stock}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md text-gray-900"
             />
@@ -111,7 +104,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
           <div>
             <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 mb-1">상품 이미지 URL</label>
             <input type="text" name="imageUrl" id="imageUrl" placeholder="https://example.com/image.png"
-              value={editingProduct ? editingProduct.imageUrl : ""}
+              value={formState.imageUrl}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md text-gray-900"
             />
@@ -122,7 +115,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
               name="description"
               id="description"
               rows={3}
-              value={editingProduct ? editingProduct.description : ""}
+              value={formState.description}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md text-gray-900"
             />
