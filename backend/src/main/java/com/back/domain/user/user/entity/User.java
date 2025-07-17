@@ -49,14 +49,14 @@ public class User extends BaseEntity {
     }
 
     @Builder
-    public User(String username, String password, String nickname, String email, String address, String role) {
+    public User(String username, String password, String nickname, String email, String address, String role, String apiKey, String refreshToken) {
         this.username = username;
         this.password = password;
         this.nickname = nickname;
         this.email = email;
         this.address = address;
         this.role = role;
-        this.apiKey = apiKey != null ? apiKey : generateApiKey();
+        this.apiKey = (apiKey != null && !apiKey.isBlank()) ? apiKey : generateApiKey();
         this.refreshToken = refreshToken;
 
     }
