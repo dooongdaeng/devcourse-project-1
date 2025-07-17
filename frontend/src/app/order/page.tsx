@@ -63,9 +63,9 @@ function useCart() {
   return {cartItems, setCartItems, handleAddToCart, handleUpdateQuantity, handleRemoveFromCart};
 }
 
-function ProductList() {
+function ProductList({cartState} : {cartState: ReturnType<typeof useCart>}) {
   const { products } = useProducts(); // 전역 상품 목록과 찜 목록 가져오기
-  const {handleAddToCart} = useCart();
+  const {handleAddToCart} = cartState;
 
   return (
     <>
@@ -95,10 +95,10 @@ function ProductList() {
   );
 }
 
-function WishList() {
+function WishList({cartState} : {cartState: ReturnType<typeof useCart>}) {
   const { products, favoriteProducts } = useProducts(); // 전역 상품 목록과 찜 목록 가져오기
   const favoritedProductsList = products.filter(product => favoriteProducts[product.id]);
-  const { handleAddToCart } = useCart();
+  const { handleAddToCart } = cartState;
 
   return (
     <>
@@ -134,9 +134,8 @@ function WishList() {
   );
 }
 
-function OrderList() {
-  const {cartItems} = useCart();
-  const {handleUpdateQuantity, handleRemoveFromCart} = useCart();
+function OrderList({cartState} : {cartState: ReturnType<typeof useCart>}) {
+  const {cartItems, handleUpdateQuantity, handleRemoveFromCart} = cartState;
 
   return (
     <>
@@ -215,6 +214,8 @@ function CheckOut() {
 }
 
 export default function Order() {
+  const cartState = useCart();
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-4 md:p-24">
       <div className="w-full max-w-5xl bg-white rounded-xl shadow-lg overflow-hidden">
@@ -222,8 +223,8 @@ export default function Order() {
 
           {/* Product List Section */}
           <div className="md:w-2/3 p-4 md:p-6 flex flex-col items-start">
-            <ProductList></ProductList>
-            <WishList></WishList>
+            <ProductList cartState={cartState}></ProductList>
+            <WishList cartState={cartState}></WishList>
           </div>
 
           {/* Summary Section */}
@@ -232,7 +233,7 @@ export default function Order() {
             <hr className="my-4 border-gray-300" />
 
             {/* Order Items */}
-            <OrderList></OrderList>
+            <OrderList cartState={cartState}></OrderList>
 
             {/* Bottom Section */}
             <div>
@@ -242,7 +243,7 @@ export default function Order() {
               </div>
 
               {/* Total and Checkout */}
-              <CheckOut></CheckOut>
+              <CheckOut cartState={cartState}></CheckOut>
             </div>
           </div>
         </div>
