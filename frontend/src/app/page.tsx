@@ -3,8 +3,7 @@
 import { useProducts } from "@/context/ProductContext";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { components } from "@/lib/backend/apiV1/schema";
-import { useProduct } from "@/context/ProductsContext"
-import { useProductImage } from "@/context/ProductImageContext";
+import { useProduct, useProductImage } from "@/context/ProductsContext"
 
 type Product = components['schemas']['ProductDto'];
 

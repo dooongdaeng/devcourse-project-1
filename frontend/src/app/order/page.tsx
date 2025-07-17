@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useProducts, OrderItem } from '@/context/ProductContext';
-import { useProduct } from '@/context/ProductsContext';
-import { useProductImage } from '@/context/ProductImageContext';
+import { useProduct, useProductImage } from '@/context/ProductsContext';
 import { components } from '@/lib/backend/apiV1/schema';
 
 type Product = components['schemas']['ProductDto'];
