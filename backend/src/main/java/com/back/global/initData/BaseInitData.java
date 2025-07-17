@@ -40,17 +40,17 @@ public class BaseInitData {
     public void work1(){
         if (productService.count() > 0) return;
 
-        Product product1 = productService.create("상품1", 10000, "상품1입니다.", 100);
-        product1.addProductImage("/images/coffee_1.jpg");
+        Product product1 = productService.create("Colombia Nariñó", 5000, "신선한 콜롬비아 원두입니다.", 100);
+        product1.addProductImage("http://localhost:8080/images/coffee_1.png");
 
-        Product product2 = productService.create("상품2", 10000, "상품2입니다.", 100);
-        product2.addProductImage("/images/coffee_2.jpg");
+        Product product2 = productService.create("Brazil Serra Do Caparaó", 6000, "고소한 브라질 원두입니다.", 150);
+        product2.addProductImage("http://localhost:8080/images/coffee_2.png");
 
-        Product product3 = productService.create("상품3", 10000, "상품3입니다.", 100);
-        product3.addProductImage("/images/coffee_3.jpg");
+        Product product3 = productService.create("Colombia Quindío (White Wine Extended Fermentation)", 6000, "달콤한 에티오피아 원두입니다.", 120);
+        product3.addProductImage("http://localhost:8080/images/coffee_3.png");
 
-        Product product4 = productService.create("상품4", 10000, "상품4입니다.", 100);
-        product4.addProductImage("/images/coffee_4.jpg");
+        Product product4 = productService.create("Ethiopia Sidamo", 8000, "감미로운 에티오피아 원두입니다.", 80);
+        product4.addProductImage("http://localhost:8080/images/coffee_4.png");
     }
 
     @Transactional
@@ -78,7 +78,7 @@ public class BaseInitData {
         if (orderItemService.count() > 0) return;
 
         // Order ID 1의 OrderItem들
-        orderItemService.create(1, 2, 10000, 1); // 상품1 2개
+        orderItemService.create(1, 2, 15000, 1); // 상품1 2개
         orderItemService.create(1, 1, 15000, 2); // 상품2 1개
 
         // Order ID 2의 OrderItem들

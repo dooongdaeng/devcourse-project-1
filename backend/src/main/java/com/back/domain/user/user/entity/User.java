@@ -55,10 +55,10 @@ public class User extends BaseEntity {
         this.apiKey = apiKey != null ? apiKey : generateApiKey();
     }
 
-    public User(int id, String username, String ninkName, String role) {
+    public User(int id, String username, String nickName, String role) {
         setId(id);
         this.username = username;
-        this.nickname = ninkName;
+        this.nickname = nickName;
         this.role = role;
     }
 

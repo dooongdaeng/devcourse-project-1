@@ -72,7 +72,8 @@ public class ApiV1UserController {
 
     @DeleteMapping("/logout")
     @Operation(summary = "로그아웃")
-    public RsData<Void> logout() {
+    @SecurityRequirement(name = "bearerAuth")
+    public RsData<Void> logout(@AuthenticationPrincipal UserSecurityUser userSecurityUser) {
 
         rq.deleteCookie("accessToken");
         rq.deleteCookie("apiKey");

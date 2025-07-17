@@ -4,14 +4,17 @@ package com.back.domain.order.orders.controller;
 import com.back.domain.order.orders.dto.OrderDto;
 import com.back.domain.order.orders.entity.Orders;
 import com.back.domain.order.orders.service.OrderService;
-import com.back.global.rq.Rq;
+import com.back.global.exception.ServiceException;
 import com.back.global.rsData.RsData;
+import com.back.global.security.UserSecurityUser;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,9 +24,9 @@ import java.util.List;
 @RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
 @Tag(name = "ApiV1OrderController", description = "주문 API 컨트롤러")
+@SecurityRequirement(name = "bearerAuth")
 public class ApiV1OrderController {
     private final OrderService orderService;
-    private final Rq rq;
 
     record OrderCreateReqBody(
             int orderCount,
@@ -60,24 +63,22 @@ public class ApiV1OrderController {
         );
     }
 
-    @GetMapping("/{id}")
-    @Operation(summary = "주문 단건 조회")
-    public OrderDto getOrder(@PathVariable int id) {
-        Orders order = orderService.findById(id).get();
 
-        return new OrderDto(order);
-    }
+    @GetMapping("/my")
+    @Operation(summary = "내 주문 목록 조회")
+    public List<OrderDto> getMyOrders(@AuthenticationPrincipal UserSecurityUser currentUser) {
+        if(currentUser == null) {
+            throw new ServiceException("401-1", "로그인이 필요합니다."); // 현재 사용자가 없으면 빈 리스트 반환
+        }
 
-    @GetMapping
-    @Operation(summary = "주문 목록 조회")
-    public List<OrderDto> getOrders() {
-        List<Orders> orders = orderService.findAll();
+        List<Orders> orders = orderService.findByUserId(currentUser.getId());
         List<OrderDto> orderDtos = orders.stream()
                 .map(OrderDto::new)
                 .toList();
 
         return orderDtos;
     }
+
 
 
     record OrderUpdateReqBody(
@@ -97,9 +98,12 @@ public class ApiV1OrderController {
     @Operation(summary = "주문 수정")
     public RsData<OrderDto> update(
             @PathVariable int id,
-            @Valid @RequestBody OrderUpdateReqBody reqBody
+            @Valid @RequestBody OrderUpdateReqBody reqBody,
+            @AuthenticationPrincipal UserSecurityUser currentUser
     ) {
         Orders order = orderService.findById(id).get();
+
+        order.checkCanUpdate(currentUser.getId());
 
         orderService.update(
                 order,
@@ -119,9 +123,12 @@ public class ApiV1OrderController {
     @Transactional
     @Operation(summary = "삭제")
     public RsData<Void> delete(
-            @PathVariable int id
+            @PathVariable int id,
+            @AuthenticationPrincipal UserSecurityUser currentUser
     ) {
         Orders order = orderService.findById(id).get();
+
+        order.checkCanDelete(currentUser.getId());
 
         orderService.delete(order);
 

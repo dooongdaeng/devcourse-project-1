@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useProducts, Product } from '@/context/ProductContext';
+import { useProducts, Product, OrderItem } from '@/context/ProductContext';
 
 // Define a type for cart items, which includes quantity
 type CartItem = Product & {
@@ -11,7 +11,7 @@ type CartItem = Product & {
 
 export default function Order() {
   const router = useRouter();
-  const { products, favoriteProducts } = useProducts(); // 전역 상품 목록과 찜 목록 가져오기
+  const { products, favoriteProducts, addOrder } = useProducts(); // 전역 상품 목록과 찜 목록 가져오기
 
   const favoritedProductsList = products.filter(product => favoriteProducts[product.id]);
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
@@ -67,8 +67,25 @@ export default function Order() {
   const handleCheckout = () => {
     const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
     if (isLoggedIn) {
-      alert('결제를 진행합니다.');
-      // Proceed with actual checkout logic
+      if (window.confirm('결제를 진행합니다.')) {
+        if (cartItems.length === 0) {
+          alert('장바구니가 비어있습니다.');
+          return;
+        }
+
+        const orderItems: OrderItem[] = cartItems.map(item => ({
+          productId: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          imageUrl: item.imageUrl,
+        }));
+
+        addOrder(orderItems, totalPrice);
+        setCartItems([]); // 장바구니 비우기
+        alert('결제가 완료되었습니다. 주문 내역에서 확인해주세요.');
+        router.push('/orderHistory');
+      }
     } else {
       alert('로그인을 해야합니다.');
       router.push('/login');
@@ -110,7 +127,10 @@ export default function Order() {
             <div className="mt-8 w-full flex flex-col items-start">
               <h5 className="text-2xl font-bold mb-4">찜목록</h5>
               <ul className="w-full">
-                {favoritedProductsList.map(item => (
+                {favoritedProductsList.length === 0 ? (
+                  <p className="text-gray-500">찜 목록이 비어있습니다.</p>
+                ) : (
+                  favoritedProductsList.map(item => (
                   <li key={item.id} className="flex items-center mt-3 p-2 border-b border-gray-200">
                     <div className="w-1/5 md:w-1/6 flex-shrink-0">
                       <img className="w-14 h-14 object-cover rounded" src={item.imageUrl} alt={item.name} />
@@ -128,7 +148,8 @@ export default function Order() {
                       </button>
                     </div>
                   </li>
-                ))}
+                  ))
+                )}
               </ul>
             </div>
           </div>
