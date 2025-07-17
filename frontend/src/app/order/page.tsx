@@ -2,7 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useProducts, Product, OrderItem } from '@/context/ProductContext';
+import { useProducts, OrderItem } from '@/context/ProductContext';
+import { useProduct } from '@/context/ProductsContext';
+import { components } from '@/lib/backend/apiV1/schema';
+
+type Product = components['schemas']['ProductDto'];
 
 // Define a type for cart items, which includes quantity
 type CartItem = Product & {
@@ -64,14 +68,14 @@ function useCart() {
 }
 
 function ProductList({cartState} : {cartState: ReturnType<typeof useCart>}) {
-  const { products } = useProducts();
+  const products = useProduct();
   const {handleAddToCart} = cartState;
 
   return (
     <>
       <h5 className="text-2xl font-bold mb-4">상품 목록</h5>
       <ul className="w-full">
-        {products.map(product => (
+        {products?.map(product => (
           <li key={product.id} className="flex items-center mt-3 p-2 border-b border-gray-200">
             <div className="w-1/5 md:w-1/6 flex-shrink-0">
               <img className="w-14 h-14 object-cover rounded" src={product.imageUrl} alt={product.name} />
@@ -96,9 +100,13 @@ function ProductList({cartState} : {cartState: ReturnType<typeof useCart>}) {
 }
 
 function WishList({cartState} : {cartState: ReturnType<typeof useCart>}) {
-  const { products, favoriteProducts } = useProducts(); // 전역 상품 목록과 찜 목록 가져오기
-  const favoritedProductsList = products.filter(product => favoriteProducts[product.id]);
+  const products = useProduct();
+
+  const { favoriteProducts } = useProducts(); // 전역 상품 목록과 찜 목록 가져오기
   const { handleAddToCart } = cartState;
+
+  if(products == null) return <div>로딩 중...</div>
+  const favoritedProductsList = products?.filter(product => favoriteProducts[product.id]);
 
   return (
     <>
