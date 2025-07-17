@@ -92,10 +92,6 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
         }
         refreshToken = rq.getCookieValue("refreshToken", "");
 
-        logger.debug("apiKey : " + apiKey);
-        logger.debug("accessToken : " + accessToken);
-        logger.debug("refreshToken : " + refreshToken);
-
         User user = null;
         boolean isAccessTokenValid = false;
 
