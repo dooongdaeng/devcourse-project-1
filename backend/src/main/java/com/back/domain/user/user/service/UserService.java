@@ -19,6 +19,8 @@ public class UserService {
     public User join(String username, String rawPassword, String nickname, String email, String address) {
         userRepository.findByUsername(username)
                 .ifPresent(u -> { throw new RuntimeException("이미 존재하는 아이디입니다."); });
+        userRepository.findByEmail(email)
+                .ifPresent(u -> { throw new RuntimeException("이미 사용 중인 이메일입니다."); });
 
         String encoded = passwordEncoder.encode(rawPassword);
         User user = new User(username, encoded, nickname, email, address);
