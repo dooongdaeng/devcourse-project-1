@@ -62,7 +62,7 @@ public class Rq {
     }
 
     public void deleteCookie(String name) {
-        setCookie(name, "", true, false, "Lax", 0);
+        setCookie(name, "", true, true, "Lax", 0);
     }
 
     public String getHeader(String name, String defaultValue) {
