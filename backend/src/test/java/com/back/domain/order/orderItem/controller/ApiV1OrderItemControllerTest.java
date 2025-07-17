@@ -3,6 +3,8 @@ package com.back.domain.order.orderItem.controller;
 
 import com.back.domain.order.orderItem.service.OrderItemService;
 import com.back.domain.order.orders.service.OrderService;
+import com.back.domain.user.user.entity.User;
+import com.back.domain.user.user.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,9 @@ public class ApiV1OrderItemControllerTest {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private UserService userService;
 
 
     @Test
@@ -161,12 +166,17 @@ public class ApiV1OrderItemControllerTest {
 
     @Test
     @DisplayName("주문 아이템 수정 테스트")
-    @WithMockUser
     void t7() throws Exception {
+        int id = 1;
+
+        User user = userService.findByUsername("user1").get();
+        String userApiKey = user.getApiKey();
+
         ResultActions resultActions = mvc
                 .perform(
                         MockMvcRequestBuilders.put("/api/v1/orderItems/1")
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + userApiKey)
                                 .content("""
                                         {
                                             "quantity": 5,
@@ -183,6 +193,7 @@ public class ApiV1OrderItemControllerTest {
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
                 .andExpect(jsonPath("$.msg").value("1번 주문 아이템이 수정되었습니다."));
     }
+
     @Test
     @DisplayName("존재하지 않는 주문 아이템 수정 테스트")
     @WithMockUser
@@ -233,13 +244,16 @@ public class ApiV1OrderItemControllerTest {
 
     @Test
     @DisplayName("주문 아이템 삭제 테스트")
-    @WithMockUser
     void t10() throws Exception {
+
+        User user = userService.findByUsername("user1").get();
+        String userApiKey = user.getApiKey();
 
         ResultActions resultActions = mvc
                 .perform(
+
                         delete("/api/v1/orderItems/1")
-                                .with(csrf())
+                                .header("Authorization", "Bearer " + userApiKey)
                 )
                 .andDo(print());
 
