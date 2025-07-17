@@ -106,9 +106,9 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
                 // 액세스 토큰이 유효하면 사용자 정보를 추출하고 인증 상태 설정 준비
                 int id = (int) payload.get("id");
                 String username = (String) payload.get("username");
-                String nickName = (String) payload.get("nickname"); // DTO와 일관성 유지 (nickName -> nickname)
+                String nickname = (String) payload.get("nickname"); // DTO와 일관성 유지 (nickName -> nickname)
                 String role = (String) payload.get("role");
-                user = new User(id, username, nickName, role);
+                user = new User(id, username, nickname, role);
                 isAccessTokenValid = true;
                 logger.debug("Access Token is valid for user: " + username);
             } else {
