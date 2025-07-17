@@ -34,6 +34,9 @@ public class User extends BaseEntity {
     @Column(unique = true, nullable = false)
     private String apiKey;
 
+    @Column(length = 500)
+    private String refreshToken;
+
     public User(String username, String password, String nickname, String email, String address) {
         this.username = username;
         this.password = password;
@@ -42,6 +45,7 @@ public class User extends BaseEntity {
         this.address = address;
         this.role = "ROLE_USER";
         this.apiKey = generateApiKey();
+        this.refreshToken = null;
     }
 
     @Builder
@@ -53,6 +57,8 @@ public class User extends BaseEntity {
         this.address = address;
         this.role = role;
         this.apiKey = apiKey != null ? apiKey : generateApiKey();
+        this.refreshToken = refreshToken;
+
     }
 
     public User(int id, String username, String nickName, String role) {
@@ -68,5 +74,9 @@ public class User extends BaseEntity {
 
     private String generateApiKey() {
         return UUID.randomUUID().toString().replace("-", "");
+    }
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }
