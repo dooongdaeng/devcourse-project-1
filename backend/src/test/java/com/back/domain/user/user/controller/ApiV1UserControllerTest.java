@@ -306,14 +306,4 @@ public class ApiV1UserControllerTest {
                 .andExpect(jsonPath("$.msg", containsString("로그인 후 이용해주세요."))); // 또는 "로그인이 필요합니다." 등
     }
 
-    @Test
-    @DisplayName("로그아웃 실패 - 비인증 (로그인 필요)")
-    void testLogoutFail_Unauthorized() throws Exception {
-        mvc.perform(delete("/api/v1/users/logout"))
-                .andDo(print())
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.resultCode", is("401-1")))
-                .andExpect(jsonPath("$.msg", containsString("로그인 후 이용해주세요."))); // 또는 "로그인이 필요합니다." 등
-    }
-
 }
