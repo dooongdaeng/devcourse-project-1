@@ -26,9 +26,9 @@ export default function OrderHistory() {
                       <img src={item.imageUrl} alt={item.name} className="w-16 h-16 object-cover rounded-md mr-4" />
                       <div className="flex-grow">
                         <p className="font-medium text-gray-800">{item.name}</p>
-                        <p className="text-sm text-gray-600">{parseInt(item.price).toLocaleString()}원 x {item.quantity}개</p>
+                        <p className="text-sm text-gray-600">{item.price.toLocaleString()}원 x {item.quantity}개</p>
                       </div>
-                      <span className="font-semibold text-gray-800">{(parseInt(item.price) * item.quantity).toLocaleString()}원</span>
+                      <span className="font-semibold text-gray-800">{(item.price * item.quantity).toLocaleString()}원</span>
                     </div>
                   ))}
                 </div>
