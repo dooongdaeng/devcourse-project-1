@@ -63,22 +63,7 @@ public class ApiV1OrderItemController {
         );
     }
 
-    @GetMapping("/{id}")
-    @Operation(summary = "주문 아이템 단건 조회")
-    public OrderItemDto getOrderItem(@PathVariable int id) {
-        OrderItem orderItem = orderItemService.findById(id).get();
 
-        return new OrderItemDto(orderItem);
-    }
-
-    @GetMapping
-    @Operation(summary = "주문 아이템 다건 조회")
-    public List<OrderItemDto> getOrderItems() {
-        List<OrderItem> orderItems = orderItemService.findAll();
-        return orderItems.stream()
-                .map(OrderItemDto::new)
-                .toList();
-    }
 
     @GetMapping("/order/{orderId}")
     @Operation(summary = "특정 주문의 아이템 목록 조회")
@@ -89,14 +74,7 @@ public class ApiV1OrderItemController {
                 .toList();
     }
 
-    @GetMapping("/product/{productId}")
-    @Operation(summary = "특정 상품의 주문 아이템 목록 조회")
-    public List<OrderItemDto> getOrderItemsByProductId(@PathVariable int productId) {
-        List<OrderItem> orderItems = orderItemService.findByProductId(productId);
-        return orderItems.stream()
-                .map(OrderItemDto::new)
-                .toList();
-    }
+
 
     record OrderItemUpdateReqBody(
             @NotNull
