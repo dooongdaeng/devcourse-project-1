@@ -11,7 +11,11 @@ export const useProduct = () => {
   const [products, setProducts] = useState<ProductWithImageUrl[] | null>(null);
 
   useEffect(() => {
-    apiFetch('/api/v1/products').then(setProducts);
+    apiFetch('/api/v1/products')
+      .then(setProducts)
+      .catch((error) => {
+        alert(`${error.resultCode} : ${error.msg}`);
+      });
   }, []);
 
   const addProduct = ({name, price, description, stock, onSuccess}: {
