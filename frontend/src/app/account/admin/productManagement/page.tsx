@@ -15,7 +15,7 @@ type ProductFormState = {
   imageUrl: string;
 };
 
-function Form(editingProduct: boolean) {
+function Form(editingProduct: Product) {
   const [newProduct, setNewProduct] = useState<ProductFormState>(initialProductFormState);
   const initialProductFormState: ProductFormState = {
     name: '',
@@ -149,59 +149,70 @@ function Form(editingProduct: boolean) {
 
 function ProductList() {
   const { products } = useProduct();
-  const { deleteProduct } = useProductItem();
+  
+  return (
+    <>
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white border border-gray-200 rounded-md">
+          <thead>
+            <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+              <th className="py-3 px-6 text-left">ID</th>
+              <th className="py-3 px-6 text-left">상품명</th>
+              <th className="py-3 px-6 text-left">가격</th>
+              <th className="py-3 px-6 text-left">재고</th>
+              <th className="py-3 px-6 text-center">액션</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-600 text-sm">
+            {products?.map(product => (
+              <ProductListItem key={product.id} product={product}></ProductListItem>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
+function ProductListItem(product: Product) {
+  const { deleteProduct } = useProductItem(product.id);
 
   // --- Handlers for Deleting Products ---
-  const handleDeleteProduct = (productId: number) => {
+  const handleDeleteProduct = () => {
     if (window.confirm('정말로 이 상품을 삭제하시겠습니까?')) {
-      deleteProduct(productId);
+      deleteProduct();
     }
   };
-    // --- Handlers for Editing Products ---  
+
+  // --- Handlers for Editing Products ---  
   const handleEditClick = (product: Product) => {
     setEditingProduct(product);
     setShowAddForm(false);
   };
 
+
   return (
     <>
-      <div className="overflow-x-auto">
-            <table className="min-w-full bg-white border border-gray-200 rounded-md">
-              <thead>
-                <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-                  <th className="py-3 px-6 text-left">ID</th>
-                  <th className="py-3 px-6 text-left">상품명</th>
-                  <th className="py-3 px-6 text-left">가격</th>
-                  <th className="py-3 px-6 text-left">재고</th>
-                  <th className="py-3 px-6 text-center">액션</th>
-                </tr>
-              </thead>
-              <tbody className="text-gray-600 text-sm">
-                {products?.map(product => (
-                  <tr key={product.id} className="border-b border-gray-200 hover:bg-gray-50">
-                    <td className="py-3 px-6 text-left whitespace-nowrap">{product.id}</td>
-                    <td className="py-3 px-6 text-left">{product.name}</td>
-                    <td className="py-3 px-6 text-left">{product.price}원</td>
-                    <td className="py-3 px-6 text-left">{product.stock}</td>
-                    <td className="py-3 px-6 text-center">
-                      <button
-                        onClick={() => handleEditClick(product)}
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs mr-2 cursor-pointer"
-                      >
-                        수정
-                      </button>
-                      <button
-                        onClick={() => handleDeleteProduct(product.id)}
-                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-xs cursor-pointer"
-                      >
-                        삭제
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+      <tr className="border-b border-gray-200 hover:bg-gray-50">
+        <td className="py-3 px-6 text-left whitespace-nowrap">{product.id}</td>
+        <td className="py-3 px-6 text-left">{product.name}</td>
+        <td className="py-3 px-6 text-left">{product.price}원</td>
+        <td className="py-3 px-6 text-left">{product.stock}</td>
+        <td className="py-3 px-6 text-center">
+          <button
+            onClick={() => handleEditClick(product)}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs mr-2 cursor-pointer"
+          >
+            수정
+          </button>
+          <button
+            onClick={() => handleDeleteProduct(product.id)}
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-xs cursor-pointer"
+          >
+            삭제
+          </button>
+        </td>
+      </tr>
     </>
   );
 }
@@ -214,8 +225,8 @@ export default function ProductManagement() {
   
   // --- Handlers for Adding Products ---
   const handleAddNewClick = () => {
-    setShowAddForm(true);
     setEditingProduct(null);
+    return <Form editingProduct={editingProduct}></Form>
   };
 
   
@@ -238,7 +249,7 @@ export default function ProductManagement() {
 
           {/* Add/Edit Form Section */}
           {(showAddForm || editingProduct) && (
-            <Form editingProduct={editingProduct}></Form>
+            <Form editingProduct={editingProduct} product={product}></Form>
           )}
 
           <ProductList></ProductList>
