@@ -15,7 +15,7 @@ type ProductFormState = {
   imageUrl: string;
 };
 
-function Form(editingProduct: Product) {
+function ProductForm(editingProduct: Product) {
   const initialProductFormState: ProductFormState = {
     name: '',
     description: '',
@@ -175,21 +175,19 @@ function ProductList() {
 }
 
 function ProductListItem(product: Product) {
-  const { deleteProduct } = useProductItem(product.id);
+  const { deleteProduct: _deleteProduct } = useProductItem(product.id);
 
-  // --- Handlers for Deleting Products ---
-  const handleDeleteProduct = () => {
-    if (window.confirm('정말로 이 상품을 삭제하시겠습니까?')) {
-      deleteProduct();
-    }
+  const deleteProduct = () => {
+    if (!window.confirm('정말로 이 상품을 삭제하시겠습니까?')) return;
+    
+    _deleteProduct((data) => {
+      alert(data.msg);
+    });
   };
 
-  // --- Handlers for Editing Products ---  
   const handleEditClick = (product: Product) => {
-    setEditingProduct(product);
-    setShowAddForm(false);
+    return <ProductForm editingProduct={product}></ProductForm>
   };
-
 
   return (
     <>
@@ -206,7 +204,7 @@ function ProductListItem(product: Product) {
             수정
           </button>
           <button
-            onClick={() => handleDeleteProduct()}
+            onClick={() => deleteProduct()}
             className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-xs cursor-pointer"
           >
             삭제
@@ -223,7 +221,7 @@ export default function ProductManagement() {
   // --- Handlers for Adding Products ---
   const handleAddNewClick = () => {
     setEditingProduct(null);
-    return <Form editingProduct={editingProduct}></Form>
+    return <ProductForm editingProduct={editingProduct}></ProductForm>
   };
 
   

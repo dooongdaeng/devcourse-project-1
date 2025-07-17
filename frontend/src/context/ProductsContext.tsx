@@ -42,7 +42,7 @@ export const useProductItem = (id: number) => {
     apiFetch(`/api/v1/products/${id}`).then(setProduct);
   }, []);
 
-  const deleteProduct = (onSuccess: () => void) => {
+  const deleteProduct = (onSuccess: (data: any) => void) => {
     apiFetch(`/api/v1/adm/products/${id}`, {
       method: "DELETE"
     }).then(onSuccess)
