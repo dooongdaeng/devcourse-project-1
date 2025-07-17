@@ -68,7 +68,7 @@ export default function RootLayout({
               <nav>
                 <ul className="flex space-x-4">
                   <li>
-                    <Link href="/" className="hover:text-gray-300">
+                    <Link href="/products" className="hover:text-gray-300">
                       제품소개
                     </Link>
                   </li>
