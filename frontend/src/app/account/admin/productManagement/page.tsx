@@ -19,20 +19,19 @@ type ProductFormState = {
   description: string;
   price: string;
   stock: string;
-  imageUrl: string;
+  imageUrls: string[]; // 배열로 변경
 };
 
 type ProductFormProps = {
   editingProduct: Product | null;
   onCancel: () => void;
-  onSubmit: () => void; // 실제로는 addProduct/modifyProduct 호출 시 사용할 수 있음
+  onSubmit: () => void;
 };
 
 function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
   const nameInputRef = useRef<HTMLInputElement>(null);
   const priceInputRef = useRef<HTMLInputElement>(null);
   const stockInputRef = useRef<HTMLInputElement>(null);
-  const urlInputRef = useRef<HTMLInputElement>(null);
   const descriptionInputRef = useRef<HTMLTextAreaElement>(null);
 
   const initialProductFormState: ProductFormState = {
@@ -40,7 +39,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
     description: '',
     price: '',
     stock: '',
-    imageUrl: ''
+    imageUrls: [''] // 초기값으로 빈 문자열 하나
   };
 
   const [formState, setFormState] = useState<ProductFormState>(
@@ -50,7 +49,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
           description: editingProduct.description,
           price: editingProduct.price.toString(),
           stock: editingProduct.stock.toString(),
-          imageUrl: editingProduct.imageUrl,
+          imageUrls: [editingProduct.imageUrl], // 기존 이미지 URL을 배열로 변환
         }
       : initialProductFormState
   );
@@ -63,6 +62,32 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
     setFormState((prev) => ({ ...prev, [name]: value }));
   };
 
+  // 이미지 URL 변경 핸들러
+  const handleImageUrlChange = (index: number, value: string) => {
+    setFormState((prev) => ({
+      ...prev,
+      imageUrls: prev.imageUrls.map((url, i) => i === index ? value : url)
+    }));
+  };
+
+  // 이미지 URL 필드 추가
+  const addImageUrlField = () => {
+    setFormState((prev) => ({
+      ...prev,
+      imageUrls: [...prev.imageUrls, '']
+    }));
+  };
+
+  // 이미지 URL 필드 제거
+  const removeImageUrlField = (index: number) => {
+    if (formState.imageUrls.length > 1) {
+      setFormState((prev) => ({
+        ...prev,
+        imageUrls: prev.imageUrls.filter((_, i) => i !== index)
+      }));
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -70,7 +95,10 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
     const description = formState.description;
     const price = parseInt(formState.price, 10);
     const stock = parseInt(formState.stock, 10);
-    const imageUrl = (formState.imageUrl.length > 0) ? formState.imageUrl : "http://localhost:8080/images/coffee_default.jpg";
+    // 첫 번째 이미지 URL 사용 (기존 API 호환성을 위해)
+    const imageUrl = (formState.imageUrls[0] && formState.imageUrls[0].length > 0) 
+      ? formState.imageUrls[0] 
+      : "http://localhost:8080/images/coffee_default.jpg";
 
     if (name.length < 2 || name.length > 100) {
       alert("상품명은 2자 이상 100자 이하로 입력해주세요.");
@@ -125,6 +153,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
 
     onSubmit();
   };
+
   return (
     <>
       <form onSubmit={handleSubmit} className="mt-6 mb-6 p-6 bg-gray-50 rounded-md border border-gray-200">
@@ -157,12 +186,36 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
             />
           </div>
           <div>
-            <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 mb-1">상품 이미지 URL</label>
-            <input type="text" name="imageUrl" id="imageUrl" placeholder="https://example.com/image.png" ref={urlInputRef}
-              value={formState.imageUrl}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md text-gray-900 bg-white"
-            />
+            <div className="flex items-center mb-2">
+              <label className="text-sm font-medium text-gray-700">상품 이미지 URL</label>
+              <button 
+                type="button" 
+                onClick={addImageUrlField} 
+                className="bg-green-500 hover:bg-green-600 text-white font-bold w-6 h-6 ml-2 rounded-md cursor-pointer flex items-center justify-center text-sm"
+              >
+                +
+              </button>
+            </div>
+            {formState.imageUrls.map((url, index) => (
+              <div key={index} className="flex items-center mb-2">
+                <input 
+                  type="text" 
+                  placeholder="https://example.com/image.png"
+                  value={url}
+                  onChange={(e) => handleImageUrlChange(index, e.target.value)}
+                  className="flex-1 p-2 border border-gray-300 rounded-md text-gray-900 bg-white"
+                />
+                {formState.imageUrls.length > 1 && (
+                  <button 
+                    type="button" 
+                    onClick={() => removeImageUrlField(index)}
+                    className="bg-red-500 hover:bg-red-600 text-white font-bold w-6 h-6 ml-2 text-center rounded-md cursor-pointer flex items-center justify-center text-sm"
+                  >
+                    x
+                  </button>
+                )}
+              </div>
+            ))}
           </div>
           <div className="md:col-span-2">
             <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">상품 설명</label>
