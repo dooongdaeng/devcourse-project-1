@@ -79,7 +79,7 @@ export default function AccountManagement() {
     return (
         <main className="flex min-h-screen flex-col items-center p-4 md:p-24">
           <div className="w-full max-w-6xl bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">회원 정보 조회</h2>
+            <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">회원 정보 관리</h2>
             <div className="text-center text-gray-600">회원 정보가 없습니다.</div>
           </div>
         </main>
@@ -89,7 +89,7 @@ export default function AccountManagement() {
   return (
       <main className="flex min-h-screen flex-col items-center p-4 md:p-24">
         <div className="w-full max-w-6xl bg-white rounded-xl shadow-lg p-8">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">회원 정보 조회</h2>
+          <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">회원 정보 관리</h2>
 
           <div className="overflow-x-auto">
             <table className="min-w-full bg-white border border-gray-200 rounded-md">

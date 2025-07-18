@@ -201,7 +201,7 @@ export default function Signup() {
             {error && <p className="text-red-500 text-xs italic mb-4 text-center">{error}</p>} {}
             <button
                 type="submit"
-                className="w-full bg-gray-800 text-white py-3 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 cursor-pointer"
+                className="w-full bg-blue-800 text-white py-3 rounded-md hover:bg-blue-950 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 cursor-pointer"
                 disabled={loading} // 로딩 중 버튼 비활성화
             >
               {loading ? '회원가입 중...' : '회원가입'} {}
@@ -212,7 +212,7 @@ export default function Signup() {
                 <button
                     type="button"
                     onClick={() => router.push('/login')}
-                    className="text-blue-500 hover:text-blue-800 font-bold"
+                    className="text-blue-500 hover:text-blue-800 font-bold cursor-pointer"
                 >
                   로그인
                 </button>
