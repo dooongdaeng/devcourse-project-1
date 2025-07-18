@@ -3,6 +3,8 @@
 import { useProducts } from '@/context/ProductContext';
 import { useCreateOrder } from '@/context/OrderContext';
 import { useEffect, useState } from 'react';
+import { apiFetch } from "@/lib/backend/client";
+import Link from 'next/link';
 
 export default function OrderHistory() {
   const { orderHistory } = useProducts();
@@ -12,12 +14,38 @@ export default function OrderHistory() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
   const [orderItems, setOrderItems] = useState<any[]>([]);
+  const [productNames, setProductNames] = useState<{ [key: number]: string }>({});
   const [itemsLoading, setItemsLoading] = useState(false);
 
   // 컴포넌트 마운트 시 주문 목록 조회
   useEffect(() => {
     getMyOrders();
   }, []);
+
+  // 주문 아이템이 로드되면 각 상품의 이름을 가져옴
+  useEffect(() => {
+    if (orderItems.length > 0) {
+      const fetchNames = async () => {
+        const names: { [key: number]: string } = {};
+        for (const item of orderItems) {
+          if (!productNames[item.productId]) { // 이미 가져온 상품명은 다시 가져오지 않음
+            try {
+              // /api/v1/products/{id} 엔드포인트 호출
+              const product = await apiFetch(`/api/v1/products/${item.productId}`);      
+              names[item.productId] = product.name;
+            } catch (err) {
+              console.error(`상품 ID ${item.productId}의 이름을 가져오지 못했습니다:`, err);
+              names[item.productId] = '알 수 없는 상품'; // 에러 발생 시 대체 텍스트
+            }
+          } else {
+            names[item.productId] = productNames[item.productId]; // 이미 있는 상품명 사용
+          }
+        }
+        setProductNames(prevNames => ({ ...prevNames, ...names }));
+      };
+      fetchNames();
+    }
+  }, [orderItems]); // orderItems가 변경될 때마다 실행
 
   // 주문 클릭 핸들러
   const handleOrderClick = async (orderId: number) => {
@@ -104,10 +132,10 @@ export default function OrderHistory() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[80vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold">주문 상세 정보 - #{selectedOrderId}</h3>
+              <h3 className="text-xl font-bold text-gray-700">주문 상세 정보 - #{selectedOrderId}</h3>
               <button 
                 onClick={handleClosePopup}
-                className="text-gray-500 hover:text-gray-700 text-xl"
+                className="text-gray-500 hover:text-gray-700 text-xl cursor-pointer"
               >
                 ✕
               </button>
@@ -127,12 +155,14 @@ export default function OrderHistory() {
                   <div key={item.id} className="border-b border-gray-200 pb-4">
                     <div className="flex justify-between items-center">
                       <div>
-                        <p className="font-medium">상품 ID: {item.productId}</p>
+                        <Link href={`/products/detail/${item.productId}`} className="block cursor-pointer">
+                          <p className="font-medium text-lg text-bold text-gray-700">상품명: {productNames[item.productId] || '로딩 중...'}</p>
+                        </Link>
                         <p className="text-sm text-gray-600">수량: {item.quantity}개</p>
                         <p className="text-sm text-gray-600">단가: {item.unitPrice?.toLocaleString()}원</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold">{item.totalPrice?.toLocaleString()}원</p>
+                        <p className="font-bold text-gray-700">{item.totalPrice?.toLocaleString()}원</p>
                       </div>
                     </div>
                   </div>
