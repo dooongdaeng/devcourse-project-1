@@ -88,7 +88,7 @@ public class SecurityConfig {
 
         // 허용할 오리진 설정
         configuration.setAllowedOrigins(List.of("https://cdpn.io", "http://localhost:3000"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 
         // 자격 증명 허용 설정
         configuration.setAllowCredentials(true);
