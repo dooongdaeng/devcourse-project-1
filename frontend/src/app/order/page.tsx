@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useProducts } from '@/context/ProductContext';
 import { useProduct, ProductsProvider } from '@/context/ProductsContext';
 import { components } from '@/lib/backend/apiV1/schema';
-import { useCreateOrder, CreateOrderRequest } from '@/context/OrderContext'; 
+import { useCreateOrder, CreateOrderRequest } from '@/context/OrderContext';
+import Link from 'next/link';
 
 export default function OrderWrapper() {
   return (
@@ -108,9 +109,9 @@ function ProductItem({cartState, product} : {
         <div className="w-1/5 md:w-1/6 flex-shrink-0">
           <img className="w-14 h-14 object-cover rounded" src={product.imageUrl} alt={product.name} />
         </div>
-        <div className="flex-grow ml-4 w-0 flex-grow">
+        <Link href={`/products/detail/${product.id}`} className="flex-grow ml-4 w-0 flex-grow cursor-pointer">
           <div className="font-semibold">{product.name}</div>
-        </div>
+        </Link>
         <div className="text-center font-medium w-1/5 md:w-1/6">{product.price.toLocaleString()}원</div>
         <div className="text-right w-1/5 md:w-1/6">
           <button
@@ -318,13 +319,13 @@ function PaymentPopup({
             <button
               type="button"
               onClick={handleClose}
-              className="flex-1 py-2 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              className="flex-1 py-2 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 cursor-pointer"
             >
               취소
             </button>
             <button
               type="submit"
-              className="flex-1 py-2 px-4 bg-gray-800 text-white rounded-md hover:bg-gray-700"
+              className="flex-1 py-2 px-4 bg-blue-800 text-white rounded-md hover:bg-blue-900 cursor-pointer"
             >
               결제하기
             </button>
@@ -414,7 +415,7 @@ function CheckOut({cartState} : {cartState: ReturnType<typeof useCart>}) {
         className={`w-full py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 cursor-pointer ${
           isLoading 
             ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
-            : 'bg-gray-800 text-white hover:bg-gray-700'
+            : 'bg-blue-800 text-white hover:bg-blue-900'
         }`}
       >
         {isLoading ? '결제 처리 중...' : '결제하기'}
