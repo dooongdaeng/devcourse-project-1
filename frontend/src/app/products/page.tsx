@@ -20,9 +20,6 @@ function ProductCard({ product }: { product: Product }) {
           {favoriteProducts[product.id] ? <FaHeart color="red" /> : <FaRegHeart />}
         </button>
       </h2>
-      <p className="m-0 max-w-[30ch] text-sm opacity-50">
-        {product.description}
-      </p>
     </div>
   );
 }
