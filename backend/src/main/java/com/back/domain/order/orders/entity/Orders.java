@@ -21,6 +21,7 @@ public class Orders extends BaseEntity {
     private int totalPrice;
     private String paymentMethod;
     private String paymentStatus;
+    private String address;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -31,19 +32,21 @@ public class Orders extends BaseEntity {
 
 
 
-    public Orders(int orderCount, int totalPrice, String paymentMethod, String paymentStatus, User user) {
+    public Orders(int orderCount, int totalPrice, String paymentMethod, String paymentStatus, User user, String address) {
         this.orderCount = orderCount;
         this.user = user;
         this.totalPrice = totalPrice;
         this.paymentMethod = paymentMethod;
         this.paymentStatus = paymentStatus;
+        this.address = address;
     }
 
-    public void update(int orderCount, int totalPrice, String paymentMethod, String paymentStatus) {
+    public void update(int orderCount, int totalPrice, String paymentMethod, String paymentStatus, String address) {
         this.orderCount = orderCount;
         this.totalPrice = totalPrice;
         this.paymentMethod = paymentMethod;
         this.paymentStatus = paymentStatus;
+        this.address = address;
     }
 
     public void checkCanUpdate(int currentUserId) {

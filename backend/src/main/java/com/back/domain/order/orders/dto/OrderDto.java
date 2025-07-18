@@ -12,6 +12,7 @@ public record OrderDto(
         int totalPrice,
         String paymentMethod,
         String paymentStatus,
+        String address,
         int userId,
         String userName
 ) {
@@ -25,6 +26,7 @@ public record OrderDto(
                 order.getTotalPrice(),
                 order.getPaymentMethod(),
                 order.getPaymentStatus(),
+                order.getAddress(),
                 order.getUser().getId(),
                 order.getUser().getUsername()
         );

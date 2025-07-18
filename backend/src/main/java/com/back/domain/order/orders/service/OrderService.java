@@ -17,10 +17,10 @@ public class OrderService {
     private final UserService userService;
 
 
-    public Orders create(int orderCount, int totalPrice, String paymentMethod, String paymentStatus, int userId) {
+    public Orders create(int orderCount, int totalPrice, String paymentMethod, String paymentStatus, int userId, String address) {
         User user = userService.findById(userId).get();
 
-        Orders order = new Orders(orderCount, totalPrice, paymentMethod, paymentStatus, user);
+        Orders order = new Orders(orderCount, totalPrice, paymentMethod, paymentStatus, user, address);
 
         return orderRepository.save(order);
     }
@@ -38,8 +38,8 @@ public class OrderService {
     }
 
 
-    public void update(Orders orders, int orderCount, int totalPrice, String paymentMethod, String paymentStatus) {
-        orders.update(orderCount, totalPrice, paymentMethod, paymentStatus);
+    public void update(Orders orders, int orderCount, int totalPrice, String paymentMethod, String paymentStatus, String address) {
+        orders.update(orderCount, totalPrice, paymentMethod, paymentStatus, address);
     }
 
     public void delete(Orders order) {

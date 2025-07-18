@@ -37,7 +37,9 @@ public class ApiV1OrderController {
             @NotBlank
             @Size(min = 2, max = 100)
             String paymentStatus,
-            int userId
+            int userId,
+            @NotBlank
+            String address
     ) {
     }
 
@@ -53,7 +55,8 @@ public class ApiV1OrderController {
                 reqBody.totalPrice(),
                 reqBody.paymentMethod(),
                 reqBody.paymentStatus(),
-                reqBody.userId()
+                reqBody.userId(),
+                reqBody.address()
         );
 
         return new RsData<>(
@@ -89,7 +92,9 @@ public class ApiV1OrderController {
             String paymentMethod,
             @NotBlank
             @Size(min = 2, max = 100)
-            String paymentStatus
+            String paymentStatus,
+            @NotBlank
+            String address
     ) {
     }
 
@@ -110,7 +115,8 @@ public class ApiV1OrderController {
                 reqBody.orderCount(),
                 reqBody.totalPrice(),
                 reqBody.paymentMethod(),
-                reqBody.paymentStatus()
+                reqBody.paymentStatus(),
+                reqBody.address()
         );
 
         return new RsData<>(
