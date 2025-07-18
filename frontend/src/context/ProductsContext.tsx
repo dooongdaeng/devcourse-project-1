@@ -103,9 +103,22 @@ export const useProductImage = (productId: number) => {
     apiFetch(`/api/v1/products/${productId}/images`).then(setProductImages);
   }, []);
 
+  const addProductImage = ({url, onSuccess}: {
+    url: string,
+    onSuccess:(data: any) => void
+  }) => {
+    apiFetch(`/api/v1/adm/products/${productId}/images`, {
+      method: "POST",
+      body: JSON.stringify({url}),
+    }).then(onSuccess)
+    .catch((error) => {
+      alert(`${error.resultCode} : ${error.msg}`);
+    });
+  }
+
   const firstImage = productImages?.[0]?.url;
 
-  return { productImages, firstImage };
+  return { productImages, addProductImage, firstImage };
 }
 
 export const useProductImageItem = (productId: number, id: number) => {
@@ -124,5 +137,18 @@ export const useProductImageItem = (productId: number, id: number) => {
     });
   };
 
-  return {productImage, deleteProductImage};
+  const modifyProductImage = ({url, onSuccess}: {
+    url: string,
+    onSuccess:(data: any) => void
+  }) => {
+    apiFetch(`/api/v1/adm/products/${productId}/images/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({url}),
+    }).then(onSuccess)
+    .catch((error) => {
+      alert(`${error.resultCode} : ${error.msg}`);
+    });
+  }
+
+  return {productImage, deleteProductImage, modifyProductImage};
 }
