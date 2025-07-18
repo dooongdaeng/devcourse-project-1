@@ -1,12 +1,15 @@
 package com.back.domain.wishList.wishList.service;
 
 import com.back.domain.product.product.entity.Product;
+import com.back.domain.product.product.repository.ProductRepository;
 import com.back.domain.product.product.service.ProductService;
 import com.back.domain.user.user.entity.User;
+import com.back.domain.user.user.repository.UserRepository;
 import com.back.domain.user.user.service.UserService;
 import com.back.domain.wishList.wishList.dto.WishListDto;
 import com.back.domain.wishList.wishList.entity.WishList;
 import com.back.domain.wishList.wishList.repository.WishListRepository;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +23,8 @@ public class WishListService {
     private final WishListRepository wishListRepository;
     private final UserService userService;
     private final ProductService productService;
+    private final ProductRepository productRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public WishList addToWishList(int userId, int productId) {
@@ -76,5 +81,34 @@ public class WishListService {
 
     public List<WishList> getWishListsByUserId(int userId) {
         return wishListRepository.findByUserIdOrderByCreateDateDesc(userId);
+    }
+
+    public int getWishListItemsCount(int id) {
+        return wishListRepository.countByUserId(id);
+    }
+
+    public WishList toggleWishList(int userId, @Min(value = 1, message = "수량은 1 이상이어야 합니다.") int productId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+
+
+        Optional<WishList> existingWishList = wishListRepository.findByUserIdAndProductId(userId, productId);
+
+        if (existingWishList.isPresent()) {
+            wishListRepository.delete(existingWishList.get());
+            return null; // 삭제된 경우 null 반환
+        } else {
+            WishList wishList = new WishList(user, product);
+            return wishListRepository.save(wishList);
+        }
+
+    }
+
+    public void clearWishList(int id) {
+        wishListRepository.deleteByUserId(id);
+
     }
 }

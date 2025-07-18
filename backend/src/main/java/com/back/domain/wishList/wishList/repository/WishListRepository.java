@@ -9,8 +9,11 @@ import java.util.Optional;
 
 public interface WishListRepository extends JpaRepository<WishList, Integer> {
     boolean existsByUserIdAndProductId(int userId, int productId);
+    int countByUserId(int userId);
 
     Optional<WishList> findByUserIdAndProductId(@Param("userId") int currentUserId, @Param("productId") int productId);
 
     List<WishList> findByUserIdOrderByCreateDateDesc(int userId);
+
+    void deleteByUserId(int userId);
 }

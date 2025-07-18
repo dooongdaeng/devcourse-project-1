@@ -110,26 +110,96 @@ public class ApiV1WishListControllerTest {
     }
 
     @Test
-    @DisplayName("위시리스트 수량 업데이트")
+    @DisplayName("찜한 상품 개수 조회")
     @WithUserDetails("user1")
-    void updateWishListQuantity() throws Exception {
+    void getWishListItemsCount() throws Exception {
+        User user = userService.findByUsername("user1").get();
+        Product product1 = productService.findAll().get(0);
+        Product product2 = productService.findAll().get(1);
+
+        wishListService.addToWishList(user.getId(), product1.getId());
+        wishListService.addToWishList(user.getId(), product2.getId());
+
+        mvc.perform(get("/api/v1/wish-lists/count"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value("200"))
+                .andExpect(jsonPath("$.msg").value("찜한 상품 개수 조회 성공"))
+                .andExpect(jsonPath("$.data").value(2));
+    }
+
+
+
+    @Test
+    @DisplayName("위시리스트 토글 - 상품 추가 (위시리스트에 없는 경우)")
+    @WithUserDetails("user1")
+    void toggleWishList_add() throws Exception {
+        Product product = productService.findAll().get(0); // ID 1번 상품이 user1 위시리스트에 없다고 가정
+        String requestBody = objectMapper.writeValueAsString(
+                Map.of("productId", product.getId())
+        );
+
+        mvc.perform(post("/api/v1/wish-lists/toggle")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody)
+                )
+                .andExpect(status().isCreated()) // 추가 시 201 Created 기대
+                .andExpect(jsonPath("$.resultCode").value("201"))
+                .andExpect(jsonPath("$.msg").value("위시리스트에 추가했습니다."))
+                .andExpect(jsonPath("$.data.productId").value(product.getId()));
+
+        mvc.perform(get("/api/v1/wish-lists/" + product.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").value(true));
+    }
+
+    @Test
+    @DisplayName("위시리스트 토글 - 상품 삭제 (위시리스트에 있는 경우)")
+    @WithUserDetails("user1")
+    void toggleWishList_remove() throws Exception {
         User user = userService.findByUsername("user1").get();
         Product product = productService.findAll().get(0);
         wishListService.addToWishList(user.getId(), product.getId());
 
         String requestBody = objectMapper.writeValueAsString(
-                Map.of("quantity", 3)
+                Map.of("productId", product.getId())
         );
 
-        mvc.perform(put("/api/v1/wish-lists/" + product.getId() + "/quantity")
+        mvc.perform(post("/api/v1/wish-lists/toggle")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200"))
-                .andExpect(jsonPath("$.msg").value("위시리스트 수량을 업데이트했습니다."))
-                .andExpect(jsonPath("$.data.productName").value(product.getName()))
-                .andExpect(jsonPath("$.data.quantity").value(3));
-        // 위시리스트의 수량이 업데이트 되었는지 확인
+                .andExpect(jsonPath("$.msg").value("위시리스트에서 삭제했습니다."))
+                .andExpect(jsonPath("$.data").doesNotExist()); // 삭제 시 data는 null이므로 존재하지 않음을 확인
+
+        // 위시리스트에 더 이상 없는지 확인
+        mvc.perform(get("/api/v1/wish-lists/" + product.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").value(false));
     }
+
+
+    @Test
+    @DisplayName("위시리스트 전체 삭제")
+    @WithUserDetails("user1")
+    void clearWishList() throws Exception {
+        User user = userService.findByUsername("user1").get();
+        Product product1 = productService.findAll().get(0);
+        Product product2 = productService.findAll().get(1);
+
+        wishListService.addToWishList(user.getId(), product1.getId());
+        wishListService.addToWishList(user.getId(), product2.getId());
+
+        mvc.perform(delete("/api/v1/wish-lists/clear"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value("200"))
+                .andExpect(jsonPath("$.msg").value("위시리스트를 모두 삭제했습니다."))
+                .andExpect(jsonPath("$.data").doesNotExist());
+
+        mvc.perform(get("/api/v1/wish-lists"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.length()").value(0));
+    }
+
 }
