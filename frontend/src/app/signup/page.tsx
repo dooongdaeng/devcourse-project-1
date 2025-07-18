@@ -2,18 +2,16 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useProducts } from '@/context/ProductContext';
 
 export default function Signup() {
-  const [userId, setUserId] = useState('');
+  const [username, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [name, setName] = useState('');
+  const [nickname, setNickname] = useState('');
   const [postalCode, setPostalCode] = useState('');
   const [address, setAddress] = useState('');
   const [email, setEmail] = useState('');
   const router = useRouter();
-  const { addUser } = useProducts();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,22 +21,40 @@ export default function Signup() {
       return;
     }
 
-    if (!userId || !password || !name || !postalCode || !address) {
+    if (!username || !password || !nickname || !postalCode || !address || !email) {
       alert('모든 필드를 입력해주세요.');
       return;
     }
 
-    addUser({
-      userId,
-      name,
-      password,
-      postalCode,
-      address,
-      role: 'user'
-    });
+    try {
+      const response = await fetch('/api/v1/users/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          password,
+          nickname,
+          email,
+          address,
+          postalCode,
+        }),
+      });
 
-    alert('회원가입이 완료되었습니다. 로그인 해주세요.');
-    router.push('/login');
+      const data = await response.json(); // 백엔드 RsData 응답을 파싱
+
+      if (response.ok) {
+        alert('회원가입이 완료되었습니다. 로그인 해주세요.');
+        router.push('/login');
+      } else {
+        alert(`회원가입 실패: ${data.msg || '알 수 없는 오류가 발생했습니다.'}`);
+      }
+    } catch (error) {
+      console.error('회원가입 요청 중 오류 발생:', error);
+      alert('회원가입 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    }
+
   };
 
   return (
@@ -47,15 +63,15 @@ export default function Signup() {
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">회원가입</h2>
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="userId" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
               사용자 ID
             </label>
             <input
               type="text"
-              id="userId"
-              name="userId"
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
+              id="username"
+              name="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-700"
               placeholder="사용자 ID를 입력하세요"
             />
@@ -89,17 +105,31 @@ export default function Signup() {
             />
           </div>
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-              이름
+            <label htmlFor="nickname" className="block text-sm font-medium text-gray-700 mb-1">
+              닉네임
             </label>
             <input
               type="text"
-              id="name"
-              name="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              id="nickname"
+              name="nickname"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
               className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-700"
-              placeholder="이름을 입력하세요"
+              placeholder="닉네임을 입력하세요"
+            />
+          </div>
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              이메일
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-700"
+              placeholder="이메일을 입력하세요"
             />
           </div>
           <div>
