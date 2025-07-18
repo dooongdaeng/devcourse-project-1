@@ -98,28 +98,41 @@ export type CreateOrderRequest = {
         });
     };
 
-      const getOrderItems = (orderId: number) => {
-        setIsLoading(true);
-        setError(null);
-        
-        return apiFetch(`/api/v1/orderItems/order/${orderId}`, {
-            method: 'GET'
-        })
-        .then((res) => {
-            setIsLoading(false);
-            if (res.error) {
-                setError(res.error.msg);
-                throw new Error(res.error.msg);
-            }
-            setOrderItems(res.data || []);
-            return res.data;
-        })
-        .catch(err => {
-            setIsLoading(false);
-            setError(err.message);
-            throw err;
-        });
-    };
+    const getOrderItems = (orderId: number) => {
+      setIsLoading(true);
+      setError(null);
+      
+      return apiFetch(`/api/v1/orderItems/order/${orderId}`, {
+          method: 'GET'
+      })
+      .then((res) => {
+          setIsLoading(false);
+          console.log('getOrderItems apiFetch 응답:', res); // 디버깅용
+          
+          // res가 직접 배열인 경우
+          if (Array.isArray(res)) {
+              setOrderItems(res);
+              return res;
+          }
+          
+          // res가 {data: [...], error: ...} 형태인 경우
+          if (res.error) {
+              setError(res.error.msg);
+              throw new Error(res.error.msg);
+          }
+          setOrderItems(res.data || []);
+          return res.data;
+      })
+      .catch(err => {
+          setIsLoading(false);
+          if (err.msg) {
+              setError(err.msg);
+          } else {
+              setError(err.message || '알 수 없는 오류가 발생했습니다.');
+          }
+          throw err;
+      });
+  };
 
       const processCompleteOrder = (
         orderData: CreateOrderRequest,

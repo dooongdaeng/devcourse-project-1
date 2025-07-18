@@ -2,24 +2,46 @@
 
 import { useProducts } from '@/context/ProductContext';
 import { useCreateOrder } from '@/context/OrderContext';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function OrderHistory() {
   const { orderHistory } = useProducts();
-  const { getMyOrders, orders, isLoading, error } = useCreateOrder();
+  const { getMyOrders, getOrderItems, orders, isLoading, error } = useCreateOrder();
+  
+  // 팝업 상태
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
+  const [orderItems, setOrderItems] = useState<any[]>([]);
+  const [itemsLoading, setItemsLoading] = useState(false);
 
+  // 컴포넌트 마운트 시 주문 목록 조회
   useEffect(() => {
-    console.log('getMyOrders 호출 시작');
-    getMyOrders()
-      .then(result => {
-        console.log('API 결과:', result);
-      })
-      .catch(err => {
-        console.log('API 에러:', err);
-      });
+    getMyOrders();
   }, []);
 
-  console.log('현재 상태:', { orders, isLoading, error });
+  // 주문 클릭 핸들러
+  const handleOrderClick = async (orderId: number) => {
+    setSelectedOrderId(orderId);
+    setIsPopupOpen(true);
+    setItemsLoading(true);
+    
+    try {
+      const items = await getOrderItems(orderId);
+      setOrderItems(items || []);
+    } catch (error) {
+      console.error('주문 아이템 조회 실패:', error);
+      setOrderItems([]);
+    } finally {
+      setItemsLoading(false);
+    }
+  };
+
+  // 팝업 닫기 핸들러
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
+    setSelectedOrderId(null);
+    setOrderItems([]);
+  };
 
   // 로딩 중일 때
   if (isLoading) {
@@ -55,7 +77,11 @@ export default function OrderHistory() {
         ) : (
           <div className="space-y-4">
             {orders.map(order => (
-              <div key={order.id} className="border border-gray-200 rounded-md p-6 bg-gray-50 cursor-pointer hover:bg-gray-100">
+              <div 
+                key={order.id} 
+                className="border border-gray-200 rounded-md p-6 bg-gray-50 cursor-pointer hover:bg-gray-100"
+                onClick={() => handleOrderClick(order.id ?? 0)}
+              >
                 <div className="flex justify-between items-center">
                   <div>
                     <h3 className="text-xl font-semibold text-gray-700">주문 번호: #{order.id ?? 0}</h3>
@@ -72,6 +98,50 @@ export default function OrderHistory() {
           </div>
         )}
       </div>
+
+      {/* 팝업 */}
+      {isPopupOpen && selectedOrderId && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[80vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold">주문 상세 정보 - #{selectedOrderId}</h3>
+              <button 
+                onClick={handleClosePopup}
+                className="text-gray-500 hover:text-gray-700 text-xl"
+              >
+                ✕
+              </button>
+            </div>
+            
+            {itemsLoading ? (
+              <div className="text-center py-8">
+                <p className="text-gray-500">주문 상품을 불러오는 중...</p>
+              </div>
+            ) : orderItems.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-gray-500">주문 상품이 없습니다.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {orderItems.map(item => (
+                  <div key={item.id} className="border-b border-gray-200 pb-4">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="font-medium">상품 ID: {item.productId}</p>
+                        <p className="text-sm text-gray-600">수량: {item.quantity}개</p>
+                        <p className="text-sm text-gray-600">단가: {item.unitPrice?.toLocaleString()}원</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold">{item.totalPrice?.toLocaleString()}원</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </main>
   );
 }
