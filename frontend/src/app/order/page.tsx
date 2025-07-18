@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useProducts, OrderItem } from '@/context/ProductContext';
-import { useProduct } from '@/context/ProductsContext';
+import { useProduct, useProductImage } from '@/context/ProductsContext';
 import { components } from '@/lib/backend/apiV1/schema';
 import { useCreateOrder, CreateOrderRequest } from '@/context/OrderContext'; 
 
@@ -13,6 +13,11 @@ type Product = components['schemas']['ProductWithImageUrlDto'];
 // Define a type for cart items, which includes quantity
 type CartItem = Product & {
   quantity: number;
+};
+
+type PaymentInfo = {
+  address: string;
+  paymentMethod: 'CARD' | 'TRANSFER';
 };
 
 function useCart() {
@@ -70,7 +75,7 @@ function useCart() {
 }
 
 function ProductList({cartState} : {cartState: ReturnType<typeof useCart>}) {
-  const { products } = useProduct();
+  const products = useProduct();
 
   return (
     <>
@@ -114,7 +119,7 @@ function ProductItem({cartState, product} : {
 }
 
 function WishList({cartState} : {cartState: ReturnType<typeof useCart>}) {
-  const { products } = useProduct();
+  const products = useProduct();
 
   const { favoriteProducts } = useProducts(); // 전역 상품 목록과 찜 목록 가져오기
 
@@ -194,10 +199,140 @@ function OrderList({cartState} : {cartState: ReturnType<typeof useCart>}) {
   );
 }
 
-function CheckOut({cartState} : {cartState : ReturnType<typeof useCart>}) {
-  const { cartItems, setCartItems } = cartState;
-  const router = useRouter();
+function PaymentPopup({ 
+  isOpen, 
+  onClose, 
+  onConfirm, 
+  totalPrice 
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: (paymentInfo: PaymentInfo) => void;
+  totalPrice: number;
+}) {
+  const [address, setAddress] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<'CARD' | 'TRANSFER'>('CARD');
+  const [errors, setErrors] = useState<{address?: string}>({});
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // 유효성 검사
+    const newErrors: {address?: string} = {};
+    if (!address.trim()) {
+      newErrors.address = '배송 주소를 입력해주세요.';
+    }
+    
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    // 결제 정보 전달
+    onConfirm({
+      address: address.trim(),
+      paymentMethod
+    });
+  };
+
+  const handleClose = () => {
+    setAddress('');
+    setPaymentMethod('CARD');
+    setErrors({});
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+        <h3 className="text-xl font-bold mb-4">결제 정보 입력</h3>
+        
+        <form onSubmit={handleSubmit}>
+          {/* 배송 주소 입력 */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              배송 주소 *
+            </label>
+            <textarea
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+              rows={3}
+              placeholder="예: 서울시 강남구 테헤란로 123, 456호"
+            />
+            {errors.address && (
+              <p className="text-red-500 text-sm mt-1">{errors.address}</p>
+            )}
+          </div>
+
+          {/* 결제 방법 선택 */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              결제 방법 *
+            </label>
+            <div className="space-y-2">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="CARD"
+                  checked={paymentMethod === 'CARD'}
+                  onChange={(e) => setPaymentMethod(e.target.value as 'CARD')}
+                  className="mr-2"
+                />
+                신용카드
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="TRANSFER"
+                  checked={paymentMethod === 'TRANSFER'}
+                  onChange={(e) => setPaymentMethod(e.target.value as 'TRANSFER')}
+                  className="mr-2"
+                />
+                계좌이체
+              </label>
+            </div>
+          </div>
+
+          {/* 총 금액 표시 */}
+          <div className="mb-6 p-4 bg-gray-50 rounded-md">
+            <div className="flex justify-between items-center">
+              <span className="font-medium">총 결제 금액</span>
+              <span className="text-xl font-bold">{totalPrice.toLocaleString()}원</span>
+            </div>
+          </div>
+
+          {/* 버튼들 */}
+          <div className="flex space-x-3">
+            <button
+              type="button"
+              onClick={handleClose}
+              className="flex-1 py-2 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+            >
+              취소
+            </button>
+            <button
+              type="submit"
+              className="flex-1 py-2 px-4 bg-gray-800 text-white rounded-md hover:bg-gray-700"
+            >
+              결제하기
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function CheckOut() {
+  const { cartItems, setCartItems } = useCart();
+  const router = useRouter();
+  const [showPaymentPopup, setShowPaymentPopup] = useState(false);
+  
   // 커스텀 훅 사용
   const { processCompleteOrder, isLoading, error } = useCreateOrder();
 
@@ -208,42 +343,50 @@ function CheckOut({cartState} : {cartState : ReturnType<typeof useCart>}) {
   const handleCheckout = async () => {
     const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
     if (isLoggedIn) {
-      if (window.confirm('결제를 진행합니다.')) {
-        if (cartItems.length === 0) {
-          alert('장바구니가 비어있습니다.');
-          return;
-        }
-
-        try {
-          // 사용자 ID 가져오기 (실제 구현에 맞게 수정 필요)
-          const userId = parseInt(sessionStorage.getItem('userId') || '1');
-
-          // 주문 데이터 생성
-          const orderData: CreateOrderRequest = {
-            orderCount: cartItems.length,
-            totalPrice: totalPrice,
-            paymentMethod: 'CARD', // 또는 사용자가 선택한 결제 방법
-            paymentStatus: 'COMPLETED',
-            userId: userId
-          };
-
-          // 백엔드 API를 통한 주문 생성
-          const result = await processCompleteOrder(orderData, cartItems);
-
-          // 장바구니 비우기
-          setCartItems([]);
-
-          alert('결제가 완료되었습니다. 주문 내역에서 확인해주세요.');
-          router.push('/orderHistory');
-          
-        } catch (error) {
-          console.error('주문 처리 중 오류:', error);
-          alert(`결제 처리 중 오류가 발생했습니다: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
-        }
+      if (cartItems.length === 0) {
+        alert('장바구니가 비어있습니다.');
+        return;
       }
+      
+      // 결제 팝업 열기
+      setShowPaymentPopup(true);
     } else {
       alert('로그인을 해야합니다.');
       router.push('/login');
+    }
+  };
+
+  // 결제 정보 확인 후 실제 결제 처리
+  const handlePaymentConfirm = async (paymentInfo: PaymentInfo) => {
+    try {
+      // 사용자 ID 가져오기 (실제 구현에 맞게 수정 필요)
+      const userId = parseInt(sessionStorage.getItem('userId') || '1');
+      
+      // 주문 데이터 생성 (주소와 결제 방법 포함)
+      const orderData: CreateOrderRequest = {
+        orderCount: cartItems.length,
+        totalPrice: totalPrice,
+        paymentMethod: paymentInfo.paymentMethod,
+        paymentStatus: 'COMPLETED',
+        userId: userId,
+        address: paymentInfo.address // 주소 추가
+      };
+
+      // 백엔드 API를 통한 주문 생성
+      const result = await processCompleteOrder(orderData, cartItems);
+      
+      // 장바구니 비우기
+      setCartItems([]);
+      
+      // 팝업 닫기
+      setShowPaymentPopup(false);
+      
+      alert('결제가 완료되었습니다. 주문 내역에서 확인해주세요.');
+      router.push('/orderHistory');
+      
+    } catch (error) {
+      console.error('주문 처리 중 오류:', error);
+      alert(`결제 처리 중 오류가 발생했습니다: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
     }
   };
 
@@ -269,6 +412,14 @@ function CheckOut({cartState} : {cartState : ReturnType<typeof useCart>}) {
       >
         {isLoading ? '결제 처리 중...' : '결제하기'}
       </button>
+
+      {/* 결제 팝업 */}
+      <PaymentPopup
+        isOpen={showPaymentPopup}
+        onClose={() => setShowPaymentPopup(false)}
+        onConfirm={handlePaymentConfirm}
+        totalPrice={totalPrice}
+      />
     </>
   );
 }

@@ -233,6 +233,7 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
       setCurrentUser(user);
       if (typeof window !== 'undefined') {
         sessionStorage.setItem('currentUser', JSON.stringify(user));
+        sessionStorage.setItem('isLoggedIn', 'true');
       }
       return true;
     }
@@ -243,6 +244,7 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     setCurrentUser(null);
     if (typeof window !== 'undefined') {
       sessionStorage.removeItem('currentUser');
+      sessionStorage.removeItem('isLoggedIn');
     }
   };
 
