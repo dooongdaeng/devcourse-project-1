@@ -22,7 +22,7 @@ export const useWishList = (userId: number) => {
 
         try {
             setIsLoading(true);
-            const data = await apiFetch(`/api/v1/wish-lists?userId=${userId}`);
+            const data = await apiFetch(`/api/v1/wish-lists`);
             setWishLists(data);
         } catch (err) {
             console.error('Failed to fetch wish lists:', err);
@@ -48,7 +48,7 @@ export const useWishList = (userId: number) => {
         try {
             const res = await apiFetch('/api/v1/wish-lists/toggle', {
                 method: 'POST',
-                body: JSON.stringify({ userId, productId })
+                body: JSON.stringify({ productId })
             });
 
             if (res.error) {
@@ -93,14 +93,14 @@ export const useWishList = (userId: number) => {
     }, []);
 
     // 전체 삭제
-    const deleteAllWishLists= useCallback(async () => {
+    const clearWishList = useCallback(async () => {
         if (!userId) return;
 
         setIsLoading(true);
         setError(null);
 
         try{
-            const res = await apiFetch(`/api/v1/wish-lists/clear?userId=${userId}`, {
+            const res = await apiFetch(`/api/v1/wish-lists/clear`, {
                 method: 'DELETE'
             });
 
@@ -126,7 +126,7 @@ export const useWishList = (userId: number) => {
         toggleWishList,
         fetchWishLists,
         deleteWishList,
-        deleteAllWishLists,
+        clearWishList,
         refetch: fetchWishLists
     };
 };
@@ -144,7 +144,7 @@ export const useWishListStatus = (userId: number, productId: number) => {
         }
         try {
             setIsLoading(true);
-            const result = await apiFetch(`/api/v1/wish-lists/check?userId=${userId}&productId=${productId}`);
+            const result = await apiFetch(`/api/v1/wish-lists/${productId}`);
             setIsInWishList(result);
         } catch (err) {
             console.error('Failed to check wish list status:', err);
@@ -178,7 +178,7 @@ export const useWishListCount = (userId: number) => {
 
         try {
             setIsLoading(true);
-            const result = await apiFetch(`/api/v1/wish-lists/count?userId=${userId}`);
+            const result = await apiFetch(`/api/v1/wish-lists/count`);
             setCount(result || 0);
         } catch (err) {
             console.error('Failed to fetch wish list count:', err);
