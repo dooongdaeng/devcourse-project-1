@@ -75,7 +75,7 @@ function useCart() {
 }
 
 function ProductList({cartState} : {cartState: ReturnType<typeof useCart>}) {
-  const products = useProduct();
+  const { products } = useProduct();
 
   return (
     <>
@@ -119,7 +119,7 @@ function ProductItem({cartState, product} : {
 }
 
 function WishList({cartState} : {cartState: ReturnType<typeof useCart>}) {
-  const products = useProduct();
+  const { products } = useProduct();
 
   const { favoriteProducts } = useProducts(); // 전역 상품 목록과 찜 목록 가져오기
 
@@ -367,7 +367,7 @@ function CheckOut() {
         orderCount: cartItems.length,
         totalPrice: totalPrice,
         paymentMethod: paymentInfo.paymentMethod,
-        paymentStatus: 'COMPLETED',
+        paymentStatus: 'PENDING',
         userId: userId,
         address: paymentInfo.address // 주소 추가
       };

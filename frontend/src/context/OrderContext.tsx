@@ -4,12 +4,16 @@ import { components } from "@/lib/backend/apiV1/schema";
 import { useState, useEffect } from "react";
 import { apiFetch } from "@/lib/backend/client";
 
+type OrderDto = components['schemas']['OrderDto'];
+type OrderItemDto = components['schemas']['OrderItemDto'];
+
 export type CreateOrderRequest = {
     orderCount: number;
     totalPrice: number;
     paymentMethod: string;
     paymentStatus: string;
     userId: number;
+    address: string;
   };
 
   export type CreateOrderItemRequest = {
@@ -57,7 +61,7 @@ export type CreateOrderRequest = {
       };
       const processCompleteOrder = (
         orderData: CreateOrderRequest,
-        cartItems: Array<{ id: number; quantity: number; price: string }>
+        cartItems: Array<{ id: number; quantity: number; price: number }>
       ) => {
         setIsLoading(true);
         setError(null);
@@ -67,7 +71,7 @@ export type CreateOrderRequest = {
             const orderItemsData = cartItems.map(item => ({
               orderId: order.id,
               quantity: item.quantity,
-              unitPrice: parseInt(item.price),
+              unitPrice: item.price,
               productId: item.id
             }));
             
