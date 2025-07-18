@@ -74,6 +74,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
         if (typeof window !== 'undefined') {
             sessionStorage.removeItem('currentUser');
             sessionStorage.removeItem('isLoggedIn');
+            sessionStorage.removeItem('cartItems');
         }
     };
 

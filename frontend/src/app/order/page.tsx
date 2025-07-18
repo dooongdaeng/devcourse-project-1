@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useProducts, OrderItem } from '@/context/ProductContext';
+import { useProducts } from '@/context/ProductContext';
 import { useProduct, ProductsProvider } from '@/context/ProductsContext';
 import { components } from '@/lib/backend/apiV1/schema';
 import { useCreateOrder, CreateOrderRequest } from '@/context/OrderContext'; 
