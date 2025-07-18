@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, ChangeEvent, useRef } from 'react';
-import { useProductItem, useProduct, ProductsProvider, useProductImage } from '@/context/ProductsContext';
+import { useProductItem, useProduct, ProductsProvider, useProductImage, useProductImageItem } from '@/context/ProductsContext';
 import type { components } from '@/lib/backend/apiV1/schema';
 
 export default function ProductManagementWrapper() {
@@ -42,7 +42,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
   const stockInputRef = useRef<HTMLInputElement>(null);
   const descriptionInputRef = useRef<HTMLTextAreaElement>(null);
 
-  const { productImages } = useProductImage((editingProduct != null) ? editingProduct.id : -1);
+  const { productImages, addProductImage } = useProductImage((editingProduct != null) ? editingProduct.id : -1);
 
   const initialProductFormState: ProductFormState = {
     name: '',
@@ -197,8 +197,6 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
         description, 
         stock, 
         imageUrl, 
-        imagesToAdd: imagesToAdd.map(img => img.url),
-        imagesToDelete: imagesToDelete.map(img => img.id),
         onSuccess: (res) => {
           alert(res.msg);
           if(products == null) return;
@@ -206,6 +204,16 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
           setProducts(products.map((product) => product.id === updatedProduct.id ? updatedProduct : product));
         }
       });
+
+      imagesToAdd.map((img) => {
+        const url = img.url;
+        addProductImage({url, onSuccess: (res) => alert(res.msg)});
+      })
+
+      imagesToDelete.map((img) => {
+        DeleteProductImage(editingProduct, (img.id !== undefined) ? img.id : -1);
+      })
+
     } else {
       // 새 상품 추가 시
       addProduct({
@@ -341,6 +349,11 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
       </form>
     </>
   );
+}
+
+function DeleteProductImage( editingProduct: Product, id: number ) {
+  const { deleteProductImage } = useProductImageItem(editingProduct?.id, id);
+  deleteProductImage((res) => alert(res.msg))
 }
 
 function ProductList({ onEditClick }: { onEditClick: (product: Product) => void }) {
