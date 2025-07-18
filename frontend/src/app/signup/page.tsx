@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function Signup() {
-  const [username, setUserId] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [nickname, setNickname] = useState('');
@@ -13,7 +13,7 @@ export default function Signup() {
   const [email, setEmail] = useState('');
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
@@ -27,7 +27,10 @@ export default function Signup() {
     }
 
     try {
-      const response = await fetch('/api/v1/users/signup', {
+      alert(process.env.NEXT_PUBLIC_API_BASE_URL);
+      const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL + '/api/v1/users/signup';
+      console.log('API 요청 보낼 URL:', apiUrl);
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
