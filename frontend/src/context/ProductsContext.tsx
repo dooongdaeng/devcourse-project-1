@@ -109,14 +109,11 @@ export const useProductImage = (productId: number) => {
     });
   }, []);
 
-  const addProductImage = ({url, onSuccess}: {
-    url: string,
-    onSuccess:(data: any) => void
-  }) => {
+  const addProductImage = (url) => {
     apiFetch(`/api/v1/adm/products/${productId}/images`, {
       method: "POST",
       body: JSON.stringify({url}),
-    }).then(onSuccess)
+    }).then()
     .catch((error) => {
       alert(`${error.resultCode} : ${error.msg}`);
     });

@@ -207,7 +207,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
 
       imagesToAdd.map((img) => {
         const url = img.url;
-        addProductImage({url, onSuccess: (res) => alert(res.msg)});
+        addProductImage(url);
       })
 
       imagesToDelete.map((img) => {
