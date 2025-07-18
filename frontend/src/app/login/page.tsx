@@ -3,123 +3,89 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
-import { apiFetch } from '@/lib/backend/client';
-import type { components } from '@/lib/backend/apiV1/schema';
-import React from 'react';
-
-interface ApiResponseError {
-  resultCode: string;
-  msg: string;
-  data?: unknown;
-}
-
-type UserLoginReqBody = components['schemas']['UserLoginReqBody'];
-type RsDataUserDto = components['schemas']['RsDataUserDto'];
 
 export default function Login() {
   const router = useRouter();
   const { login } = useUser();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    const requestBody: UserLoginReqBody = { username, password };
-
     try {
-      const response: RsDataUserDto = await apiFetch('/api/v1/users/login', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL + '/api/v1/users/login';
+      console.log('로그인 요청 보낼 URL:', apiUrl);
+
+      const response = await fetch(apiUrl, {
         method: 'POST',
-        body: JSON.stringify(requestBody),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
       });
 
-      // HTTP 상태 코드 2xx 응답 (성공)
-      if (response.resultCode === '200') {
-        const userData = response.data;
-        if (userData) {
-          login(userData);
-          alert('로그인 성공!');
-          router.push('/');
-        } else {
-          setError('로그인 데이터가 올바르지 않습니다.');
-        }
+      const data = await response.json();
+
+      if (response.ok) {
+        const userData = {
+          id: data.data.id,
+          username: data.data.username,
+          nickname: data.data.nickname,
+          email: data.data.email,
+          address: data.data.address,
+          postalCode: data.data.postalCode,
+        };
+        login(userData);
+        alert('로그인 성공!');
+        router.push('/');
       } else {
-        setError(response.msg || '알 수 없는 로그인 오류가 발생했습니다.');
+        alert(`로그인 실패: ${data.msg || '사용자 이름 또는 비밀번호가 올바르지 않습니다.'}`);
       }
-    } catch (err: unknown) {
-      if (typeof err === 'object' && err !== null && 'resultCode' in err && 'msg' in err) {
-        const apiError = err as ApiResponseError;
-        console.error('API 오류 발생:', apiError.resultCode, apiError.msg);
-        setError(apiError.msg);
-      } else if (err instanceof Error) {
-        console.error('클라이언트 측 오류 발생:', err.message);
-        setError(`오류 발생: ${err.message}`);
-      } else {
-        console.error('알 수 없는 오류 발생:', err);
-        setError('알 수 없는 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
-      }
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      console.error('로그인 요청 중 오류 발생:', error);
+      alert('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
     }
   };
 
   return (
-      <main className="flex min-h-screen flex-col items-center justify-center p-4">
-        <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold text-center mb-6">로그인</h2>
-          <form onSubmit={handleLogin}>
-            <div className="mb-4">
-              <label htmlFor="username" className="block text-gray-700 text-sm font-bold mb-2">
-                사용자 이름:
+      <main className="flex min-h-screen flex-col items-center justify-center p-4 md:p-24">
+        <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
+          <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">로그인</h2>
+          <form className="space-y-6" onSubmit={handleLogin}>
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+                사용자 ID
               </label>
               <input
                   type="text"
                   id="username"
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  name="username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  required
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-700"
+                  placeholder="사용자 ID를 입력하세요"
               />
             </div>
-            <div className="mb-6">
-              <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">
-                비밀번호:
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                비밀번호
               </label>
               <input
                   type="password"
                   id="password"
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+                  name="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-700"
+                  placeholder="비밀번호를 입력하세요"
               />
             </div>
-            {error && <p className="text-red-500 text-xs italic mb-4">{error}</p>}
-            <div className="flex items-center justify-between">
-              <button
-                  type="submit"
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
-                  disabled={loading}
-              >
-                {loading ? '로그인 중...' : '로그인'}
-              </button>
-            </div>
-            <div className="text-center mt-4">
-              <p className="text-gray-600">
-                계정이 없으신가요?{" "}
-                <button
-                    type="button"
-                    onClick={() => router.push('/signup')}
-                    className="text-blue-500 hover:text-blue-800 font-bold"
-                >
-                  회원가입
-                </button>
-              </p>
-            </div>
+            <button
+                type="submit"
+                className="w-full bg-gray-800 text-white py-3 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 cursor-pointer"
+            >
+              로그인
+            </button>
           </form>
         </div>
       </main>
