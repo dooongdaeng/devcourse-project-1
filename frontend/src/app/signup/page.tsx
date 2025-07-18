@@ -27,6 +27,7 @@ export default function Signup() {
     }
 
     try {
+
       alert(process.env.NEXT_PUBLIC_API_BASE_URL);
       const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL + '/api/v1/users/signup';
       console.log('API 요청 보낼 URL:', apiUrl);

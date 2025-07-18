@@ -3,7 +3,8 @@
 import { useProducts } from "@/context/ProductContext";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { components } from "@/lib/backend/apiV1/schema";
-import { useProduct } from "@/context/ProductsContext"
+import { useProduct } from "@/context/ProductsContext";
+import Link from "next/link";
 
 type Product = components['schemas']['ProductWithImageUrlDto'];
 
@@ -11,7 +12,7 @@ function ProductCard({ product }: { product: Product }) {
   const { favoriteProducts, toggleFavorite } = useProducts();
 
   return (
-    <div className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30">
+    <Link href={`/products/detail/${product.id}`} className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30">
       <img src={product.imageUrl} alt={product.name} className="mb-3 h-40 w-full object-cover"/>
 
       <h2 className="mb-3 text-xl font-semibold">
@@ -20,15 +21,12 @@ function ProductCard({ product }: { product: Product }) {
           {favoriteProducts[product.id] ? <FaHeart color="red" /> : <FaRegHeart />}
         </button>
       </h2>
-      <p className="m-0 max-w-[30ch] text-sm opacity-50">
-        {product.description}
-      </p>
-    </div>
+    </Link>
   );
 }
 
 export default function Home() {
-  const products = useProduct();
+  const {products} = useProduct();
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-4 md:p-24">
