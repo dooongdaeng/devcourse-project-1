@@ -132,10 +132,10 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">상품명</label>
-            <input type="text" name="name" id="name" ref={nameInputRef}
+            <input type="text" name="name" id="name" ref={nameInputRef} autoFocus
               value={formState.name}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md text-gray-900"
+              className="w-full p-2 border border-gray-300 rounded-md text-gray-900 bg-white"
             />
           </div>
           <div>
@@ -143,7 +143,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
             <input type="number" name="price" id="price" ref={priceInputRef}
               value={formState.price}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md text-gray-900"
+              className="w-full p-2 border border-gray-300 rounded-md text-gray-900 bg-white"
             />
           </div>
           <div>
@@ -151,7 +151,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
             <input type="number" name="stock" id="stock" ref={stockInputRef}
               value={formState.stock}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md text-gray-900"
+              className="w-full p-2 border border-gray-300 rounded-md text-gray-900 bg-white"
             />
           </div>
           <div>
@@ -159,7 +159,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
             <input type="text" name="imageUrl" id="imageUrl" placeholder="https://example.com/image.png" ref={urlInputRef}
               value={formState.imageUrl}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md text-gray-900"
+              className="w-full p-2 border border-gray-300 rounded-md text-gray-900 bg-white"
             />
           </div>
           <div className="md:col-span-2">
@@ -168,7 +168,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
               name="description" id="description" rows={3} ref={descriptionInputRef}
               value={formState.description}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md text-gray-900"
+              className="w-full p-2 border border-gray-300 rounded-md text-gray-900 bg-white"
             />
           </div>
         </div>
