@@ -31,6 +31,10 @@ export const apiFetch = async <T = unknown>(url: string, options?: RequestInit) 
 
     try {
         response = await fetch(fullUrl, options);
+        if (response.status === 204) {
+            console.log(`HTTP 204 No Content for ${url}. No JSON body to parse.`);
+            return null;
+        }
         responseData = await response.json() as RsData<T>;
     } catch (error) {
         console.error('API 요청 중 네트워크 오류 또는 응답 파싱 실패:', error);

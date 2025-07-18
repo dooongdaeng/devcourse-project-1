@@ -4,6 +4,7 @@ import com.back.domain.user.user.dto.AdminUserDto;
 import com.back.domain.user.user.entity.User;
 import com.back.domain.user.user.service.UserService;
 import com.back.global.exception.ServiceException;
+import com.back.global.rsData.RsData; // RsData 임포트가 반드시 있어야 합니다.
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,8 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/api/v1/adm/users")
+@RestController // 이 어노테이션이 있는지 확인
+@RequestMapping("/api/v1/adm/users") // 이 경로가 정확한지 확인
 @RequiredArgsConstructor
 @Tag(name = "관리자 유저 API")
 @SecurityRequirement(name = "bearerAuth")
@@ -24,12 +25,13 @@ import java.util.List;
 public class ApiV1AdminUserController {
     private final UserService userService;
 
-    @GetMapping
+    @GetMapping // 이 어노테이션이 있는지 확인
     @Operation(summary = "모든 사용자 정보 조회 (관리자)")
-    public List<AdminUserDto> getUsers() {
-        return userService.findAll().stream()
+    public RsData<List<AdminUserDto>> getUsers() {
+        List<AdminUserDto> users = userService.findAll().stream()
                 .map(AdminUserDto::new)
                 .toList();
+        return new RsData<>("200", "모든 사용자 정보 조회 성공", users);
     }
 
     @GetMapping("/{id}")
@@ -42,9 +44,9 @@ public class ApiV1AdminUserController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "특정 사용자 삭제 (관리자)")
-    @ResponseStatus(HttpStatus.NO_CONTENT) // 성공적인 삭제에 대해 204 No Content 반환
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> deleteUser(@PathVariable int id) {
         userService.deleteUser(id);
-        return ResponseEntity.noContent().build(); // 204 No Content 반환
+        return ResponseEntity.noContent().build();
     }
 }
