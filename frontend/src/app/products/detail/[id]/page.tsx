@@ -4,6 +4,7 @@ import { useProductItem } from "@/context/ProductsContext";
 import { useParams } from "next/navigation";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useProducts } from "@/context/ProductContext"; // Assuming this is for favorites
+import Link from "next/link";
 
 export default function ProductDetail() {
   const params = useParams();
@@ -58,11 +59,11 @@ export default function ProductDetail() {
                 {product.description}
               </p>
             </div>
-            <div className="mt-6 flex gap-4">
+            <Link href="/order" className="mt-6 flex gap-4">
               <button className="flex-1 rounded-md border border-gray-300 px-6 py-3 transition bg-gray-700 hover:text-white hover:bg-gray-100 dark:border-neutral-600 dark:hover:bg-blue-700 cursor-pointer">
                 구매하기
               </button>
-            </div>
+            </Link>
           </div>
         </div>
       </div>
