@@ -53,7 +53,9 @@ public class ApiV1OrderItemControllerTest {
                                             "orderId": 1,
                                             "quantity": 2,
                                             "unitPrice": 25000,
-                                            "productId": 1
+                                            "productId": 1,
+                                            "userId": 1,
+                                            "address": "서울시 강남구 역삼동"
                                         }
                                         """)
                                 .with(csrf())

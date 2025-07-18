@@ -67,7 +67,8 @@ public class ApiV1AdmOrderController {
                 reqBody.orderCount(),
                 reqBody.totalPrice(),
                 reqBody.paymentMethod(),
-                reqBody.paymentStatus()
+                reqBody.paymentStatus(),
+                reqBody.address()
         );
 
         return new RsData<>(

@@ -66,10 +66,10 @@ public class BaseInitData {
 
     @Transactional
     public void work3() {
-        orderService.create(3, 45000, "card", "pending", 1);
-        orderService.create(10, 12000, "card", "pending", 2);
-        orderService.create(7, 80000, "bank_transfer", "completed", 1);
-        orderService.create(2, 5000, "card", "completed", 3);
+        orderService.create(3, 45000, "card", "pending", 1, "서울시 강남구");
+        orderService.create(10, 12000, "card", "pending", 2, "서울시 서초구");
+        orderService.create(7, 80000, "bank_transfer", "completed", 1, "서울시 종로구");
+        orderService.create(2, 5000, "card", "completed", 3, "서울시 강동구");
 
     }
 
