@@ -1,14 +1,45 @@
 "use client";
 
-import { useState, ChangeEvent } from 'react';
-import { useProducts, User } from '@/context/ProductContext';
+import { useState, useEffect } from 'react';
+import { useProducts } from '@/context/ProductContext';
+import type { components } from '@/lib/backend/apiV1/schema';
+import { apiFetch } from '@/lib/backend/client';
+
+type User = components['schemas']['UserDto'];
+
+const useUsers = () => {
+  const [ users, setUsers ] = useState<User[] | null>(null);
+
+  useEffect(() => {
+    apiFetch('/api/v1/adm/users')
+      .then(setUsers)
+      .catch((error) => {
+        alert(`${error.resultCode} : ${error.msg}`);
+      });
+  }, []);
+
+  const deleteUser = (id: number, onSuccess: (data: any) => void) => {
+    apiFetch(`/api/v1/adm/users/${id}`, {
+      method: "DELETE"
+    }).then(onSuccess)
+    .catch((error) => {
+      alert(`${error.resultCode} : ${error.msg}`);
+    });
+  };
+
+  return { users, setUsers, deleteUser };
+}
 
 export default function AccountManagement() {
-  const { users, deleteUser } = useProducts();
+  const { users, setUsers, deleteUser } = useUsers();
 
   const handleDeleteUser = (userId: number) => {
     if (window.confirm('정말로 이 회원을 삭제하시겠습니까?')) {
-      deleteUser(userId);
+      deleteUser(userId, (res) => {
+        alert(res.msg);
+        if(users == null) return;
+        setUsers(users.filter((user) => user.id ! == userId));
+      });
     }
   };
 
@@ -32,11 +63,11 @@ export default function AccountManagement() {
               </tr>
             </thead>
             <tbody className="text-gray-600 text-sm">
-              {users.map(user => (
+              {users?.map(user => (
                 <tr key={user.id} className="border-b border-gray-200 hover:bg-gray-50">
                   <td className="py-3 px-6 text-left whitespace-nowrap">{user.id}</td>
-                  <td className="py-3 px-6 text-left">{user.userId}</td>
-                  <td className="py-3 px-6 text-left">{user.name}</td>
+                  <td className="py-3 px-6 text-left">{user.username}</td>
+                  <td className="py-3 px-6 text-left">{user.nickname}</td>
                   <td className="py-3 px-6 text-left">{user.postalCode}</td>
                   <td className="py-3 px-6 text-left">{user.address}</td>
                   <td className="py-3 px-6 text-left">{user.signupDate}</td>

@@ -158,23 +158,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/users": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 회원가입 */
-        post: operations["join"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/users/token/refresh": {
         parameters: {
             query?: never;
@@ -186,6 +169,23 @@ export interface paths {
         put?: never;
         /** 액세스 토큰 갱신 */
         post: operations["refreshAccessToken"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/signup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 회원가입 */
+        post: operations["join"];
         delete?: never;
         options?: never;
         head?: never;
@@ -482,7 +482,8 @@ export interface paths {
         get: operations["getUser"];
         put?: never;
         post?: never;
-        delete?: never;
+        /** 특정 사용자 삭제 (관리자) */
+        delete: operations["deleteUser"];
         options?: never;
         head?: never;
         patch?: never;
@@ -650,6 +651,26 @@ export interface components {
             description: string;
             /** Format: int32 */
             stock?: number;
+            imageUrl: string;
+        };
+        ProductDto: {
+            /** Format: int32 */
+            id: number;
+            /** Format: date-time */
+            createDate: string;
+            /** Format: date-time */
+            modifyDate: string;
+            name: string;
+            /** Format: int32 */
+            price: number;
+            description: string;
+            /** Format: int32 */
+            stock: number;
+        };
+        RsDataProductDto: {
+            resultCode?: string;
+            msg?: string;
+            data?: components["schemas"]["ProductDto"];
         };
         /** @description 위시리스트 추가 요청  */
         WishListAddReqBody: {
@@ -659,13 +680,6 @@ export interface components {
             quantity?: number;
             /** Format: int32 */
             quantityOrDefault?: number;
-        };
-        UserJoinReqBody: {
-            username: string;
-            password: string;
-            nickname: string;
-            email: string;
-            address: string;
         };
         RsDataUserDto: {
             resultCode?: string;
@@ -679,6 +693,15 @@ export interface components {
             nickname: string;
             email: string;
             address: string;
+            postalCode: string;
+        };
+        UserJoinReqBody: {
+            username: string;
+            password: string;
+            nickname: string;
+            email: string;
+            address: string;
+            postalCode: string;
         };
         UserLoginReqBody: {
             username: string;
@@ -734,25 +757,7 @@ export interface components {
             description: string;
             /** Format: int32 */
             stock?: number;
-        };
-        ProductDto: {
-            /** Format: int32 */
-            id: number;
-            /** Format: date-time */
-            createDate: string;
-            /** Format: date-time */
-            modifyDate: string;
-            name: string;
-            /** Format: int32 */
-            price: number;
-            description: string;
-            /** Format: int32 */
-            stock: number;
-        };
-        RsDataProductDto: {
-            resultCode?: string;
-            msg?: string;
-            data?: components["schemas"]["ProductDto"];
+            imageUrl: string;
         };
         ProductImageCreateReqBody: {
             url?: string;
@@ -1012,7 +1017,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataProductDto"];
                 };
             };
         };
@@ -1223,18 +1228,16 @@ export interface operations {
             };
         };
     };
-    join: {
+    refreshAccessToken: {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UserJoinReqBody"];
+            cookie?: {
+                refreshToken?: string;
             };
         };
+        requestBody?: never;
         responses: {
             /** @description OK */
             200: {
@@ -1247,16 +1250,18 @@ export interface operations {
             };
         };
     };
-    refreshAccessToken: {
+    join: {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
-            cookie?: {
-                refreshToken?: string;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserJoinReqBody"];
             };
         };
-        requestBody?: never;
         responses: {
             /** @description OK */
             200: {
@@ -1667,6 +1672,26 @@ export interface operations {
                 content: {
                     "application/json;charset=UTF-8": components["schemas"]["AdminUserDto"];
                 };
+            };
+        };
+    };
+    deleteUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
