@@ -25,7 +25,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
   const priceInputRef = useRef<HTMLInputElement>(null);
   const stockInputRef = useRef<HTMLInputElement>(null);
   const urlInputRef = useRef<HTMLInputElement>(null);
-  const descriptionInputRef = useRef<HTMLInputElement>(null);
+  const descriptionInputRef = useRef<HTMLTextAreaElement>(null);
 
   const initialProductFormState: ProductFormState = {
     name: '',
@@ -140,7 +140,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
           </div>
           <div>
             <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">가격 (원)</label>
-            <input type="number" name="price" id="price" ref={priceInputRef}
+            <input type="number" name="price" id="price" ref={priceInputRef}
               value={formState.price}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md text-gray-900"
@@ -148,7 +148,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
           </div>
           <div>
             <label htmlFor="stock" className="block text-sm font-medium text-gray-700 mb-1">재고</label>
-            <input type="number" name="stock" id="stock" ref={stockInputRef}
+            <input type="number" name="stock" id="stock" ref={stockInputRef}
               value={formState.stock}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md text-gray-900"
