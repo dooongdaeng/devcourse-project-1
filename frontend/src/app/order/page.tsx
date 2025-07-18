@@ -319,13 +319,13 @@ function PaymentPopup({
             <button
               type="button"
               onClick={handleClose}
-              className="flex-1 py-2 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              className="flex-1 py-2 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 cursor-pointer"
             >
               취소
             </button>
             <button
               type="submit"
-              className="flex-1 py-2 px-4 bg-gray-800 text-white rounded-md hover:bg-gray-700"
+              className="flex-1 py-2 px-4 bg-blue-800 text-white rounded-md hover:bg-blue-900 cursor-pointer"
             >
               결제하기
             </button>
@@ -415,7 +415,7 @@ function CheckOut({cartState} : {cartState: ReturnType<typeof useCart>}) {
         className={`w-full py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 cursor-pointer ${
           isLoading 
             ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
-            : 'bg-gray-800 text-white hover:bg-gray-700'
+            : 'bg-blue-800 text-white hover:bg-blue-900'
         }`}
       >
         {isLoading ? '결제 처리 중...' : '결제하기'}
