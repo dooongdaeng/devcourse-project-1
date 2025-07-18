@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useProducts } from '@/context/ProductContext';
 import { useProduct, ProductsProvider } from '@/context/ProductsContext';
 import { components } from '@/lib/backend/apiV1/schema';
-import { useCreateOrder, CreateOrderRequest } from '@/context/OrderContext'; 
+import { useCreateOrder, CreateOrderRequest } from '@/context/OrderContext';
+import Link from 'next/link';
 
 export default function OrderWrapper() {
   return (
@@ -108,9 +109,9 @@ function ProductItem({cartState, product} : {
         <div className="w-1/5 md:w-1/6 flex-shrink-0">
           <img className="w-14 h-14 object-cover rounded" src={product.imageUrl} alt={product.name} />
         </div>
-        <div className="flex-grow ml-4 w-0 flex-grow">
+        <Link href={`/products/detail/${product.id}`} className="flex-grow ml-4 w-0 flex-grow cursor-pointer">
           <div className="font-semibold">{product.name}</div>
-        </div>
+        </Link>
         <div className="text-center font-medium w-1/5 md:w-1/6">{product.price.toLocaleString()}원</div>
         <div className="text-right w-1/5 md:w-1/6">
           <button
