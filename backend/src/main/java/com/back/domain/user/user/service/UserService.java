@@ -45,7 +45,7 @@ public class UserService {
     public Map<String, Object> verifyRefreshToken(String refreshToken) {
         Map<String, Object> payload = userAuthTokenService.payloadRefreshToken(refreshToken);
         if (payload == null) {
-            throw new ServiceException("401-5", "리프레시 토큰이 유효하지 않거나 만료되었습니다.");
+            throw new ServiceException("401-6", "리프레시 토큰이 유효하지 않거나 만료되었습니다.");
         }
         return payload;
     }
