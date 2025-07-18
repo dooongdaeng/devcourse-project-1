@@ -1,8 +1,16 @@
 "use client";
 
 import { useState, ChangeEvent, useRef } from 'react';
-import { useProductItem, useProduct } from '@/context/ProductsContext';
+import { useProductItem, useProduct, ProductsProvider } from '@/context/ProductsContext';
 import type { components } from '@/lib/backend/apiV1/schema';
+
+export default function ProductManagementWrapper() {
+  return (
+    <ProductsProvider>
+      <ProductManagement />
+    </ProductsProvider>
+  );
+}
 
 type Product = components['schemas']['ProductWithImageUrlDto'];
 
@@ -235,7 +243,7 @@ function DeleteButton({ productId }: { productId: number }) {
       deleteProduct((res) => {
         alert(res.msg);
         if(products == null) return;
-        setProducts(products.filter((product) => product.id ! == productId));
+        setProducts(products.filter((product) => product.id !== productId));
       });
     }
   };
@@ -250,7 +258,7 @@ function DeleteButton({ productId }: { productId: number }) {
   );
 }
 
-export default function ProductManagement() {
+export function ProductManagement() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showForm, setShowForm] = useState(false);
 

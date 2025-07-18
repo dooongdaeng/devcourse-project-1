@@ -1,14 +1,22 @@
 "use client";
 
 import { components } from "@/lib/backend/apiV1/schema";
-import { useState, useEffect } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
 import { apiFetch } from "@/lib/backend/client";
 
-type ProductWithImageUrl = components['schemas']['ProductWithImageUrlDto'];
+type Product = components['schemas']['ProductWithImageUrlDto'];
 type ProductImage = components['schemas']['ProductImageDto'];
 
-export const useProduct = () => {
-  const [products, setProducts] = useState<ProductWithImageUrl[] | null>(null);
+type ProductsContextType = {
+  products: Product[] | null;
+  setProducts: React.Dispatch<React.SetStateAction<Product[] | null>>;
+  addProduct: (...args: any[]) => void;
+};
+
+const ProductsContext = createContext<ProductsContextType | undefined>(undefined);
+
+export function ProductsProvider({ children }: { children: React.ReactNode }) {
+  const [products, setProducts] = useState<Product[] | null>(null);
 
   useEffect(() => {
     apiFetch('/api/v1/products')
@@ -37,11 +45,21 @@ export const useProduct = () => {
     });
   }
 
-  return {products, setProducts, addProduct};
-};
+  return (
+    <ProductsContext.Provider value={{ products, setProducts, addProduct }}>
+      {children}
+    </ProductsContext.Provider>
+  );
+}
+
+export const useProduct = () => {
+  const context = useContext(ProductsContext);
+  if(!context) throw new Error("useProduct must be used within a ProductsProvider");
+  return context;
+}
 
 export const useProductItem = (id: number) => {
-  const [product, setProduct] = useState<ProductWithImageUrl | null>(null);
+  const [product, setProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     apiFetch(`/api/v1/products/${id}`).then(setProduct);
