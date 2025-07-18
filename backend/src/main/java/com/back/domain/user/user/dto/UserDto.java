@@ -9,7 +9,8 @@ public record UserDto(
         @NonNull String nickname,
         @NonNull String email,
         @NonNull String address,
-        @NonNull String postalCode
+        @NonNull String postalCode,
+        @NonNull String role
 ) {
     public UserDto(User user) {
         this(
@@ -18,7 +19,8 @@ public record UserDto(
                 user.getNickname(),
                 user.getEmail(),
                 user.getAddress(),
-                user.getPostalCode()
+                user.getPostalCode(),
+                user.getRole()
         );
     }
 }

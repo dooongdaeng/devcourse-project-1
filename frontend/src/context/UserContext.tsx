@@ -10,7 +10,7 @@ interface User {
     email: string;
     address: string;
     postalCode: string;
-    role?: string;
+    role: string;
 }
 
 // 2. UserContext가 제공할 값의 타입 정의
