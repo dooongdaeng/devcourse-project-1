@@ -1,7 +1,7 @@
 "use client";
 
 import { components } from "@/lib/backend/apiV1/schema";
-import { useState, useEffect } from "react";
+import {useState, useEffect, useCallback} from "react";
 import { apiFetch } from "@/lib/backend/client";
 
 type WishList = components['schemas']['WishListDto'];
@@ -17,133 +17,184 @@ export const useWishList = (userId: number) => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        if (userId) {
-            apiFetch(`/api/v1/wish-lists?userId=${userId}`).then(setWishLists);
+    const fetchWishLists = useCallback(async () => {
+        if (!userId) return;
+
+        try {
+            setIsLoading(true);
+            const data = await apiFetch(`/api/v1/wish-lists?userId=${userId}`);
+            setWishLists(data);
+        } catch (err) {
+            console.error('Failed to fetch wish lists:', err);
+            setError(err instanceof Error ? err.message : 'Unknown error');
+        } finally {
+            setIsLoading(false);
         }
     }, [userId]);
 
+    useEffect(() => {
+        fetchWishLists();
+    }, [fetchWishLists]);
 
 
-    const createWishList = (wishListData: CreateWishListRequest) => {
+    const toggleWishList = useCallback(async (productId: number) => {
+        if (!userId) {
+            throw new Error('로그인이 필요합니다.');
+        }
+
         setIsLoading(true);
         setError(null);
 
-        return apiFetch('/api/v1/wish-lists', {
-            method: 'POST',
-            body: JSON.stringify(wishListData)
-        })
-            .then((res) => {
-                setIsLoading(false);
-                if (res.error) {
-                    setError(res.error.msg);
-                    throw new Error(res.error.msg);
-                }
-                if (wishLists) {
-                    setWishLists([...wishLists, res.data]);
-                }
-                return res.data;
+        try {
+            const res = await apiFetch('/api/v1/wish-lists/toggle', {
+                method: 'POST',
+                body: JSON.stringify({ userId, productId })
             });
-    };
 
-    const deleteWishList = (wishListId: number) => {
+            if (res.error) {
+                throw new Error(res.error.msg);
+            }
+
+            await fetchWishLists();
+            return res.data;
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+            setError(errorMessage);
+            throw err;
+        } finally {
+            setIsLoading(false);
+        }
+    }, [userId, fetchWishLists]);
+
+    const deleteWishList = useCallback(async (productId: number) => {
         setIsLoading(true);
         setError(null);
 
-        return apiFetch(`/api/v1/wish-lists/${wishListId}`, {
-            method: 'DELETE'
-        })
-            .then((res) => {
-                setIsLoading(false);
-                if (res.error) {
-                    setError(res.error.msg);
-                    throw new Error(res.error.msg);
-                }
-                if (wishLists) {
-                    setWishLists(wishLists.filter(item => item.productId !== wishListId));
-                }
-                return res.data;
+        try {
+            const res = await apiFetch(`/api/v1/wish-lists/${productId}`, {
+                method: 'DELETE'
             });
-    };
 
+            if (res.error) {
+                throw new Error(res.error.msg);
+            }
 
-    const deleteAllWishLists = (userId: number) => {
+            // 로컬 상태에서 삭제
+            setWishLists(prev => prev.filter(item => item.productId !== productId));
+            return res.data;
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+            setError(errorMessage);
+            throw err;
+        } finally {
+            setIsLoading(false);
+        }
+
+    }, []);
+
+    // 전체 삭제
+    const deleteAllWishLists= useCallback(async () => {
+        if (!userId) return;
+
         setIsLoading(true);
         setError(null);
 
-        return apiFetch(`/api/v1/wish-lists/clear?userId=${userId}`, {
-            method: 'DELETE'
-        })
-            .then((res) => {
-                setIsLoading(false);
-                if (res.error) {
-                    setError(res.error.msg);
-                    throw new Error(res.error.msg);
-                }
-                // 전체 삭제 후 목록 초기화
-                setWishLists([]);
-                return res.data;
+        try{
+            const res = await apiFetch(`/api/v1/wish-lists/clear?userId=${userId}`, {
+                method: 'DELETE'
             });
-    };
 
-    const toggleWishList = (userId: number, productId: number) => {
-        setIsLoading(true);
-        setError(null);
+            if(res.error){
+                throw new Error(res.error.msg);
+            }
 
-        return apiFetch('/api/v1/wish-lists/toggle', {
-            method: 'POST',
-            body: JSON.stringify({ userId, productId })
-        })
-            .then((res) => {
-                setIsLoading(false);
-                if (res.error) {
-                    setError(res.error.msg);
-                    throw new Error(res.error.msg);
-                }
-                // 토글 후 목록 새로고침
-                apiFetch(`/api/v1/wish-lists?userId=${userId}`).then(setWishLists);
-                return res.data;
-            })
-            .catch(err => {
-                setIsLoading(false);
-                throw err;
-            });
-    };
+            setWishLists([]);
+            return res.data;
+        } catch(err){
+            const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+            setError(errorMessage);
+            throw err;
+        } finally {
+            setIsLoading(false);
+        }
+    }, [userId]);
 
     return {
         wishLists,
-        createWishList,
+        isLoading,
+        error,
+        toggleWishList,
+        fetchWishLists,
         deleteWishList,
         deleteAllWishLists,
-        toggleWishList,
-        isLoading,
-        error
+        refetch: fetchWishLists
     };
 };
 
-// 특정 상품이 위시리스트에 있는지 확인
-export const useWishListCheck = (userId: number, productId: number) => {
-    const [isInWishList, setIsInWishList] = useState<boolean | null>(null);
 
-    useEffect(() => {
-        if (userId && productId) {
-            apiFetch(`/api/v1/wish-lists/check?userId=${userId}&productId=${productId}`)
-                .then(setIsInWishList);
+// 특정 상품이 위시리스트에 있는지 상태 확인
+export const useWishListStatus = (userId: number, productId: number) => {
+    const [isInWishList, setIsInWishList] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const checkWishListStatus = useCallback(async () => {
+        if (!userId || !productId) {
+            setIsInWishList(false);
+            return;
+        }
+        try {
+            setIsLoading(true);
+            const result = await apiFetch(`/api/v1/wish-lists/check?userId=${userId}&productId=${productId}`);
+            setIsInWishList(result);
+        } catch (err) {
+            console.error('Failed to check wish list status:', err);
+            setIsInWishList(false);
+        } finally {
+            setIsLoading(false);
         }
     }, [userId, productId]);
 
-    return isInWishList;
+    useEffect(() => {
+        checkWishListStatus();
+    }, [checkWishListStatus]);
+
+    return {
+        isInWishList,
+        isLoading,
+        refresh : checkWishListStatus
+    };
 };
 
-// 위시리스트 개수 조회
+// 찜 개수 조회
 export const useWishListCount = (userId: number) => {
-    const [count, setCount] = useState<number | null>(null);
+    const [count, setCount] = useState<number>(0);
+    const [isLoading, setIsLoading] = useState(false);
 
-    useEffect(() => {
-        if (userId) {
-            apiFetch(`/api/v1/wish-lists/count?userId=${userId}`).then(setCount);
+    const fetchCount = useCallback(async () => {
+        if(!userId){
+            setCount(0);
+            return;
+        }
+
+        try {
+            setIsLoading(true);
+            const result = await apiFetch(`/api/v1/wish-lists/count?userId=${userId}`);
+            setCount(result || 0);
+        } catch (err) {
+            console.error('Failed to fetch wish list count:', err);
+            setCount(0);
+        } finally {
+            setIsLoading(false);
         }
     }, [userId]);
 
-    return count;
+    useEffect(() => {
+        fetchCount();
+    }, [fetchCount]);
+
+    return {
+        count,
+        isLoading,
+        refetch: fetchCount
+    }
 };
