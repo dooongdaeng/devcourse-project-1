@@ -3,8 +3,6 @@ package com.back.domain.user.user.dto;
 import com.back.domain.user.user.entity.User;
 import org.springframework.lang.NonNull;
 
-import java.time.LocalDateTime;
-
 public record UserDto(
         @NonNull int id,
         @NonNull String username,
