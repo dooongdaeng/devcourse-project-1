@@ -61,7 +61,7 @@ function AppContent({ children }: { children: React.ReactNode }) {
                                         회원정보
                                     </Link>
                                 </li>
-                                {currentUser.role === 'admin' && (
+                                {currentUser/*.role === 'admin'*/ && (
                                     <>
                                         <li>
                                             <Link href="/account/admin/accountManagement" className="hover:text-gray-300">
