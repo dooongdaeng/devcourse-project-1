@@ -60,7 +60,7 @@ export default function ProductDetail() {
               </p>
             </div>
             <Link href="/order" className="mt-6 flex gap-4">
-              <button className="flex-1 rounded-md border border-gray-300 px-6 py-3 transition bg-gray-700 hover:text-white hover:bg-gray-100 dark:border-neutral-600 dark:hover:bg-blue-700 cursor-pointer">
+              <button className="text-white flex-1 rounded-md border border-gray-300 px-6 py-3 transition bg-gray-700 hover:text-black hover:bg-gray-100 dark:border-neutral-600 dark:hover:bg-blue-700 cursor-pointer">
                 구매하기
               </button>
             </Link>
