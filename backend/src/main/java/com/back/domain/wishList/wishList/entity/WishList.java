@@ -6,6 +6,7 @@ import com.back.global.jpa.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import static jakarta.persistence.FetchType.LAZY;
 
@@ -17,6 +18,7 @@ import static jakarta.persistence.FetchType.LAZY;
 )
 @NoArgsConstructor
 @Getter
+@Setter
 public class WishList extends BaseEntity {
 
     @ManyToOne(fetch = LAZY)

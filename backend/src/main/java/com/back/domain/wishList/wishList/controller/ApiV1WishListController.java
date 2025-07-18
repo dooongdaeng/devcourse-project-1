@@ -3,7 +3,6 @@ package com.back.domain.wishList.wishList.controller;
 import com.back.domain.wishList.wishList.dto.WishListDto;
 import com.back.domain.wishList.wishList.entity.WishList;
 import com.back.domain.wishList.wishList.service.WishListService;
-import com.back.global.rq.Rq;
 import com.back.global.rsData.RsData;
 import com.back.global.security.UserSecurityUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,7 +23,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ApiV1WishListController {
     private final WishListService wishListService;
-    private final Rq rq;
 
     @Schema(description = "위시리스트 추가 요청 ")
     record WishListAddReqBody(
@@ -36,10 +34,10 @@ public class ApiV1WishListController {
             return quantity != null ? quantity : 1;
         }
     }
-    @Schema(description = "위시리스트 수량 업데이트 요청 ")
-    record WishListUpdateQuantityReqBody(
+    @Schema(description = "위시리스트 토글 요청")
+    record WishListToggleReqBody(
             @Min(value = 1, message = "수량은 1 이상이어야 합니다.")
-            Integer quantity
+            int productId
     ) {}
 
     @Operation(summary = "위시리스트 전체 조회", description = "현재 사용자의 모든 위시리스트를 조회합니다.")
@@ -51,9 +49,9 @@ public class ApiV1WishListController {
         return new RsData<>("200", "위시리스트 조회 성공", wishListDtos);
     }
 
-    @Operation(summary = "위시리스트 상세 조회", description = "특정 상품의 위시리스트 존재 여부를 확인합니다.")
+    @Operation(summary = "위시리스트 상품 존재 여부 확인", description = "특정 상품의 위시리스트 존재 여부를 확인합니다.")
     @GetMapping("/{productId}")
-    public RsData<Boolean> detailWishList(
+    public RsData<Boolean> checkWishListExists(
             @PathVariable int productId,
             @AuthenticationPrincipal UserSecurityUser user
     ) {
@@ -84,18 +82,34 @@ public class ApiV1WishListController {
         return new RsData<>("200", "위시리스트에서 삭제했습니다.", removedWishList);
     }
 
-    @Operation(summary = "위시리스트 상품 수량 수정", description = "위시리스트에 있는 상품 수량을 수정합니다.")
-    @PutMapping("/{productId}/quantity")
-    public RsData<WishListDto> updateWishListQuantity(
-            @AuthenticationPrincipal UserSecurityUser user,
-            @PathVariable int productId,
-            @Valid @RequestBody WishListUpdateQuantityReqBody reqBody
-    ) {
-        if (reqBody.quantity == null) {
-            return new RsData<>("400", "수량은 필수입니다.", null);
-        }
-        WishList wishList = wishListService.updateQuantity(user.getId(), productId, reqBody.quantity);
+    @Operation(summary = "찜한 상품 개수 조회", description = "현재 사용자가 찜한 상품의 총 개수를 조회합니다.")
+    @GetMapping("/count")
+    public RsData<Integer> getWishListItemsCount(@AuthenticationPrincipal UserSecurityUser user) {
+        int count = wishListService.getWishListItemsCount(user.getId());
 
-        return new RsData<>("200", "위시리스트 수량을 업데이트했습니다.", new WishListDto(wishList));
+        return new RsData<>("200", "찜한 상품 개수 조회 성공", count);
+    }
+
+    @Operation(summary = "위시리스트 토글", description = "특정 상품을 위시리스트에 추가하거나 삭제합니다. (있으면 삭제, 없으면 추가)")
+    @PostMapping("/toggle")
+    public RsData<WishListDto> toggleWishList(
+            @Valid @RequestBody WishListToggleReqBody reqBody,
+            @AuthenticationPrincipal UserSecurityUser user
+    ) {
+        WishList wishList = wishListService.toggleWishList(user.getId(), reqBody.productId);
+
+        if (wishList != null) {
+            return new RsData<>("201", "위시리스트에 추가했습니다.", new WishListDto(wishList));
+        } else {
+            return new RsData<>("200", "위시리스트에서 삭제했습니다.", null);
+        }
+    }
+
+    @Operation(summary = "위시리스트 전체 삭제", description = "현재 사용자의 모든 위시리스트를 삭제합니다.")
+    @DeleteMapping("/clear")
+    public RsData<String> clearWishList(@AuthenticationPrincipal UserSecurityUser user) {
+        wishListService.clearWishList(user.getId());
+
+        return new RsData<>("200", "위시리스트를 모두 삭제했습니다.", null);
     }
 }
