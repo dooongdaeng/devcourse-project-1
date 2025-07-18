@@ -73,7 +73,7 @@ public class ApiV1UserController {
         userService.updateRefreshToken(user, refreshToken);
 
         // JWT, apiKey 쿠키 세팅
-        rq.setCookie("accessToken", accessToken);
+        rq.setCookie("accessToken", accessToken, true);
         rq.setCookie("apiKey", user.getApiKey());
         rq.setCookie("refreshToken", refreshToken, true);
 
@@ -135,7 +135,7 @@ public class ApiV1UserController {
         String newAccessToken = userService.genAccessToken(user);
 
         //새로운 액세스 토큰 쿠키에 설정
-        rq.setCookie("accessToken", newAccessToken);
+        rq.setCookie("accessToken", newAccessToken, true);
 
         return new RsData<>("200", "새로운 액세스 토큰이 발급되었습니다.", new UserDto(user));
     }

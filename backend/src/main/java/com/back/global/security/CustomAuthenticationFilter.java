@@ -65,25 +65,21 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String apiKey;
-        String accessToken;
-        String refreshToken;
-
         String headerAuthorization = rq.getHeader("Authorization", "");
+
+        String accessToken = "";
+        String refreshToken = rq.getCookieValue("refreshToken", "");
+        String apiKey = rq.getCookieValue("apiKey", "");
 
         if (!headerAuthorization.isBlank()) {
             if (!headerAuthorization.startsWith("Bearer "))
                 throw new ServiceException("401-2", "Authorization 헤더가 Bearer 형식이 아닙니다.");
 
-            String[] headerAuthorizationBits = headerAuthorization.split(" ", 3);
 
-            apiKey = headerAuthorizationBits[1];
-            accessToken = headerAuthorizationBits.length == 3 ? headerAuthorizationBits[2] : "";
+            accessToken = headerAuthorization.substring("Bearer ".length()).trim();
         } else {
-            apiKey = rq.getCookieValue("apiKey", "");
             accessToken = rq.getCookieValue("accessToken", "");
         }
-        refreshToken = rq.getCookieValue("refreshToken", "");
 
         User user = null;
         boolean isAccessTokenValid = false;
