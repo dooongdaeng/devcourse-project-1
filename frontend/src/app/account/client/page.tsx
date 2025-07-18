@@ -6,6 +6,7 @@ import React from 'react';
 
 export default function UserInfoPage() {
   const { user: currentUser } = useUser();
+
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {

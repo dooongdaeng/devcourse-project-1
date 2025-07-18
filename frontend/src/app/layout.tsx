@@ -3,9 +3,10 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { ProductProvider, useProducts } from '@/context/ProductContext';
+import { useRouter } from "next/navigation";
+import { ProductProvider } from '@/context/ProductContext';
 import { UserProvider, useUser } from '@/context/UserContext';
+import React from 'react';
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -56,11 +57,13 @@ function AppContent({ children }: { children: React.ReactNode }) {
                                         주문내역
                                     </Link>
                                 </li>
-                                <li>
-                                    <Link href="/account/client" className="hover:text-gray-300">
-                                        회원정보
-                                    </Link>
-                                </li>
+                                {currentUser.role !== 'ROLE_ADMIN' && (
+                                    <li>
+                                        <Link href="/account/client" className="hover:text-gray-300">
+                                            회원정보
+                                        </Link>
+                                    </li>
+                                )}
                                 {currentUser.role === 'ROLE_ADMIN' && (
                                     <>
                                         <li>
