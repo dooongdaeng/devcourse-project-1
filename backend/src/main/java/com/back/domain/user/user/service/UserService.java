@@ -1,7 +1,11 @@
 package com.back.domain.user.user.service;
 
 import com.back.domain.user.user.entity.User;
+import com.back.domain.order.orders.entity.Orders;
+import com.back.domain.order.orderItem.entity.OrderItem;
 import com.back.domain.user.user.repository.UserRepository;
+import com.back.domain.order.orders.repository.OrderRepository;
+import com.back.domain.order.orderItem.repository.OrderItemRepository;
 import com.back.global.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +22,8 @@ public class UserService {
     private final UserAuthTokenService userAuthTokenService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
 
     public User join(String username, String rawPassword, String nickname, String email, String address, String postalCode) {
         userRepository.findByUsername(username)
@@ -113,6 +119,17 @@ public class UserService {
     public void deleteUser(int id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ServiceException("404-3", "삭제하려는 회원이 존재하지 않습니다."));
+        List<Orders> userOrders = orderRepository.findByUserId(user.getId());
+        userOrders.forEach(order -> {
+            List<OrderItem> orderItems = orderItemRepository.findByOrderId(order.getId());
+            if (!orderItems.isEmpty()) {
+                orderItemRepository.deleteAll(orderItems);
+            }
+        });
+
+        if (!userOrders.isEmpty()) {
+            orderRepository.deleteAll(userOrders);
+        }
         userRepository.delete(user);
     }
 }
