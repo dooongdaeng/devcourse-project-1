@@ -68,7 +68,7 @@ export default function Login() {
   };
 
   return (
-      <main className="flex min-h-screen flex-col items-center justify-center p-4">
+      <main className="flex min-h-screen flex-col items-center justify-center p-4 transform -translate-y-20">
         <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
           <h2 className="text-2xl font-bold text-center mb-6">로그인</h2>
           <form onSubmit={handleLogin}>
@@ -83,6 +83,7 @@ export default function Login() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
+                  autoFocus
               />
             </div>
             <div className="mb-6">
@@ -102,7 +103,7 @@ export default function Login() {
             <div className="flex items-center justify-between">
               <button
                   type="submit"
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+                  className="bg-blue-950 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full cursor-pointer"
                   disabled={loading}
               >
                 {loading ? '로그인 중...' : '로그인'}
@@ -114,7 +115,7 @@ export default function Login() {
                 <button
                     type="button"
                     onClick={() => router.push('/signup')}
-                    className="text-blue-500 hover:text-blue-800 font-bold"
+                    className="text-blue-950 hover:text-blue-800 font-bold cursor-pointer"
                 >
                   회원가입
                 </button>
