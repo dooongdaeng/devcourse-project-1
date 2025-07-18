@@ -36,7 +36,9 @@ public class ApiV1AdmProductController {
             String description,
             @Min(1)
             @Max(10000)
-            int stock
+            int stock,
+            @NotBlank
+            String imageUrl
     ) {}
 
     @PostMapping
@@ -46,6 +48,7 @@ public class ApiV1AdmProductController {
             @Valid @RequestBody ProductCreateReqBody reqBody
     ) {
         Product product = productService.create(reqBody.name, reqBody.price, reqBody.description, reqBody.stock);
+        productService.createProductImage(product, reqBody.imageUrl);
 
         return new RsData<>(
                 "201-1",
@@ -81,23 +84,27 @@ public class ApiV1AdmProductController {
             String description,
             @Min(1)
             @Max(10000)
-            int stock
+            int stock,
+            @NotBlank
+            String imageUrl
     ) {}
 
 
     @PutMapping("/{id}")
     @Transactional
     @Operation(summary = "수정")
-    public RsData<Void> update(
+    public RsData<ProductDto> update(
             @PathVariable int id,
             @Valid @RequestBody ProductUpdateReqBody reqBody
     ) {
         Product product = productService.findById(id).get();
         productService.modify(product, reqBody.name, reqBody.price, reqBody.description, reqBody.stock);
+        productService.modifyProductImage(product.getProductImages().get(0), reqBody.imageUrl);
 
         return new RsData<>(
                 "200-1",
-                "%d번 상품이 수정되었습니다.".formatted(id)
+                "%d번 상품이 수정되었습니다.".formatted(id),
+                new ProductDto(product)
         );
     }
 }

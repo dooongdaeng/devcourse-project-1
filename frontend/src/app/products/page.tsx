@@ -20,15 +20,12 @@ function ProductCard({ product }: { product: Product }) {
           {favoriteProducts[product.id] ? <FaHeart color="red" /> : <FaRegHeart />}
         </button>
       </h2>
-      <p className="m-0 max-w-[30ch] text-sm opacity-50">
-        {product.description}
-      </p>
     </div>
   );
 }
 
 export default function Home() {
-  const products = useProduct();
+  const {products} = useProduct();
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-4 md:p-24">
