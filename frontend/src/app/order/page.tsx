@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useProducts, OrderItem } from '@/context/ProductContext';
-import { useProduct, useProductImage } from '@/context/ProductsContext';
+import { useProduct } from '@/context/ProductsContext';
 import { components } from '@/lib/backend/apiV1/schema';
 import { useCreateOrder, CreateOrderRequest } from '@/context/OrderContext'; 
 
@@ -70,7 +70,7 @@ function useCart() {
 }
 
 function ProductList({cartState} : {cartState: ReturnType<typeof useCart>}) {
-  const products = useProduct();
+  const { products } = useProduct();
 
   return (
     <>
@@ -114,7 +114,7 @@ function ProductItem({cartState, product} : {
 }
 
 function WishList({cartState} : {cartState: ReturnType<typeof useCart>}) {
-  const products = useProduct();
+  const { products } = useProduct();
 
   const { favoriteProducts } = useProducts(); // 전역 상품 목록과 찜 목록 가져오기
 
@@ -194,10 +194,10 @@ function OrderList({cartState} : {cartState: ReturnType<typeof useCart>}) {
   );
 }
 
-function CheckOut() {
-  const { cartItems, setCartItems } = useCart();
+function CheckOut({cartState} : {cartState : ReturnType<typeof useCart>}) {
+  const { cartItems, setCartItems } = cartState;
   const router = useRouter();
-  
+
   // 커스텀 훅 사용
   const { processCompleteOrder, isLoading, error } = useCreateOrder();
 
@@ -217,7 +217,7 @@ function CheckOut() {
         try {
           // 사용자 ID 가져오기 (실제 구현에 맞게 수정 필요)
           const userId = parseInt(sessionStorage.getItem('userId') || '1');
-          
+
           // 주문 데이터 생성
           const orderData: CreateOrderRequest = {
             orderCount: cartItems.length,
@@ -229,10 +229,10 @@ function CheckOut() {
 
           // 백엔드 API를 통한 주문 생성
           const result = await processCompleteOrder(orderData, cartItems);
-          
+
           // 장바구니 비우기
           setCartItems([]);
-          
+
           alert('결제가 완료되었습니다. 주문 내역에서 확인해주세요.');
           router.push('/orderHistory');
           
