@@ -11,6 +11,7 @@ export default function Signup() {
   const [name, setName] = useState('');
   const [postalCode, setPostalCode] = useState('');
   const [address, setAddress] = useState('');
+  const [email, setEmail] = useState('');
   const router = useRouter();
   const { addUser } = useProducts();
 
