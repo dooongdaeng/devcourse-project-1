@@ -4,9 +4,15 @@ import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { components } from "@/lib/backend/apiV1/schema";
 import { useProduct, ProductsProvider } from "@/context/ProductsContext";
 import Link from "next/link";
+<<<<<<< HEAD
 import {useWishListContext, WishListProvider} from "@/context/WishListContext";
+<<<<<<< HEAD
 import {getUserId} from "@/util/auth";
 import {useRouter} from "next/navigation";
+=======
+=======
+>>>>>>> 6a19250 (feat: imageUrl 추가/삭제 기능)
+>>>>>>> a4b0f67 (feat: imageUrl 추가/삭제 기능)
 
 export default function ProductsWrapper() {
     const userId =getUserId();

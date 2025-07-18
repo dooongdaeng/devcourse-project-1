@@ -103,5 +103,26 @@ export const useProductImage = (productId: number) => {
     apiFetch(`/api/v1/products/${productId}/images`).then(setProductImages);
   }, []);
 
-  return productImages?.[0]?.url;
+  const firstImage = productImages?.[0]?.url;
+
+  return { productImages, firstImage };
+}
+
+export const useProductImageItem = (productId: number, id: number) => {
+  const [productImage, setProductImage] = useState<ProductImage>();
+
+  useEffect(() => {
+    apiFetch(`/api/v1/products/${productId}/images/${id}`).then(setProductImage);
+  }, []);
+
+  const deleteProductImage = (onSuccess: (data: any) => void) => {
+    apiFetch(`/api/v1/adm/products/${productId}/images/${id}`, {
+      method: "DELETE"
+    }).then(onSuccess)
+    .catch((error) => {
+      alert(`${error.resultCode} : ${error.msg}`);
+    });
+  };
+
+  return {productImage, deleteProductImage};
 }

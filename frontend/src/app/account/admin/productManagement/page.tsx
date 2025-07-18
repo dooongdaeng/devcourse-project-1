@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, ChangeEvent, useRef } from 'react';
-import { useProductItem, useProduct, ProductsProvider } from '@/context/ProductsContext';
+import { useProductItem, useProduct, ProductsProvider, useProductImage } from '@/context/ProductsContext';
 import type { components } from '@/lib/backend/apiV1/schema';
 
 export default function ProductManagementWrapper() {
@@ -13,13 +13,21 @@ export default function ProductManagementWrapper() {
 }
 
 type Product = components['schemas']['ProductWithImageUrlDto'];
+type ProductImageDto = components['schemas']['ProductImageDto'];
+
+type ProductImage = {
+  id?: number; // 기존 이미지의 경우 ID 존재
+  url: string;
+  isNew: boolean; // 새로 추가된 이미지인지 여부
+  toDelete: boolean; // 삭제 예정인지 여부
+};
 
 type ProductFormState = {
   name: string;
   description: string;
   price: string;
   stock: string;
-  imageUrls: string[]; // 배열로 변경
+  productImages: ProductImage[]; // 이미지 객체 배열로 변경
 };
 
 type ProductFormProps = {
@@ -34,12 +42,14 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
   const stockInputRef = useRef<HTMLInputElement>(null);
   const descriptionInputRef = useRef<HTMLTextAreaElement>(null);
 
+  const { productImages } = useProductImage((editingProduct != null) ? editingProduct.id : -1);
+
   const initialProductFormState: ProductFormState = {
     name: '',
     description: '',
     price: '',
     stock: '',
-    imageUrls: [''] // 초기값으로 빈 문자열 하나
+    productImages: [{ url: '', isNew: true, toDelete: false }] // 초기값으로 새 이미지 하나
   };
 
   const [formState, setFormState] = useState<ProductFormState>(
@@ -49,7 +59,16 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
           description: editingProduct.description,
           price: editingProduct.price.toString(),
           stock: editingProduct.stock.toString(),
-          imageUrls: [editingProduct.imageUrl], // 기존 이미지 URL을 배열로 변환
+          // 기존 상품의 이미지들을 ProductImage 형태로 변환
+          // editingProduct.productImages가 있다면 사용, 없다면 imageUrl 사용
+          productImages: productImages 
+            ? productImages.map((img: ProductImageDto) => ({
+                id: img.id,
+                url: img.url,
+                isNew: false,
+                toDelete: false
+              }))
+            : [{ url: editingProduct.imageUrl, isNew: false, toDelete: false }]
         }
       : initialProductFormState
   );
@@ -66,26 +85,51 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
   const handleImageUrlChange = (index: number, value: string) => {
     setFormState((prev) => ({
       ...prev,
-      imageUrls: prev.imageUrls.map((url, i) => i === index ? value : url)
+      productImages: prev.productImages.map((img, i) => 
+        i === index ? { ...img, url: value } : img
+      )
     }));
   };
 
-  // 이미지 URL 필드 추가
+  // 새 이미지 URL 필드 추가
   const addImageUrlField = () => {
     setFormState((prev) => ({
       ...prev,
-      imageUrls: [...prev.imageUrls, '']
+      productImages: [...prev.productImages, { url: '', isNew: true, toDelete: false }]
     }));
   };
 
-  // 이미지 URL 필드 제거
-  const removeImageUrlField = (index: number) => {
-    if (formState.imageUrls.length > 1) {
-      setFormState((prev) => ({
-        ...prev,
-        imageUrls: prev.imageUrls.filter((_, i) => i !== index)
-      }));
-    }
+  // 이미지 삭제 처리 (실제 삭제가 아닌 삭제 예정으로 마킹)
+  const markImageForDeletion = (index: number) => {
+    setFormState((prev) => ({
+      ...prev,
+      productImages: prev.productImages.map((img, i) => 
+        i === index ? { ...img, toDelete: true } : img
+      )
+    }));
+  };
+
+  // 삭제 예정인 이미지를 복원
+  const restoreImage = (index: number) => {
+    setFormState((prev) => ({
+      ...prev,
+      productImages: prev.productImages.map((img, i) => 
+        i === index ? { ...img, toDelete: false } : img
+      )
+    }));
+  };
+
+  // 새로 추가된 이미지를 완전히 제거
+  const removeNewImage = (index: number) => {
+    setFormState((prev) => ({
+      ...prev,
+      productImages: prev.productImages.filter((_, i) => i !== index)
+    }));
+  };
+
+  // 활성 이미지 개수 계산 (삭제 예정이 아닌 이미지들)
+  const getActiveImageCount = () => {
+    return formState.productImages.filter(img => !img.toDelete).length;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -95,10 +139,19 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
     const description = formState.description;
     const price = parseInt(formState.price, 10);
     const stock = parseInt(formState.stock, 10);
-    // 첫 번째 이미지 URL 사용 (기존 API 호환성을 위해)
-    const imageUrl = (formState.imageUrls[0] && formState.imageUrls[0].length > 0) 
-      ? formState.imageUrls[0] 
+    
+    // 활성 이미지들 (삭제 예정이 아닌 것들)
+    const activeImages = formState.productImages.filter(img => !img.toDelete);
+    
+    // 첫 번째 이미지 URL (대표 이미지)
+    const imageUrl = (activeImages.length > 0 && activeImages[0].url.length > 0) 
+      ? activeImages[0].url 
       : "http://localhost:8080/images/coffee_default.jpg";
+
+    // 이미지 처리 로직
+    const imagesToAdd = formState.productImages.filter(img => img.isNew && !img.toDelete && img.url.trim() !== '');
+    const imagesToDelete = formState.productImages.filter(img => img.id && img.toDelete);
+    const imagesToUpdate = formState.productImages.filter(img => !img.isNew && !img.toDelete && img.id);
 
     if (name.length < 2 || name.length > 100) {
       alert("상품명은 2자 이상 100자 이하로 입력해주세요.");
@@ -137,18 +190,37 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
     }
 
     if (editingProduct) {
-      modifyProduct({name, price, description, stock, imageUrl, onSuccess: (res) => {
-        alert(res.msg);
-        if(products == null) return;
-        const updatedProduct = res.data;
-        setProducts(products.map((product) => product.id === updatedProduct.id ? updatedProduct : product));
-      }});
+      // 상품 수정 시 이미지 처리 로직
+      modifyProduct({
+        name, 
+        price, 
+        description, 
+        stock, 
+        imageUrl, 
+        imagesToAdd: imagesToAdd.map(img => img.url),
+        imagesToDelete: imagesToDelete.map(img => img.id),
+        onSuccess: (res) => {
+          alert(res.msg);
+          if(products == null) return;
+          const updatedProduct = res.data;
+          setProducts(products.map((product) => product.id === updatedProduct.id ? updatedProduct : product));
+        }
+      });
     } else {
-      addProduct({name, price, description, stock, imageUrl, onSuccess: (res) => {
-        alert(res.msg);
-        if(products == null) return;
-        setProducts([...products, res.data]);
-      }});
+      // 새 상품 추가 시
+      addProduct({
+        name, 
+        price, 
+        description, 
+        stock, 
+        imageUrl, 
+        additionalImages: imagesToAdd.slice(1).map(img => img.url), // 첫 번째 제외하고 추가 이미지들
+        onSuccess: (res) => {
+          alert(res.msg);
+          if(products == null) return;
+          setProducts([...products, res.data]);
+        }
+      });
     }
 
     onSubmit();
@@ -191,31 +263,62 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
               <button 
                 type="button" 
                 onClick={addImageUrlField} 
-                className="bg-green-500 hover:bg-green-600 text-white font-bold w-6 h-6 ml-2 rounded-md cursor-pointer flex items-center justify-center text-sm"
+                className="bg-green-500 hover:bg-green-600 text-white font-bold w-6 h-6 ml-2 rounded-full cursor-pointer flex items-center justify-center text-sm"
               >
                 +
               </button>
             </div>
-            {formState.imageUrls.map((url, index) => (
-              <div key={index} className="flex items-center mb-2">
-                <input 
-                  type="text" 
-                  placeholder="https://example.com/image.png"
-                  value={url}
-                  onChange={(e) => handleImageUrlChange(index, e.target.value)}
-                  className="flex-1 p-2 border border-gray-300 rounded-md text-gray-900 bg-white"
-                />
-                {formState.imageUrls.length > 1 && (
-                  <button 
-                    type="button" 
-                    onClick={() => removeImageUrlField(index)}
-                    className="bg-red-500 hover:bg-red-600 text-white font-bold w-6 h-6 ml-2 text-center rounded-md cursor-pointer flex items-center justify-center text-sm"
-                  >
-                    x
-                  </button>
-                )}
+            {formState.productImages.map((image, index) => (
+              <div key={index} className={`flex items-center mb-2 ${image.toDelete ? 'opacity-50' : ''}`}>
+                <div className="flex-1 flex items-center">
+                  {index === 0 && (
+                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded mr-2">
+                      대표
+                    </span>
+                  )}
+                  <input 
+                    type="text" 
+                    placeholder="https://example.com/image.png"
+                    value={image.url}
+                    onChange={(e) => handleImageUrlChange(index, e.target.value)}
+                    disabled={image.toDelete}
+                    className={`flex-1 p-2 border border-gray-300 rounded-md text-gray-900 bg-white ${
+                      image.toDelete ? 'bg-gray-100' : ''
+                    }`}
+                  />
+                </div>
+                <div className="ml-2 flex items-center">
+                  {image.toDelete ? (
+                    <button 
+                      type="button" 
+                      onClick={() => restoreImage(index)}
+                      className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-2 py-1 rounded text-xs cursor-pointer"
+                    >
+                      복원
+                    </button>
+                  ) : (
+                    <>
+                      {/* 첫 번째 이미지(대표 이미지)가 아니거나, 활성 이미지가 2개 이상일 때만 삭제 버튼 표시 */}
+                      {(index !== 0 || getActiveImageCount() > 1) && (
+                        <button 
+                          type="button" 
+                          onClick={() => image.isNew ? removeNewImage(index) : markImageForDeletion(index)}
+                          className="bg-red-500 hover:bg-red-600 text-white font-bold w-6 h-6 rounded-full cursor-pointer flex items-center justify-center text-sm"
+                        >
+                          ×
+                        </button>
+                      )}
+                    </>
+                  )}
+                </div>
               </div>
             ))}
+            {/* 삭제 예정인 이미지들 안내 */}
+            {formState.productImages.some(img => img.toDelete) && (
+              <div className="text-xs text-gray-500 mt-2">
+                * 회색으로 표시된 이미지는 저장 시 삭제됩니다.
+              </div>
+            )}
           </div>
           <div className="md:col-span-2">
             <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">상품 설명</label>
