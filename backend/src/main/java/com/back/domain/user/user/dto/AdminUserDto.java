@@ -6,13 +6,15 @@ import lombok.NonNull;
 import java.time.LocalDateTime;
 
 public record AdminUserDto(
-        @NonNull int id,
+        int id,
         @NonNull String username,
         @NonNull String nickname,
         @NonNull String email,
         @NonNull LocalDateTime createDate,
         @NonNull LocalDateTime modifyDate,
-        @NonNull String role
+        @NonNull String role,
+        @NonNull String address,
+        @NonNull String postalCode
 ) {
     public AdminUserDto(User user) {
         this(
@@ -22,7 +24,9 @@ public record AdminUserDto(
                 user.getEmail(),
                 user.getCreateDate(),
                 user.getModifyDate(),
-                user.getRole()
+                user.getRole(),
+                user.getAddress(),
+                user.getPostalCode()
         );
     }
 }

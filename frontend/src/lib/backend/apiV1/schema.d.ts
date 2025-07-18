@@ -814,6 +814,8 @@ export interface components {
             /** Format: date-time */
             modifyDate?: string;
             role?: string;
+            address?: string;
+            postalCode?: string;
         };
     };
     responses: never;
