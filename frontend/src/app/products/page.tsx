@@ -3,8 +3,16 @@
 import { useProducts } from "@/context/ProductContext";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { components } from "@/lib/backend/apiV1/schema";
-import { useProduct } from "@/context/ProductsContext";
+import { useProduct, ProductsProvider } from "@/context/ProductsContext";
 import Link from "next/link";
+
+export default function ProductsWrapper() {
+  return (
+    <ProductsProvider>
+      <Products />
+    </ProductsProvider>
+  );
+}
 
 type Product = components['schemas']['ProductWithImageUrlDto'];
 
@@ -25,7 +33,7 @@ function ProductCard({ product }: { product: Product }) {
   );
 }
 
-export default function Home() {
+export function Products() {
   const {products} = useProduct();
 
   return (

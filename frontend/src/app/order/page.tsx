@@ -3,10 +3,17 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useProducts, OrderItem } from '@/context/ProductContext';
-import { useProduct, useProductImage } from '@/context/ProductsContext';
+import { useProduct, ProductsProvider } from '@/context/ProductsContext';
 import { components } from '@/lib/backend/apiV1/schema';
 import { useCreateOrder, CreateOrderRequest } from '@/context/OrderContext'; 
 
+export default function OrderWrapper() {
+  return (
+    <ProductsProvider>
+      <Order />
+    </ProductsProvider>
+  );
+}
 
 type Product = components['schemas']['ProductWithImageUrlDto'];
 
@@ -424,7 +431,7 @@ function CheckOut({cartState} : {cartState: ReturnType<typeof useCart>}) {
   );
 }
 
-export default function Order() {
+export function Order() {
   const cartState = useCart();
 
   return (
