@@ -22,30 +22,30 @@ export default function ProductDetail() {
 
   return (
     <main className="flex min-h-screen flex-col items-center p-4 md:p-24">
-      <div className="w-full max-w-4xl rounded-lg border bg-white p-8 shadow-lg dark:border-neutral-700 dark:bg-neutral-800/30">
+      <div className="w-full max-w-4xl rounded-lg border bg-white p-8 shadow-lg dark:border-neutral-700">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           <div>
             <img
               src={product.imageUrl}
               alt={product.name}
-              className="h-auto w-full rounded-lg object-cover shadow-md"
+              className="h-auto w-full rounded-lg object-cover shadow-md text-gray-700"
             />
           </div>
           <div className="flex flex-col justify-between">
             <div>
-              <h1 className="mb-2 text-3xl font-bold">
+              <h1 className="mb-2 text-3xl text-gray-700 font-bold">
                 {product.name}
               </h1>
               <div className="mb-4 flex items-center">
                 <p className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-                  ${product.price.toLocaleString()}
+                  {product.price.toLocaleString()}원
                 </p>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     toggleFavorite(product.id);
                   }}
-                  className="ml-4 cursor-pointer text-2xl"
+                  className="ml-4 cursor-pointer text-2xl text-gray-700"
                 >
                   {favoriteProducts[product.id] ? (
                     <FaHeart color="red" />
@@ -54,13 +54,13 @@ export default function ProductDetail() {
                   )}
                 </button>
               </div>
-              <p className="mb-4 text-gray-700 dark:text-gray-300">
+              <p className="mb-4 text-gray-700">
                 {product.description}
               </p>
             </div>
             <div className="mt-6 flex gap-4">
-              <button className="flex-1 rounded-md border border-gray-300 px-6 py-3 transition hover:bg-gray-100 dark:border-neutral-600 dark:hover:bg-neutral-700 cursor-pointer">
-                Buy Now
+              <button className="flex-1 rounded-md border border-gray-300 px-6 py-3 transition bg-gray-700 hover:text-white hover:bg-gray-100 dark:border-neutral-600 dark:hover:bg-blue-700 cursor-pointer">
+                구매하기
               </button>
             </div>
           </div>
