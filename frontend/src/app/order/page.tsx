@@ -328,8 +328,8 @@ function PaymentPopup({
   );
 }
 
-function CheckOut() {
-  const { cartItems, setCartItems } = useCart();
+function CheckOut({cartState} : {cartState: ReturnType<typeof useCart>}) {
+  const { cartItems, setCartItems } = cartState;
   const router = useRouter();
   const [showPaymentPopup, setShowPaymentPopup] = useState(false);
   
