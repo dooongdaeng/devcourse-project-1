@@ -1,45 +1,147 @@
 "use client";
 
 import { useProducts } from '@/context/ProductContext';
+import { useCreateOrder } from '@/context/OrderContext';
+import { useEffect, useState } from 'react';
 
 export default function OrderHistory() {
   const { orderHistory } = useProducts();
+  const { getMyOrders, getOrderItems, orders, isLoading, error } = useCreateOrder();
+  
+  // 팝업 상태
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
+  const [orderItems, setOrderItems] = useState<any[]>([]);
+  const [itemsLoading, setItemsLoading] = useState(false);
+
+  // 컴포넌트 마운트 시 주문 목록 조회
+  useEffect(() => {
+    getMyOrders();
+  }, []);
+
+  // 주문 클릭 핸들러
+  const handleOrderClick = async (orderId: number) => {
+    setSelectedOrderId(orderId);
+    setIsPopupOpen(true);
+    setItemsLoading(true);
+    
+    try {
+      const items = await getOrderItems(orderId);
+      setOrderItems(items || []);
+    } catch (error) {
+      console.error('주문 아이템 조회 실패:', error);
+      setOrderItems([]);
+    } finally {
+      setItemsLoading(false);
+    }
+  };
+
+  // 팝업 닫기 핸들러
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
+    setSelectedOrderId(null);
+    setOrderItems([]);
+  };
+
+  // 로딩 중일 때
+  if (isLoading) {
+    return (
+      <main className="flex min-h-screen flex-col items-center p-4 md:p-24">
+        <div className="w-full max-w-5xl bg-white rounded-xl shadow-lg p-8">
+          <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">주문 내역</h2>
+          <p className="text-center text-gray-500 text-lg">주문 내역을 불러오는 중...</p>
+        </div>
+      </main>
+    );
+  }
+
+  // 에러 발생 시
+  if (error) {
+    return (
+      <main className="flex min-h-screen flex-col items-center p-4 md:p-24">
+        <div className="w-full max-w-5xl bg-white rounded-xl shadow-lg p-8">
+          <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">주문 내역</h2>
+          <p className="text-center text-red-500 text-lg">오류: {error}</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="flex min-h-screen flex-col items-center p-4 md:p-24">
       <div className="w-full max-w-5xl bg-white rounded-xl shadow-lg p-8">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">주문 내역</h2>
 
-        {orderHistory.length === 0 ? (
+        {!orders || orders.length === 0 ? (
           <p className="text-center text-gray-500 text-lg">주문 내역이 없습니다.</p>
         ) : (
-          <div className="space-y-8">
-            {orderHistory.map(order => (
-              <div key={order.id} className="border border-gray-200 rounded-md p-6 bg-gray-50">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl font-semibold text-gray-700">주문 번호: {order.id}</h3>
-                  <span className="text-gray-600">주문일: {order.date}</span>
-                </div>
-                <div className="space-y-3">
-                  {order.items.map(item => (
-                    <div key={item.productId} className="flex items-center border-b border-gray-100 pb-3">
-                      <img src={item.imageUrl} alt={item.name} className="w-16 h-16 object-cover rounded-md mr-4" />
-                      <div className="flex-grow">
-                        <p className="font-medium text-gray-800">{item.name}</p>
-                        <p className="text-sm text-gray-600">{item.price.toLocaleString()}원 x {item.quantity}개</p>
-                      </div>
-                      <span className="font-semibold text-gray-800">{(item.price * item.quantity).toLocaleString()}원</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="flex justify-end items-center pt-4 mt-4 border-t border-gray-200">
-                  <h4 className="text-lg font-bold text-gray-800">총 결제 금액: {order.totalPrice.toLocaleString()}원</h4>
+          <div className="space-y-4">
+            {orders.map(order => (
+              <div 
+                key={order.id} 
+                className="border border-gray-200 rounded-md p-6 bg-gray-50 cursor-pointer hover:bg-gray-100"
+                onClick={() => handleOrderClick(order.id ?? 0)}
+              >
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-700">주문 번호: #{order.id ?? 0}</h3>
+                    <p className="text-gray-600">주문일: {order.createDate ?? '정보 없음'}</p>
+                    <p className="text-sm text-gray-500">결제방법: {order.paymentMethod ?? '정보 없음'}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-lg font-bold text-gray-800">{(order.totalPrice ?? 0).toLocaleString()}원</p>
+                    <p className="text-sm text-gray-500">{order.orderCount ?? 0}개 상품</p>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* 팝업 */}
+      {isPopupOpen && selectedOrderId && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[80vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold">주문 상세 정보 - #{selectedOrderId}</h3>
+              <button 
+                onClick={handleClosePopup}
+                className="text-gray-500 hover:text-gray-700 text-xl"
+              >
+                ✕
+              </button>
+            </div>
+            
+            {itemsLoading ? (
+              <div className="text-center py-8">
+                <p className="text-gray-500">주문 상품을 불러오는 중...</p>
+              </div>
+            ) : orderItems.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-gray-500">주문 상품이 없습니다.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {orderItems.map(item => (
+                  <div key={item.id} className="border-b border-gray-200 pb-4">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="font-medium">상품 ID: {item.productId}</p>
+                        <p className="text-sm text-gray-600">수량: {item.quantity}개</p>
+                        <p className="text-sm text-gray-600">단가: {item.unitPrice?.toLocaleString()}원</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold">{item.totalPrice?.toLocaleString()}원</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </main>
   );
 }
