@@ -66,10 +66,10 @@ public class BaseInitData {
 
     @Transactional
     public void work3() {
-        orderService.create(3, 45000, "card", "PENDING", 1, "서울시 강남구");
-        orderService.create(10, 12000, "card", "PENDING", 2, "서울시 서초구");
-        orderService.create(7, 80000, "bank_transfer", "COMPLETED", 1, "서울시 종로구");
-        orderService.create(2, 5000, "card", "COMPLETED", 3, "서울시 강동구");
+        orderService.create(3, 16000, "card", "PENDING", 1, "서울시 강남구");
+        orderService.create(2, 11000, "card", "PENDING", 2, "서울시 서초구");
+        orderService.create(5, 32000, "bank_transfer", "COMPLETED", 1, "서울시 종로구");
+        orderService.create(1, 8000, "card", "COMPLETED", 3, "서울시 강동구");
 
     }
 
@@ -78,20 +78,19 @@ public class BaseInitData {
         if (orderItemService.count() > 0) return;
 
         // Order ID 1의 OrderItem들
-        orderItemService.create(1, 2, 15000, 1); // 상품1 2개
-        orderItemService.create(1, 1, 15000, 2); // 상품2 1개
+        orderItemService.create(1, 2, 5000, 1); // 상품1 2개
+        orderItemService.create(1, 1, 6000, 2); // 상품2 1개
 
         // Order ID 2의 OrderItem들
-        orderItemService.create(2, 5, 1200, 1);  // 상품1 5개
-        orderItemService.create(2, 3, 2000, 3);  // 상품3 3개
-        orderItemService.create(2, 2, 1000, 4);  // 상품4 2개
+        orderItemService.create(2, 1, 5000, 1);  // 상품1 5개
+        orderItemService.create(2, 1, 6000, 3);  // 상품3 3개
 
         // Order ID 3의 OrderItem들
-        orderItemService.create(3, 4, 10000, 2); // 상품2 4개
-        orderItemService.create(3, 3, 15000, 4); // 상품4 3개
+        orderItemService.create(3, 4, 6000, 2); // 상품2 4개
+        orderItemService.create(3, 1, 8000, 4); // 상품4 3개
 
         // Order ID 4의 OrderItem들
-        orderItemService.create(4, 1, 5000, 1);  // 상품1 1개
+        orderItemService.create(4, 1, 8000, 4);  // 상품1 1개
     }
 
 }
