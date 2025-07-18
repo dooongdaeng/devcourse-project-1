@@ -736,6 +736,7 @@ export interface components {
             email: string;
             address: string;
             postalCode: string;
+            role: string;
         };
         UserJoinReqBody: {
             username: string;
