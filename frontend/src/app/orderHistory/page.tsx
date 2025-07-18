@@ -4,6 +4,7 @@ import { useProducts } from '@/context/ProductContext';
 import { useCreateOrder } from '@/context/OrderContext';
 import { useEffect, useState } from 'react';
 import { apiFetch } from "@/lib/backend/client";
+import Link from 'next/link';
 
 export default function OrderHistory() {
   const { orderHistory } = useProducts();
@@ -154,7 +155,9 @@ export default function OrderHistory() {
                   <div key={item.id} className="border-b border-gray-200 pb-4">
                     <div className="flex justify-between items-center">
                       <div>
-                        <p className="font-medium text-gray-700">상품명: {productNames[item.productId] || '로딩 중...'}</p>
+                        <Link href={`/products/detail/${item.productId}`} className="block cursor-pointer">
+                          <p className="font-medium text-lg text-bold text-gray-700">상품명: {productNames[item.productId] || '로딩 중...'}</p>
+                        </Link>
                         <p className="text-sm text-gray-600">수량: {item.quantity}개</p>
                         <p className="text-sm text-gray-600">단가: {item.unitPrice?.toLocaleString()}원</p>
                       </div>
