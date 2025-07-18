@@ -24,7 +24,7 @@ function AppContent({ children }: { children: React.ReactNode }) {
     const handleLogout = () => {
         logout();
         alert('로그아웃 되었습니다.');
-        router.push('/');
+        router.push('/login');
     };
 
     return (
