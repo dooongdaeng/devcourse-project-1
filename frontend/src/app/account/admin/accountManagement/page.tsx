@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useProducts } from '@/context/ProductContext';
 import type { components } from '@/lib/backend/apiV1/schema';
 import { apiFetch } from '@/lib/backend/client';
 
