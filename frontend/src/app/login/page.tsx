@@ -72,16 +72,16 @@ export default function Login() {
       // 이렇게 하면 상단바와의 겹침을 방지하고 레이아웃이 올바르게 작동합니다.
       <main className="flex flex-col items-center p-4">
         <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold text-center mb-6">로그인</h2>
+          <h2 className="text-3xl font-bold text-center text-gray-700 mb-6">로그인</h2>
           <form onSubmit={handleLogin}>
             <div className="mb-4">
-              <label htmlFor="username" className="block text-gray-700 text-sm font-bold mb-2">
+              <label htmlFor="username" className="block text-gray-700 text-lg font-bold mb-2">
                 사용자 이름:
               </label>
               <input
                   type="text"
                   id="username"
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  className="border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 w-full py-2 px-3 text-gray-700 text-lg"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
@@ -89,13 +89,13 @@ export default function Login() {
               />
             </div>
             <div className="mb-6">
-              <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">
+              <label htmlFor="password" className="block text-gray-700 text-lg font-bold mb-2">
                 비밀번호:
               </label>
               <input
                   type="password"
                   id="password"
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+                  className="border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 w-full py-2 px-3 text-gray-700 text-lg"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -105,7 +105,7 @@ export default function Login() {
             <div className="flex items-center justify-between">
               <button
                   type="submit"
-                  className="bg-blue-950 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full cursor-pointer"
+                  className="bg-blue-800 hover:bg-blue-950 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full cursor-pointer"
                   disabled={loading}
               >
                 {loading ? '로그인 중...' : '로그인'}
