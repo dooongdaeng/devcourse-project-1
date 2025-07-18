@@ -211,7 +211,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
       })
 
       imagesToDelete.map((img) => {
-        DeleteProductImage(editingProduct, (img.id !== undefined) ? img.id : -1);
+        DeleteProductImage(editingProduct.id, (img.id !== undefined) ? img.id : -1);
       })
 
     } else {
@@ -222,13 +222,14 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
         description, 
         stock, 
         imageUrl, 
-        additionalImages: imagesToAdd.slice(1).map(img => img.url), // 첫 번째 제외하고 추가 이미지들
         onSuccess: (res) => {
           alert(res.msg);
           if(products == null) return;
           setProducts([...products, res.data]);
         }
       });
+
+      imagesToAdd.slice(1).map((img) => addProductImage(img.url))
     }
 
     onSubmit();
@@ -279,11 +280,6 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
             {formState.productImages.map((image, index) => (
               <div key={index} className={`flex items-center mb-2 ${image.toDelete ? 'opacity-50' : ''}`}>
                 <div className="flex-1 flex items-center">
-                  {index === 0 && (
-                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded mr-2">
-                      대표
-                    </span>
-                  )}
                   <input 
                     type="text" 
                     placeholder="https://example.com/image.png"
@@ -294,6 +290,11 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
                       image.toDelete ? 'bg-gray-100' : ''
                     }`}
                   />
+                  {index === 0 && (
+                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded ml-2">
+                      대표
+                    </span>
+                  )}
                 </div>
                 <div className="ml-2 flex items-center">
                   {image.toDelete ? (
@@ -307,7 +308,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
                   ) : (
                     <>
                       {/* 첫 번째 이미지(대표 이미지)가 아니거나, 활성 이미지가 2개 이상일 때만 삭제 버튼 표시 */}
-                      {(index !== 0 || getActiveImageCount() > 1) && (
+                      {(index !== 0 && getActiveImageCount() > 1) && (
                         <button 
                           type="button" 
                           onClick={() => image.isNew ? removeNewImage(index) : markImageForDeletion(index)}
@@ -351,8 +352,8 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
   );
 }
 
-function DeleteProductImage( editingProduct: Product, id: number ) {
-  const { deleteProductImage } = useProductImageItem(editingProduct?.id, id);
+function DeleteProductImage( productId: number, id: number ) {
+  const { deleteProductImage } = useProductImageItem(productId, id);
   deleteProductImage((res) => alert(res.msg))
 }
 
