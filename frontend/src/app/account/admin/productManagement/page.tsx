@@ -70,7 +70,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
     const description = formState.description;
     const price = parseInt(formState.price, 10);
     const stock = parseInt(formState.stock, 10);
-    const imageUrl = formState.imageUrl;
+    const imageUrl = (formState.imageUrl.length > 0) ? formState.imageUrl : "http://localhost:8080/images/coffee_default.jpg";
 
     if (name.length < 2 || name.length > 100) {
       alert("상품명은 2자 이상 100자 이하로 입력해주세요.");
@@ -105,12 +105,6 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
     if (stock < 1 || stock > 10000) {
       alert("상품 재고는 1 이상 10000 이하로 입력해주세요.");
       stockInputRef.current?.focus();
-      return;
-    }
-
-    if (imageUrl.length <= 0) {
-      alert("상품 이미지 URL을 입력해주세요.");
-      urlInputRef.current?.focus();
       return;
     }
 

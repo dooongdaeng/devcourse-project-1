@@ -52,7 +52,7 @@ function ProductCard({ product }: { product: Product }) {
   return (
     <div className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30">
       <Link href={`/products/detail/${product.id}`}>
-        <img src={product.imageUrl} alt={product.name} className="mb-3 h-40 w-full object-cover"/>
+        <img src={product.imageUrl} alt={product.name} className="mb-3 h-50 w-full object-cover"/>
         <h2 className="mb-3 text-xl font-semibold">
           {product.name}
         </h2>
