@@ -102,11 +102,15 @@ function OrderCard({ order, onOrderUpdate }: {
         </div>
         <div>
           <span className="text-sm text-gray-500">주문 수량</span>
-          <p className="font-medium">{order.orderCount}개</p>
+          <p className="font-medium">
+            {order.items.reduce((total, item) => total + item.quantity, 0)}개
+          </p>
         </div>
         <div>
           <span className="text-sm text-gray-500">총 결제 금액</span>
-          <p className="font-medium text-lg">{order.totalPrice.toLocaleString()}원</p>
+          <p className="font-medium text-lg">
+            {order.items.reduce((total, item) => total + item.totalPrice, 0).toLocaleString()}원
+          </p>
         </div>
       </div>
 
@@ -133,7 +137,7 @@ function OrderCard({ order, onOrderUpdate }: {
       {/* 주문 아이템 목록 */}
       {isExpanded && (
         <div className="mt-4 pt-4 border-t border-gray-200">
-          <OrderItemsList items={order.items} onOrderUpdate={onOrderUpdate} />
+          <OrderItemsList items={order.items} order={order} onOrderUpdate={onOrderUpdate} />
         </div>
       )}
     </div>
@@ -198,20 +202,23 @@ function OrderActions({ order, onOrderUpdate }: {
         </button>
       )}
       
-      <button
-        onClick={handleDelete}
-        disabled={isProcessing}
-        className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm cursor-pointer disabled:opacity-50"
-      >
-        주문 삭제
-      </button>
+      {order.status === '처리중' && (
+        <button
+          onClick={handleDelete}
+          disabled={isProcessing}
+          className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm cursor-pointer disabled:opacity-50"
+        >
+          주문 삭제
+        </button>
+      )}
     </>
   );
 }
 
-function OrderItemsList({ items, onOrderUpdate }: { 
+function OrderItemsList({ items, onOrderUpdate, order }: { 
   items: OrderItemDisplayData[]; 
   onOrderUpdate: () => void;
+  order: OrderDisplayData;
 }) {
   return (
     <div className="overflow-x-auto">
@@ -231,6 +238,7 @@ function OrderItemsList({ items, onOrderUpdate }: {
             <OrderItemRow 
               key={item.id} 
               item={item} 
+              order={order}
               onOrderUpdate={onOrderUpdate}
             />
           ))}
@@ -240,11 +248,12 @@ function OrderItemsList({ items, onOrderUpdate }: {
   );
 }
 
-function OrderItemRow({ item, onOrderUpdate }: { 
+function OrderItemRow({ item, onOrderUpdate, order }: { 
   item: OrderItemDisplayData; 
   onOrderUpdate: () => void;
+  order: OrderDisplayData;
 }) {
-  const { deleteOrderItem } = useCreateOrder();
+  const { deleteOrderItem, updateOrder, mapDisplayStatusToPaymentStatus } = useCreateOrder();
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleDelete = async () => {
@@ -255,7 +264,22 @@ function OrderItemRow({ item, onOrderUpdate }: {
     try {
       setIsProcessing(true);
       await deleteOrderItem(item.id);
-      alert('주문 아이템이 삭제되었습니다.');
+      
+      // 아이템 삭제 후 주문 정보 업데이트
+      const remainingItems = order.items.filter(i => i.id !== item.id);
+      const newTotalPrice = remainingItems.reduce((total, i) => total + i.totalPrice, 0);
+      const newOrderCount = remainingItems.reduce((total, i) => total + i.quantity, 0);
+      
+      // 주문 정보 업데이트
+      await updateOrder(order.id, {
+        orderCount: newOrderCount,
+        totalPrice: newTotalPrice,
+        paymentMethod: order.paymentMethod,
+        paymentStatus: mapDisplayStatusToPaymentStatus(order.status),
+        address: order.address
+      });
+      
+      alert('주문 아이템이 삭제되고 주문 정보가 업데이트되었습니다.');
       onOrderUpdate();
     } catch (error) {
       alert('주문 아이템 삭제에 실패했습니다.');
@@ -272,13 +296,15 @@ function OrderItemRow({ item, onOrderUpdate }: {
       <td className="py-2 px-4 text-left">{item.quantity}개</td>
       <td className="py-2 px-4 text-left font-medium">{item.totalPrice.toLocaleString()}원</td>
       <td className="py-2 px-4 text-center">
-        <button
-          onClick={handleDelete}
-          disabled={isProcessing}
-          className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded text-xs cursor-pointer disabled:opacity-50"
-        >
-          삭제
-        </button>
+        {order.status === '처리중' && (
+          <button
+            onClick={handleDelete}
+            disabled={isProcessing}
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded text-xs cursor-pointer disabled:opacity-50"
+          >
+            삭제
+          </button>
+        )}
       </td>
     </tr>
   );
