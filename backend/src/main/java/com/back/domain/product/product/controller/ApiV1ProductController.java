@@ -36,8 +36,8 @@ public class ApiV1ProductController {
     @GetMapping("/{id}")
     @Transactional(readOnly = true)
     @Operation(summary = "단건 조회")
-    public ProductDto getItem(@PathVariable int id) {
+    public ProductWithImageUrlDto getItem(@PathVariable int id) {
         Product product = productService.findById(id).get();
-        return new ProductDto(product);
+        return new ProductWithImageUrlDto(product);
     }
 }
