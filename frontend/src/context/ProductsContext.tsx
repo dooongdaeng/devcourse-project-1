@@ -62,7 +62,10 @@ export const useProductItem = (id: number) => {
   const [product, setProduct] = useState<Product | null>(null);
 
   useEffect(() => {
-    apiFetch(`/api/v1/products/${id}`).then(setProduct);
+    apiFetch(`/api/v1/products/${id}`).then(setProduct)
+    .catch((error) => {
+      alert(`${error.resultCode} : ${error.msg}`);
+    });
   }, []);
 
   const deleteProduct = (onSuccess: (data: any) => void) => {
@@ -100,7 +103,10 @@ export const useProductImage = (productId: number) => {
   const [productImages, setProductImages] = useState<ProductImage[] | null>(null);
 
   useEffect(() => {
-    apiFetch(`/api/v1/products/${productId}/images`).then(setProductImages);
+    apiFetch(`/api/v1/products/${productId}/images`).then(setProductImages)
+    .catch((error) => {
+      alert(`${error.resultCode} : ${error.msg}`);
+    });
   }, []);
 
   const addProductImage = ({url, onSuccess}: {
@@ -125,7 +131,10 @@ export const useProductImageItem = (productId: number, id: number) => {
   const [productImage, setProductImage] = useState<ProductImage>();
 
   useEffect(() => {
-    apiFetch(`/api/v1/products/${productId}/images/${id}`).then(setProductImage);
+    apiFetch(`/api/v1/products/${productId}/images/${id}`).then(setProductImage)
+    .catch((error) => {
+      alert(`${error.resultCode} : ${error.msg}`);
+  });
   }, []);
 
   const deleteProductImage = (onSuccess: (data: any) => void) => {
