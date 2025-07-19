@@ -24,7 +24,16 @@ export type CreateOrderItemRequest = {
     productId: number;
 };
 
-// 새로운 타입들
+// 일반 사용자용 주문 수정 타입 (userId 제외)
+export type UpdateMyOrderRequest = {
+    orderCount: number;
+    totalPrice: number;
+    paymentMethod: string;
+    paymentStatus: string;
+    address: string;
+};
+
+// 관리자용 주문 수정 타입
 export type UpdateOrderRequest = {
     orderCount: number;
     totalPrice: number;
@@ -195,7 +204,62 @@ export const useCreateOrder = () => {
         });
     };
 
-    // 관리자용 함수들
+    // 일반 사용자용 주문 수정 함수
+    const updateMyOrder = (orderId: number, orderData: UpdateMyOrderRequest) => {
+        setIsLoading(true);
+        setError(null);
+        
+        return apiFetch(`/api/v1/orders/${orderId}`, {
+            method: 'PUT',
+            body: JSON.stringify(orderData)
+        })
+        .then((res: any) => {
+            setIsLoading(false);
+            if (hasError(res)) {
+                setError(res.error.msg);
+                throw new Error(res.error.msg);
+            }
+            
+            if (isRsDataFormat(res)) {
+                return res.data;
+            }
+            return res;
+        })
+        .catch(err => {
+            setIsLoading(false);
+            setError(err.message || '주문 수정에 실패했습니다.');
+            throw err;
+        });
+    };
+
+    // 일반 사용자용 주문 삭제 함수
+    const deleteMyOrder = (orderId: number) => {
+        setIsLoading(true);
+        setError(null);
+        
+        return apiFetch(`/api/v1/orders/${orderId}`, {
+            method: 'DELETE'
+        })
+        .then((res: any) => {
+            setIsLoading(false);
+            if (hasError(res)) {
+                setError(res.error.msg);
+                throw new Error(res.error.msg);
+            }
+            
+            if (isRsDataFormat(res)) {
+                return res.data;
+            }
+            return res;
+        })
+        .catch(err => {
+            setIsLoading(false);
+            setError(err.message || '주문 삭제에 실패했습니다.');
+            throw err;
+        });
+    };
+
+    // 관리자용 주문 수정 함수
     const updateOrder = (orderId: number, orderData: UpdateOrderRequest) => {
         setIsLoading(true);
         setError(null);
@@ -218,6 +282,7 @@ export const useCreateOrder = () => {
         });
     };
 
+    // 관리자용 주문 삭제 함수
     const deleteOrder = (orderId: number) => {
         setIsLoading(true);
         setError(null);
@@ -466,20 +531,24 @@ export const useCreateOrder = () => {
     };
 
     return {
-        // 기존 함수들
+        // 기본 주문 생성 및 조회 함수들
         createOrder,
         createOrderItem,
         processCompleteOrder,
         getMyOrders,
         getOrderItems,
         
+        // 일반 사용자용 주문 수정/삭제 함수들
+        updateMyOrder,
+        deleteMyOrder,
+        
         // 관리자용 함수들
         getAllOrders,
         getAllOrdersForDisplay,
-        updateOrder,
-        deleteOrder,
-        updateOrderItem,
-        deleteOrderItem,
+        updateOrder,      // 관리자용 주문 수정
+        deleteOrder,      // 관리자용 주문 삭제
+        updateOrderItem,  // 관리자용 주문아이템 수정
+        deleteOrderItem,  // 관리자용 주문아이템 삭제
         
         // 유틸리티 함수들
         transformOrderToDisplayData,
