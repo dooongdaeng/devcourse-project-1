@@ -37,7 +37,7 @@ function ProductCard({ product }: { product: Product }) {
     const handleHeartClick = async () => {
         if(!userId){
             alert("로그인 후 찜 기능을 이용할 수 있습니다.");
-            router.push('/login');
+            router.push('/products');
             return;
         }
         if(wishListContext){
