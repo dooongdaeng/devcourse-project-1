@@ -1,35 +1,57 @@
 "use client";
 
 import { useProductItem } from "@/context/ProductsContext";
-import { useParams } from "next/navigation";
+import {useParams, useRouter} from "next/navigation";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 // import { useProducts } from "@/context/ProductContext"; // Assuming this is for favorites
 import Link from "next/link";
 import {useWishListContext, WishListProvider} from "@/context/WishListContext";
+import {getUserId} from "@/util/auth";
 
 export default function ProductDetailWrapper() {
+  const userId = getUserId();
+
   return (
-      <WishListProvider userId={1}>
-        <ProductDetail />
-      </WishListProvider>
+      <>
+        {userId ? (
+            <WishListProvider userId={userId}>
+              <ProductDetail />
+            </WishListProvider>
+        ) : (
+            <ProductDetail />
+        )}
+      </>
+
   );
 }
 
 function ProductDetail() {
   const params = useParams();
+  const router = useRouter();
   const id = Number(params.id);
+  const userId = getUserId();
 
   const { product } = useProductItem(id);
   // const { favoriteProducts, toggleFavorite } = useProducts(); // For favorite button
-  const {toggleWishList, isInWishList, isLoading} = useWishListContext();
+  const wishListContext = userId ? useWishListContext() : null;
 
   const handleHeartClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    try {
-      await toggleWishList(product.id);
-    } catch (error) {
-      console.error('찜 토글 실패:', error);
+
+    if(!userId) {
+        alert("로그인 후 찜 기능을 이용할 수 있습니다.");
+        router.push('/products/detail/' + product.id);
+        return;
     }
+
+    if(wishListContext){
+      try {
+        await wishListContext.toggleWishList(product.id);
+      } catch (error) {
+        console.error('찜 토글 실패:', error);
+      }
+    }
+
   };
 
   if (!product) {
@@ -62,10 +84,10 @@ function ProductDetail() {
                 </p>
                 <button
                   onClick={handleHeartClick}
-                    disabled={isLoading}
+                    disabled={wishListContext?.isLoading || false}
                   className = "ml-4 cursor-pointer text-2xl text-gray-700 disabled:opacity-50"
                   >
-                  {isInWishList(product.id) ? (
+                  {userId && wishListContext?.isInWishList(product.id) ? (
                       <FaHeart color="red" />
                   ) : (
                       <FaRegHeart />

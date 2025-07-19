@@ -8,15 +8,32 @@ import { components } from '@/lib/backend/apiV1/schema';
 import { useCreateOrder, CreateOrderRequest } from '@/context/OrderContext';
 import Link from 'next/link';
 import { useUser } from '@/context/UserContext';
+import {getUserId} from "@/util/auth";
 import {useWishListContext, WishListProvider} from "@/context/WishListContext";
 
 export default function OrderWrapper() {
+  const router = useRouter();
+  const userId = getUserId();
+
+  useEffect(() => {
+    if (!userId) {
+      router.replace('/order/guest')
+    }
+  }, [userId, router]);
+
+  if(!userId) {
+    return (
+        <div className="flex min-h-screen flex-col items-center justify-center p-24">
+          <div>로딩 중..</div>
+        </div>
+    );
+  }
   return (
-    <WishListProvider userId={1}>
-      <ProductsProvider>
-        <Order />
-      </ProductsProvider>
-    </WishListProvider>
+          <WishListProvider userId={userId}>
+            <ProductsProvider>
+              <Order />
+            </ProductsProvider>
+          </WishListProvider>
   );
 }
 
@@ -134,6 +151,8 @@ function WishList({cartState} : {cartState: ReturnType<typeof useCart>}) {
   const { products } = useProduct();
   const {wishLists, isLoading} = useWishListContext();
 
+  const { favoriteProducts } = useProducts(); // 전역 상품 목록과 찜 목록 가져오기
+
   if(products == null) return <div>로딩 중...</div>
   const favoritedProductsList = wishLists
       .map(wishItem => products.find(product => product.id === wishItem.productId))
@@ -144,9 +163,7 @@ function WishList({cartState} : {cartState: ReturnType<typeof useCart>}) {
       <div className="mt-8 w-full flex flex-col items-start">
         <h5 className="text-2xl font-bold mb-4">찜목록</h5>
         <ul className="w-full">
-          { isLoading ? (
-            <p className="text-grey-500">로딩 중...</p>
-          ): favoritedProductsList.length === 0 ? (
+          {favoritedProductsList.length === 0 ? (
             <p className="text-gray-500">찜 목록이 비어있습니다.</p>
           ) : (
             favoritedProductsList.map(item => (
@@ -174,6 +191,7 @@ function WishListItem({cartState, item} : {
       console.error('찜목록에서 제거 실패:', error);
     }
   };
+
   return (
     <>
       <li key={item.id} className="flex items-center mt-3 p-2 border-b border-gray-200">
@@ -223,11 +241,11 @@ function OrderList({cartState} : {cartState: ReturnType<typeof useCart>}) {
   );
 }
 
-function PaymentPopup({
-  isOpen,
-  onClose,
-  onConfirm,
-  totalPrice
+function PaymentPopup({ 
+  isOpen, 
+  onClose, 
+  onConfirm, 
+  totalPrice 
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -240,13 +258,13 @@ function PaymentPopup({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
+    
     // 유효성 검사
     const newErrors: {address?: string} = {};
     if (!address.trim()) {
       newErrors.address = '배송 주소를 입력해주세요.';
     }
-
+    
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -272,7 +290,7 @@ function PaymentPopup({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
         <h3 className="text-xl font-bold mb-4">결제 정보 입력</h3>
-
+        
         <form onSubmit={handleSubmit}>
           {/* 배송 주소 입력 */}
           <div className="mb-4">
@@ -370,7 +388,7 @@ function CheckOut({cartState} : {cartState: ReturnType<typeof useCart>}) {
         alert('장바구니가 비어있습니다.');
         return;
       }
-
+      
       // 결제 팝업 열기
       setShowPaymentPopup(true);
     } else {
@@ -389,7 +407,7 @@ function CheckOut({cartState} : {cartState: ReturnType<typeof useCart>}) {
         router.push('/login');
         return;
       }
-
+      
       // 주문 데이터 생성 (주소와 결제 방법 포함)
       const orderData: CreateOrderRequest = {
         orderCount: cartItems.length,
@@ -402,16 +420,16 @@ function CheckOut({cartState} : {cartState: ReturnType<typeof useCart>}) {
 
       // 백엔드 API를 통한 주문 생성
       const result = await processCompleteOrder(orderData, cartItems);
-
+      
       // 장바구니 비우기
       setCartItems([]);
-
+      
       // 팝업 닫기
       setShowPaymentPopup(false);
-
+      
       alert('결제가 완료되었습니다. 주문 내역에서 확인해주세요.');
       router.push('/orderHistory');
-
+      
     } catch (error) {
       console.error('주문 처리 중 오류:', error);
       alert(`결제 처리 중 오류가 발생했습니다: ${error instanceof Error ? error.message : JSON.stringify(error)}`);

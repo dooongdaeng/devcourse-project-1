@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 public class ApiV1WishListController {
     private final WishListService wishListService;
 
-    private final int TEST_USER_ID = 1; // 테스트용 사용자 ID, 실제 환경에서는 제거해야 합니다.
 
     @Schema(description = "위시리스트 추가 요청 ")
     record WishListAddReqBody(
@@ -45,8 +44,7 @@ public class ApiV1WishListController {
     @Operation(summary = "위시리스트 전체 조회", description = "현재 사용자의 모든 위시리스트를 조회합니다.")
     @GetMapping
     public RsData<List<WishListDto>> getAllWishLists(@AuthenticationPrincipal UserSecurityUser user) {
-        //List<WishList> wishLists = wishListService.getWishListsByUserId(user.getId());
-        List<WishList> wishLists = wishListService.getWishListsByUserId(TEST_USER_ID); // 테스트용 사용자 ID 사용, 실제 환경에서는 제거해야 합니다.
+        List<WishList> wishLists = wishListService.getWishListsByUserId(user.getId());
 
         List<WishListDto> wishListDtos = wishLists.stream().map(WishListDto::new).collect(Collectors.toList());
 
@@ -59,8 +57,7 @@ public class ApiV1WishListController {
             @PathVariable int productId,
             @AuthenticationPrincipal UserSecurityUser user
     ) {
-        //boolean exists = wishListService.existsWishList(user.getId(), productId);
-        boolean exists = wishListService.existsWishList(TEST_USER_ID, productId); // 테스트용 사용자 ID 사용, 실제 환경에서는 제거해야 합니다.
+        boolean exists = wishListService.existsWishList(user.getId(), productId);
 
         return new RsData<>("200", "위시리스트 조회 성공", exists);
     }
@@ -71,8 +68,7 @@ public class ApiV1WishListController {
             @Valid @RequestBody WishListAddReqBody reqBody,
             @AuthenticationPrincipal UserSecurityUser user
     ){
-        //WishList wishList = wishListService.addToWishList(user.getId(), reqBody.productId, reqBody.getQuantityOrDefault());
-        WishList wishList = wishListService.addToWishList(TEST_USER_ID, reqBody.productId, reqBody.getQuantityOrDefault()); // 테스트용 사용자 ID 사용, 실제 환경에서는 제거해야 합니다.
+        WishList wishList = wishListService.addToWishList(user.getId(), reqBody.productId, reqBody.getQuantityOrDefault());
 
         return new RsData<>("201", "위시리스트에 추가했습니다.", new WishListDto(wishList));
     }
@@ -83,8 +79,7 @@ public class ApiV1WishListController {
             @PathVariable int productId,
             @AuthenticationPrincipal UserSecurityUser user
     ){
-        //WishListDto removedWishList = wishListService.removeWishList(user.getId(), productId);
-        WishListDto removedWishList = wishListService.removeWishList(TEST_USER_ID, productId); // 테스트용 사용자 ID 사용, 실제 환경에서는 제거해야 합니다.
+        WishListDto removedWishList = wishListService.removeWishList(user.getId(), productId);
 
         return new RsData<>("200", "위시리스트에서 삭제했습니다.", removedWishList);
     }
@@ -92,8 +87,7 @@ public class ApiV1WishListController {
     @Operation(summary = "찜한 상품 개수 조회", description = "현재 사용자가 찜한 상품의 총 개수를 조회합니다.")
     @GetMapping("/count")
     public RsData<Integer> getWishListItemsCount(@AuthenticationPrincipal UserSecurityUser user) {
-        //int count = wishListService.getWishListItemsCount(user.getId());
-        int count = wishListService.getWishListItemsCount(TEST_USER_ID); // 테스트용 사용자 ID 사용, 실제 환경에서는 제거해야 합니다.
+        int count = wishListService.getWishListItemsCount(user.getId());
 
         return new RsData<>("200", "찜한 상품 개수 조회 성공", count);
     }
@@ -104,8 +98,7 @@ public class ApiV1WishListController {
             @Valid @RequestBody WishListToggleReqBody reqBody,
             @AuthenticationPrincipal UserSecurityUser user
     ) {
-        //WishList wishList = wishListService.toggleWishList(user.getId(), reqBody.productId);
-        WishList wishList = wishListService.toggleWishList(TEST_USER_ID, reqBody.productId); // 테스트용 사용자 ID 사용, 실제 환경에서는 제거해야 합니다.
+        WishList wishList = wishListService.toggleWishList(user.getId(), reqBody.productId);
 
         if (wishList != null) {
             return new RsData<>("201", "위시리스트에 추가했습니다.", new WishListDto(wishList));
@@ -117,8 +110,7 @@ public class ApiV1WishListController {
     @Operation(summary = "위시리스트 전체 삭제", description = "현재 사용자의 모든 위시리스트를 삭제합니다.")
     @DeleteMapping("/clear")
     public RsData<String> clearWishList(@AuthenticationPrincipal UserSecurityUser user) {
-        //wishListService.clearWishList(user.getId());
-        wishListService.clearWishList(TEST_USER_ID); // 테스트용 사용자 ID 사용, 실제 환경에서는 제거해야 합니다.
+        wishListService.clearWishList(user.getId());
 
         return new RsData<>("200", "위시리스트를 모두 삭제했습니다.", null);
     }
