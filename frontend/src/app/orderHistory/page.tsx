@@ -42,6 +42,15 @@ export default function OrderHistory() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editOrder, setEditOrder] = useState<any>(null);
   const [editForm, setEditForm] = useState({ address: '', paymentMethod: 'CARD' });
+  const { updateMyOrderItem, deleteMyOrderItem } = useCreateOrder();
+  const [editItemModalOpen, setEditItemModalOpen] = useState(false);
+  const [editItem, setEditItem] = useState<any>(null);
+  const [editItemQuantity, setEditItemQuantity] = useState(1);
+
+  // 현재 선택된 주문의 정보를 가져오는 함수
+  const getCurrentOrder = () => {
+    return orders?.find(order => order.id === selectedOrderId);
+  };
 
   // 컴포넌트 마운트 시 주문 목록 조회
   useEffect(() => {
@@ -152,6 +161,87 @@ export default function OrderHistory() {
     }
   };
 
+  // 아이템 수정 버튼 클릭
+  const handleEditItemClick = (item: any) => {
+    setEditItem(item);
+    setEditItemQuantity(item.quantity);
+    setEditItemModalOpen(true);
+  };
+
+  // 아이템 수정 저장
+  const handleEditItemSave = async () => {
+    if (!editItem) return;
+    try {
+      await updateMyOrderItem(editItem.id, {
+        quantity: editItemQuantity,
+        unitPrice: editItem.unitPrice ?? editItem.price, // 둘 중 하나라도 값이 있으면 사용
+        productId: editItem.productId
+      });
+      alert('상품 수량이 수정되었습니다.');
+      setEditItemModalOpen(false);
+      setEditItem(null);
+      // 주문 아이템 목록 새로고침
+      if (selectedOrderId) {
+        const items = await getOrderItems(selectedOrderId);
+        setOrderItems(items || []);
+        // 주문 합계 재계산 및 주문 정보 업데이트
+        const totalCount = (items || []).reduce((sum, item) => sum + item.quantity, 0);
+        const totalPrice = (items || []).reduce((sum, item) => sum + (item.unitPrice ?? item.price) * item.quantity, 0);
+        // 주문 정보 가져오기 (orders에서 찾기)
+        const order = orders?.find(o => o.id === selectedOrderId);
+        if (!order || !order.id || !order.paymentMethod || !order.paymentStatus || !order.address) {
+          return;
+        }
+        
+        await updateMyOrder(order.id, {
+          orderCount: totalCount,
+          totalPrice: totalPrice,
+          paymentMethod: order.paymentMethod,
+          paymentStatus: order.paymentStatus,
+          address: order.address
+        });
+        // 주문 목록 새로고침
+        await getMyOrders();
+      }
+    } catch (err) {
+      alert('상품 수량 수정에 실패했습니다.');
+    }
+  };
+
+  // 아이템 삭제 버튼 클릭
+  const handleDeleteItemClick = async (itemId?: number) => {
+    if (!itemId) return;
+    if (!window.confirm('정말로 이 상품을 삭제하시겠습니까?')) return;
+    try {
+      await deleteMyOrderItem(itemId);
+      alert('상품이 삭제되었습니다.');
+      // 주문 아이템 목록 새로고침
+      if (selectedOrderId != null) {
+        const items = await getOrderItems(selectedOrderId);
+        setOrderItems(items || []);
+        // 주문 합계 재계산 및 주문 정보 업데이트
+        const totalCount = (items || []).reduce((sum, item) => sum + item.quantity, 0);
+        const totalPrice = (items || []).reduce((sum, item) => sum + (item.unitPrice ?? item.price) * item.quantity, 0);
+        // 주문 정보 가져오기 (orders에서 찾기)
+        const order = orders?.find(o => o.id === selectedOrderId);
+        if (!order || !order.id || !order.paymentMethod || !order.paymentStatus || !order.address) {
+          return;
+        }
+        await updateMyOrder(order.id, {
+          orderCount: totalCount,
+          totalPrice: totalPrice,
+          paymentMethod: order.paymentMethod,
+          paymentStatus: order.paymentStatus,
+          address: order.address
+        });
+        // 주문 목록 새로고침
+        await getMyOrders();
+      }
+    } catch (err) {
+      alert('상품 삭제에 실패했습니다.');
+    }
+  };
+
   // 날짜 포맷팅 함수
   const formatDate = (dateString: string | undefined) => {
     if (!dateString) return '정보 없음';
@@ -221,22 +311,24 @@ export default function OrderHistory() {
                     <p className="text-sm text-gray-500">{order.orderCount ?? 0}개 상품</p>
                   </div>
                 </div>
-                <div className="mt-4 flex space-x-2">
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); handleEditClick(order); }}
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm cursor-pointer"
-                    disabled={!order.id}
-                  >
-                    주문 수정
-                  </button>
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); handleDeleteClick(order.id); }}
-                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm cursor-pointer"
-                    disabled={!order.id}
-                  >
-                    주문 취소
-                  </button>
-                </div>
+                {order.paymentStatus === 'PENDING' && (
+                  <div className="mt-4 flex space-x-2">
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); handleEditClick(order); }}
+                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm cursor-pointer"
+                      disabled={!order.id}
+                    >
+                      주문 수정
+                    </button>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); handleDeleteClick(order.id); }}
+                      className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm cursor-pointer"
+                      disabled={!order.id}
+                    >
+                      주문 취소
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -286,6 +378,25 @@ export default function OrderHistory() {
                         <p className="font-bold text-gray-700">{item.totalPrice?.toLocaleString()}원</p>
                       </div>
                     </div>
+                    {/* 수정된 부분: 현재 주문의 상태를 확인 */}
+                    {getCurrentOrder()?.paymentStatus === 'PENDING' && (
+                      <div className="flex items-center space-x-2 mt-2">
+                        <button
+                          onClick={() => handleEditItemClick(item)}
+                          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm cursor-pointer"
+                          disabled={!item.id}
+                        >
+                          수정
+                        </button>
+                        <button
+                          onClick={() => handleDeleteItemClick(item.id)}
+                          className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm cursor-pointer"
+                          disabled={!item.id}
+                        >
+                          삭제
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
                 <div className="pt-4 border-t border-gray-300">
@@ -336,6 +447,39 @@ export default function OrderHistory() {
               </button>
               <button
                 onClick={() => setEditModalOpen(false)}
+                className="flex-1 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+              >
+                취소
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 아이템 수정 모달 */}
+      {editItemModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-xl font-bold mb-4">상품 수량 수정</h3>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">수량</label>
+              <input
+                type="number"
+                min={1}
+                value={editItemQuantity}
+                onChange={e => setEditItemQuantity(Number(e.target.value))}
+                className="w-full p-2 border border-gray-300 rounded"
+              />
+            </div>
+            <div className="flex space-x-2 pt-4">
+              <button
+                onClick={handleEditItemSave}
+                className="flex-1 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              >
+                저장
+              </button>
+              <button
+                onClick={() => setEditItemModalOpen(false)}
                 className="flex-1 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
               >
                 취소

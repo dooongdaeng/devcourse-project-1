@@ -259,6 +259,60 @@ export const useCreateOrder = () => {
         });
     };
 
+    const updateMyOrderItem = (orderItemId: number, orderItemData: UpdateOrderItemRequest) => {
+        setIsLoading(true);
+        setError(null);
+        
+        return apiFetch(`/api/v1/orderItems/${orderItemId}`, {
+            method: 'PUT',
+            body: JSON.stringify(orderItemData)
+        })
+        .then((res: any) => {
+            setIsLoading(false);
+            if (hasError(res)) {
+                setError(res.error.msg);
+                throw new Error(res.error.msg);
+            }
+            
+            if (isRsDataFormat(res)) {
+                return res.data;
+            }
+            return res;
+        })
+        .catch(err => {
+            setIsLoading(false);
+            setError(err.message || '주문 아이템 수정에 실패했습니다.');
+            throw err;
+        });
+    };
+
+
+    const deleteMyOrderItem = (orderItemId: number) => {
+        setIsLoading(true);
+        setError(null);
+        
+        return apiFetch(`/api/v1/orderItems/${orderItemId}`, {
+            method: 'DELETE'
+        })
+        .then((res: any) => {
+            setIsLoading(false);
+            if (hasError(res)) {
+                setError(res.error.msg);
+                throw new Error(res.error.msg);
+            }
+            
+            if (isRsDataFormat(res)) {
+                return res.data;
+            }
+            return res;
+        })
+        .catch(err => {
+            setIsLoading(false);
+            setError(err.message || '주문 아이템 삭제에 실패했습니다.');
+            throw err;
+        });
+    };
+
     // 관리자용 주문 수정 함수
     const updateOrder = (orderId: number, orderData: UpdateOrderRequest) => {
         setIsLoading(true);
@@ -541,6 +595,8 @@ export const useCreateOrder = () => {
         // 일반 사용자용 주문 수정/삭제 함수들
         updateMyOrder,
         deleteMyOrder,
+        updateMyOrderItem,
+        deleteMyOrderItem,
         
         // 관리자용 함수들
         getAllOrders,
