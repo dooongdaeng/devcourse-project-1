@@ -6,6 +6,29 @@ import { useEffect, useState } from 'react';
 import { apiFetch } from "@/lib/backend/client";
 import Link from 'next/link';
 
+// 상품 타입 정의
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  description: string;
+  stock: number;
+  createDate?: string;
+  modifyDate?: string;
+}
+
+// RsData 타입 정의 (필요한 경우)
+interface RsData<T = unknown> {
+  resultCode: string;
+  msg: string;
+  data?: T;
+}
+
+// 타입 가드 함수
+const isRsDataFormat = (res: any): res is RsData<any> => {
+  return res && typeof res === 'object' && 'resultCode' in res && 'msg' in res;
+};
+
 export default function OrderHistory() {
   const { orderHistory } = useProducts();
   const { getMyOrders, getOrderItems, orders, isLoading, error } = useCreateOrder();
@@ -31,8 +54,23 @@ export default function OrderHistory() {
           if (!productNames[item.productId]) { // 이미 가져온 상품명은 다시 가져오지 않음
             try {
               // /api/v1/products/{id} 엔드포인트 호출
-              const product = await apiFetch(`/api/v1/products/${item.productId}`);      
-              names[item.productId] = product.name;
+              const response: any = await apiFetch(`/api/v1/products/${item.productId}`);
+              
+              // 응답 형식에 따라 처리
+              let productName = '알 수 없는 상품';
+              
+              if (response) {
+                // 직접 Product 객체인 경우
+                if ('name' in response && typeof response.name === 'string') {
+                  productName = response.name;
+                }
+                // RsData 형식인 경우
+                else if (isRsDataFormat(response) && response.data && 'name' in response.data) {
+                  productName = response.data.name;
+                }
+              }
+              
+              names[item.productId] = productName;
             } catch (err) {
               console.error(`상품 ID ${item.productId}의 이름을 가져오지 못했습니다:`, err);
               names[item.productId] = '알 수 없는 상품'; // 에러 발생 시 대체 텍스트
@@ -71,6 +109,24 @@ export default function OrderHistory() {
     setOrderItems([]);
   };
 
+  // 날짜 포맷팅 함수
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return '정보 없음';
+    
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
   // 로딩 중일 때
   if (isLoading) {
     return (
@@ -107,14 +163,15 @@ export default function OrderHistory() {
             {orders.map(order => (
               <div 
                 key={order.id} 
-                className="border border-gray-200 rounded-md p-6 bg-gray-50 cursor-pointer hover:bg-gray-100"
+                className="border border-gray-200 rounded-md p-6 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
                 onClick={() => handleOrderClick(order.id ?? 0)}
               >
                 <div className="flex justify-between items-center">
                   <div>
                     <h3 className="text-xl font-semibold text-gray-700">주문 번호: #{order.id ?? 0}</h3>
-                    <p className="text-gray-600">주문일: {order.createDate ?? '정보 없음'}</p>
+                    <p className="text-gray-600">주문일: {formatDate(order.createDate)}</p>
                     <p className="text-sm text-gray-500">결제방법: {order.paymentMethod ?? '정보 없음'}</p>
+                    <p className="text-sm text-gray-500">결제상태: {order.paymentStatus === 'COMPLETED' ? '완료' : '처리중'}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-lg font-bold text-gray-800">{(order.totalPrice ?? 0).toLocaleString()}원</p>
@@ -155,8 +212,13 @@ export default function OrderHistory() {
                   <div key={item.id} className="border-b border-gray-200 pb-4">
                     <div className="flex justify-between items-center">
                       <div>
-                        <Link href={`/products/detail/${item.productId}`} className="block cursor-pointer">
-                          <p className="font-medium text-lg text-bold text-gray-700">상품명: {productNames[item.productId] || '로딩 중...'}</p>
+                        <Link 
+                          href={`/products/detail/${item.productId}`} 
+                          className="block cursor-pointer hover:text-blue-600 transition-colors"
+                        >
+                          <p className="font-medium text-lg text-bold text-gray-700">
+                            상품명: {productNames[item.productId] || '로딩 중...'}
+                          </p>
                         </Link>
                         <p className="text-sm text-gray-600">수량: {item.quantity}개</p>
                         <p className="text-sm text-gray-600">단가: {item.unitPrice?.toLocaleString()}원</p>
@@ -167,6 +229,14 @@ export default function OrderHistory() {
                     </div>
                   </div>
                 ))}
+                <div className="pt-4 border-t border-gray-300">
+                  <div className="flex justify-between items-center">
+                    <p className="text-lg font-bold text-gray-700">총 합계</p>
+                    <p className="text-lg font-bold text-gray-900">
+                      {orderItems.reduce((sum, item) => sum + (item.totalPrice || 0), 0).toLocaleString()}원
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
           </div>
