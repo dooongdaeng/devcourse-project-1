@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, ChangeEvent, useRef, useEffect } from 'react';
+import { useState, ChangeEvent, useRef, useEffect, useMemo } from 'react';
 import { useProductItem, useProduct, ProductsProvider, useProductImage, useProductImageItem } from '@/context/ProductsContext';
 import type { components } from '@/lib/backend/apiV1/schema';
 
@@ -46,31 +46,24 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
   const { productImages, addProductImage } = useProductImage(productId);
   const { modifyProduct } = useProductItem(productId);
 
-  const initialProductFormState: ProductFormState = {
+  // 컴포넌트 외부나 useMemo로 초기 상태 정의
+  const initialProductFormState = useMemo(() => ({
     name: '',
     description: '',
     price: '',
     stock: '',
-    productImages: [{ url: '', isNew: true, toDelete: false }] // 초기값으로 새 이미지 하나
-  };
+    productImages: [{ url: '', isNew: true, toDelete: false }] as ProductImage[]
+  }), []);
 
-  const [formState, setFormState] = useState<ProductFormState>(
+  const [formState, setFormState] = useState<ProductFormState>(() =>
     editingProduct
       ? {
-          name: editingProduct.name,
-          description: editingProduct.description,
-          price: editingProduct.price.toString(),
-          stock: editingProduct.stock.toString(),
-          // 기존 상품의 이미지들을 ProductImage 형태로 변환
-          // editingProduct.productImages가 있다면 사용, 없다면 imageUrl 사용
-          productImages: productImages 
-            ? productImages.map((img: ProductImageDto) => ({
-                id: img.id,
-                url: img.url,
-                isNew: false,
-                toDelete: false
-              }))
-            : [{ url: editingProduct.imageUrl, isNew: false, toDelete: false }]
+          name: editingProduct.name || '',
+          description: editingProduct.description || '',
+          price: editingProduct.price.toString() || '',
+          stock: editingProduct.stock.toString() || '',
+          // 편집 모드일 때는 빈 배열로 시작하고, useEffect에서 이미지 로드
+          productImages: []
         }
       : initialProductFormState
   );
@@ -80,17 +73,37 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
   // 편집 모드에서 productImages가 로드되면 formState 업데이트
   useEffect(() => {
     if (editingProduct && productImages) {
+      const mappedImages = productImages.map((img: ProductImageDto) => ({
+        id: img.id,
+        url: img.url,
+        isNew: false,
+        toDelete: false
+      }));
+
+      // 이미지가 없으면 빈 이미지 필드 하나 추가
+      const finalImages = mappedImages.length > 0 
+        ? mappedImages 
+        : [{ url: editingProduct.imageUrl || '', isNew: false, toDelete: false }];
+
       setFormState(prev => ({
         ...prev,
-        productImages: productImages.map((img: ProductImageDto) => ({
-          id: img.id,
-          url: img.url,
-          isNew: false,
-          toDelete: false
-        }))
+        productImages: finalImages
       }));
     }
   }, [editingProduct, productImages]);
+
+  // 새 상품 추가 모드에서 폼이 초기화될 때
+  useEffect(() => {
+    if (!editingProduct) {
+      setFormState({
+        name: '',
+        description: '',
+        price: '',
+        stock: '',
+        productImages: [{ url: '', isNew: true, toDelete: false }]
+      });
+    }
+  }, [editingProduct]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -167,8 +180,8 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
     // 이미지 처리 로직
     const imagesToAdd = formState.productImages.filter(img => img.isNew && !img.toDelete && img.url.trim() !== '');
     const imagesToDelete = formState.productImages.filter(img => img.id && img.toDelete);
-    const imagesToUpdate = formState.productImages.filter(img => !img.isNew && !img.toDelete && img.id);
 
+    // 유효성 검사
     if (name.length < 2 || name.length > 100) {
       alert("상품명은 2자 이상 100자 이하로 입력해주세요.");
       nameInputRef.current?.focus();
@@ -218,19 +231,20 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
           if(products == null) return;
           const updatedProduct = res.data;
           setProducts(products.map((product) => product.id === updatedProduct.id ? updatedProduct : product));
+          
+          imagesToAdd.forEach((img) => {
+            addProductImage(img.url, productId);
+          });
+
+          imagesToDelete.forEach((img) => {
+            if(img.id !== undefined) {
+              DeleteProductImage(productId, img.id);
+            }
+          });
+
+          onSubmit();
         }
       });
-
-      imagesToAdd.forEach((img) => {
-        addProductImage(img.url, productId);
-      });
-
-      imagesToDelete.forEach((img) => {
-        if(img.id !== undefined) {
-          DeleteProductImage(productId, img.id);
-        }
-      })
-
     } else {
       // 새 상품 추가 시
       addProduct({
@@ -241,8 +255,9 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
           setProducts([...products, res.data]);
 
           const newProductId = res.data.id;
+          // 첫 번째 이미지는 이미 imageUrl로 저장되므로, 나머지 이미지들만 추가
           imagesToAdd.slice(1).forEach((img) => {
-            addProductImage(img.url, newProductId)
+            addProductImage(img.url, newProductId);
             console.log(`Adding image ${img.url} to product ${newProductId}`);
           });
           
@@ -250,9 +265,18 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
         }
       });
     }
-
-    onSubmit();
   };
+
+  // 로딩 상태 표시
+  if (editingProduct && formState.productImages.length === 0) {
+    return (
+      <div className="mt-6 mb-6 p-6 bg-gray-50 rounded-md border border-gray-200">
+        <div className="flex justify-center items-center h-32">
+          <div className="text-gray-500">이미지 정보를 불러오는 중...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -264,7 +288,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">상품명</label>
             <input type="text" name="name" id="name" ref={nameInputRef} autoFocus
-              defaultValue={formState.name}
+              value={formState.name || ''}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md text-gray-900 bg-white"
             />
@@ -272,7 +296,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
           <div>
             <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">가격 (원)</label>
             <input type="number" name="price" id="price" ref={priceInputRef}
-              defaultValue={formState.price}
+              value={formState.price || ''}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md text-gray-900 bg-white"
             />
@@ -280,7 +304,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
           <div>
             <label htmlFor="stock" className="block text-sm font-medium text-gray-700 mb-1">재고</label>
             <input type="number" name="stock" id="stock" ref={stockInputRef}
-              defaultValue={formState.stock}
+              value={formState.stock || ''}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md text-gray-900 bg-white"
             />
@@ -302,7 +326,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
                   <input 
                     type="text" 
                     placeholder="https://example.com/image.png"
-                    defaultValue={image.url}
+                    value={image.url || ''}
                     onChange={(e) => handleImageUrlChange(index, e.target.value)}
                     disabled={image.toDelete}
                     className={`flex-1 p-2 border border-gray-300 rounded-md text-gray-900 bg-white ${
@@ -326,7 +350,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
                     </button>
                   ) : (
                     <>
-                      {/* 첫 번째 이미지(대표 이미지)가 아니거나, 활성 이미지가 2개 이상일 때만 삭제 버튼 표시 */}
+                      {/* 첫 번째 이미지(대표 이미지)가 아닐 때와 활성 이미지가 2개 이상일 때만 삭제 버튼 표시 */}
                       {(index !== 0 && getActiveImageCount() > 1) && (
                         <button 
                           type="button" 
@@ -352,7 +376,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
             <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">상품 설명</label>
             <textarea
               name="description" id="description" rows={3} ref={descriptionInputRef}
-              value={formState.description}
+              value={formState.description || ''}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md text-gray-900 bg-white"
             />
