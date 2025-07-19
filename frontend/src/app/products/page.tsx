@@ -30,7 +30,7 @@ function ProductCard({ product }: { product: Product }) {
     const userId = getUserId();
     const router = useRouter();
   //const { favoriteProducts, toggleFavorite } = useProducts();
-    const wishListContext = userId ? useWishListContext() : null;
+    const wishListContext = useWishListContext();
 
 
     const handleHeartClick = async () => {
@@ -39,12 +39,11 @@ function ProductCard({ product }: { product: Product }) {
         router.push('/products');
         return;
       }
-      if(wishListContext){
-        try {
-                await wishListContext.toggleWishList(product.id);
-        } catch (error) {
-            console.error('찜 토글 실패:', error);
-        }
+      
+      try {
+        await wishListContext.toggleWishList(product.id);
+      } catch (error) {
+        console.error('찜 토글 실패:', error);
       }
 
     };
