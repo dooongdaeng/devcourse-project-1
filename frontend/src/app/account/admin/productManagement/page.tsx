@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, ChangeEvent, useRef } from 'react';
+import { useState, ChangeEvent, useRef, useEffect } from 'react';
 import { useProductItem, useProduct, ProductsProvider, useProductImage, useProductImageItem } from '@/context/ProductsContext';
 import type { components } from '@/lib/backend/apiV1/schema';
 
@@ -41,8 +41,10 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
   const priceInputRef = useRef<HTMLInputElement>(null);
   const stockInputRef = useRef<HTMLInputElement>(null);
   const descriptionInputRef = useRef<HTMLTextAreaElement>(null);
-
-  const { productImages, addProductImage } = useProductImage((editingProduct != null) ? editingProduct.id : -1);
+  
+  const productId = editingProduct?.id || 0;
+  const { productImages, addProductImage } = useProductImage(productId);
+  const { modifyProduct } = useProductItem(productId);
 
   const initialProductFormState: ProductFormState = {
     name: '',
@@ -74,7 +76,21 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
   );
 
   const { addProduct, products, setProducts } = useProduct();
-  const { modifyProduct } = useProductItem((editingProduct != null) ? editingProduct.id : 1);
+
+  // 편집 모드에서 productImages가 로드되면 formState 업데이트
+  useEffect(() => {
+    if (editingProduct && productImages) {
+      setFormState(prev => ({
+        ...prev,
+        productImages: productImages.map((img: ProductImageDto) => ({
+          id: img.id,
+          url: img.url,
+          isNew: false,
+          toDelete: false
+        }))
+      }));
+    }
+  }, [editingProduct, productImages]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -165,7 +181,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
       return;
     }
 
-    if (isNaN(price) ) {
+    if (isNaN(price)) {
       alert("상품 가격은 숫자로만 입력해주세요.");
       priceInputRef.current?.focus();
       return;
@@ -177,7 +193,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
       return;
     }
 
-    if (isNaN(stock) ) {
+    if (isNaN(stock)) {
       alert("상품 재고는 숫자로만 입력해주세요.");
       stockInputRef.current?.focus();
       return;
@@ -205,31 +221,34 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
         }
       });
 
-      imagesToAdd.map((img) => {
-        const url = img.url;
-        addProductImage(url);
-      })
+      imagesToAdd.forEach((img) => {
+        addProductImage(img.url, productId);
+      });
 
-      imagesToDelete.map((img) => {
-        DeleteProductImage(editingProduct.id, (img.id !== undefined) ? img.id : -1);
+      imagesToDelete.forEach((img) => {
+        if(img.id !== undefined) {
+          DeleteProductImage(productId, img.id);
+        }
       })
 
     } else {
       // 새 상품 추가 시
       addProduct({
-        name, 
-        price, 
-        description, 
-        stock, 
-        imageUrl, 
+        name, price, description, stock, imageUrl, 
         onSuccess: (res) => {
           alert(res.msg);
           if(products == null) return;
           setProducts([...products, res.data]);
+
+          const newProductId = res.data.id;
+          imagesToAdd.slice(1).forEach((img) => {
+            addProductImage(img.url, newProductId)
+            console.log(`Adding image ${img.url} to product ${newProductId}`);
+          });
+          
+          onSubmit();
         }
       });
-
-      imagesToAdd.slice(1).map((img) => addProductImage(img.url))
     }
 
     onSubmit();
@@ -245,7 +264,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">상품명</label>
             <input type="text" name="name" id="name" ref={nameInputRef} autoFocus
-              value={formState.name}
+              defaultValue={formState.name}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md text-gray-900 bg-white"
             />
@@ -253,7 +272,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
           <div>
             <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">가격 (원)</label>
             <input type="number" name="price" id="price" ref={priceInputRef}
-              value={formState.price}
+              defaultValue={formState.price}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md text-gray-900 bg-white"
             />
@@ -261,7 +280,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
           <div>
             <label htmlFor="stock" className="block text-sm font-medium text-gray-700 mb-1">재고</label>
             <input type="number" name="stock" id="stock" ref={stockInputRef}
-              value={formState.stock}
+              defaultValue={formState.stock}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md text-gray-900 bg-white"
             />
@@ -283,7 +302,7 @@ function ProductForm({ editingProduct, onCancel, onSubmit }: ProductFormProps) {
                   <input 
                     type="text" 
                     placeholder="https://example.com/image.png"
-                    value={image.url}
+                    defaultValue={image.url}
                     onChange={(e) => handleImageUrlChange(index, e.target.value)}
                     disabled={image.toDelete}
                     className={`flex-1 p-2 border border-gray-300 rounded-md text-gray-900 bg-white ${
