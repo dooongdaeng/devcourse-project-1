@@ -7,6 +7,7 @@ import { useProduct, ProductsProvider } from '@/context/ProductsContext';
 import { components } from '@/lib/backend/apiV1/schema';
 import { useCreateOrder, CreateOrderRequest } from '@/context/OrderContext';
 import Link from 'next/link';
+import { useUser } from '@/context/UserContext';
 
 export default function OrderWrapper() {
   return (
@@ -340,9 +341,8 @@ function CheckOut({cartState} : {cartState: ReturnType<typeof useCart>}) {
   const { cartItems, setCartItems } = cartState;
   const router = useRouter();
   const [showPaymentPopup, setShowPaymentPopup] = useState(false);
-  
-  // 커스텀 훅 사용
   const { processCompleteOrder, isLoading, error } = useCreateOrder();
+  const { user } = useUser();
 
   // Calculate total price dynamically
   const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -367,8 +367,13 @@ function CheckOut({cartState} : {cartState: ReturnType<typeof useCart>}) {
   // 결제 정보 확인 후 실제 결제 처리
   const handlePaymentConfirm = async (paymentInfo: PaymentInfo) => {
     try {
-      // 사용자 ID 가져오기 (실제 구현에 맞게 수정 필요)
-      const userId = parseInt(sessionStorage.getItem('userId') || '1');
+      // 사용자 ID를 Context에서 가져오기
+      const userId = user?.id;
+      if (!userId) {
+        alert('로그인 정보가 올바르지 않습니다. 다시 로그인 해주세요.');
+        router.push('/login');
+        return;
+      }
       
       // 주문 데이터 생성 (주소와 결제 방법 포함)
       const orderData: CreateOrderRequest = {

@@ -31,7 +31,7 @@ const isRsDataFormat = (res: any): res is RsData<any> => {
 
 export default function OrderHistory() {
   const { orderHistory } = useProducts();
-  const { getMyOrders, getOrderItems, orders, isLoading, error } = useCreateOrder();
+  const { getMyOrders, getOrderItems, updateMyOrder, deleteMyOrder, orders, isLoading, error } = useCreateOrder();
   
   // 팝업 상태
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -39,6 +39,9 @@ export default function OrderHistory() {
   const [orderItems, setOrderItems] = useState<any[]>([]);
   const [productNames, setProductNames] = useState<{ [key: number]: string }>({});
   const [itemsLoading, setItemsLoading] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editOrder, setEditOrder] = useState<any>(null);
+  const [editForm, setEditForm] = useState({ address: '', paymentMethod: 'CARD' });
 
   // 컴포넌트 마운트 시 주문 목록 조회
   useEffect(() => {
@@ -107,6 +110,46 @@ export default function OrderHistory() {
     setIsPopupOpen(false);
     setSelectedOrderId(null);
     setOrderItems([]);
+  };
+
+  // 수정 버튼 클릭 시
+  const handleEditClick = (order: any) => {
+    setEditOrder(order);
+    setEditForm({ address: order.address, paymentMethod: order.paymentMethod });
+    setEditModalOpen(true);
+  };
+
+  // 수정 모달에서 저장
+  const handleEditSave = async () => {
+    if (!editOrder) return;
+    try {
+      await updateMyOrder(editOrder.id, {
+        orderCount: editOrder.orderCount,
+        totalPrice: editOrder.totalPrice,
+        paymentStatus: editOrder.paymentStatus,
+        address: editForm.address,
+        paymentMethod: editForm.paymentMethod,
+      });
+      alert('주문 정보가 수정되었습니다.');
+      setEditModalOpen(false);
+      setEditOrder(null);
+      await getMyOrders();
+    } catch (err) {
+      alert('주문 정보 수정에 실패했습니다.');
+    }
+  };
+
+  // 삭제(취소) 버튼 클릭 시
+  const handleDeleteClick = async (orderId?: number) => {
+    if (!orderId) return;
+    if (!window.confirm('정말로 이 주문을 취소하시겠습니까?')) return;
+    try {
+      await deleteMyOrder(orderId);
+      alert('주문이 취소되었습니다.');
+      await getMyOrders();
+    } catch (err) {
+      alert('주문 취소에 실패했습니다.');
+    }
   };
 
   // 날짜 포맷팅 함수
@@ -178,6 +221,22 @@ export default function OrderHistory() {
                     <p className="text-sm text-gray-500">{order.orderCount ?? 0}개 상품</p>
                   </div>
                 </div>
+                <div className="mt-4 flex space-x-2">
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); handleEditClick(order); }}
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm cursor-pointer"
+                    disabled={!order.id}
+                  >
+                    주문 수정
+                  </button>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); handleDeleteClick(order.id); }}
+                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm cursor-pointer"
+                    disabled={!order.id}
+                  >
+                    주문 취소
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -239,6 +298,49 @@ export default function OrderHistory() {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* 수정 모달 */}
+      {editModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-xl font-bold mb-4">주문 정보 수정</h3>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">배송지</label>
+              <input
+                type="text"
+                value={editForm.address}
+                onChange={e => setEditForm({ ...editForm, address: e.target.value })}
+                className="w-full p-2 border border-gray-300 rounded"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">결제 방법</label>
+              <select
+                value={editForm.paymentMethod}
+                onChange={e => setEditForm({ ...editForm, paymentMethod: e.target.value })}
+                className="w-full p-2 border border-gray-300 rounded"
+              >
+                <option value="CARD">카드</option>
+                <option value="TRANSFER">계좌이체</option>
+              </select>
+            </div>
+            <div className="flex space-x-2 pt-4">
+              <button
+                onClick={handleEditSave}
+                className="flex-1 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              >
+                저장
+              </button>
+              <button
+                onClick={() => setEditModalOpen(false)}
+                className="flex-1 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+              >
+                취소
+              </button>
+            </div>
           </div>
         </div>
       )}
