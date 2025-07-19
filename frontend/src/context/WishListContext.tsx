@@ -111,8 +111,6 @@ export const useWishList = (userId: number | null) => {
         } catch (err:any) {
             setError(err?.msg || '찜 변경에 실패했습니다.');
             throw err;
-        } finally {
-            setIsLoading(false);
         }
     }, [userId, fetchWishLists]);
 
@@ -120,18 +118,13 @@ export const useWishList = (userId: number | null) => {
         if (!userId || userId === 0) {
             throw new Error('로그인이 필요합니다.');
         }
-        
+      
         try {
             setError(null);
 
             const res = await apiFetch(`/api/v1/wish-lists/${productId}`, {
                 method: 'DELETE'
             });
-
-            if (res?.error) {
-                throw new Error(res.error.msg || '위시리스트 삭제 실패');
-            }
-
             // 로컬 상태에서 삭제
             setWishLists(prev => prev.filter(item => item.productId !== productId));
             return res?.data || null;
