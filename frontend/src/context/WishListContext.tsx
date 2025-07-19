@@ -12,7 +12,6 @@ type WishListContextType = {
     error: string | null;
     toggleWishList: (productId: number) => Promise<any>;
     deleteWishList: (productId: number) => Promise<any>;
-    clearWishList: () => Promise<any>;
     refetch: () => Promise<void>;
     isInWishList: (productId: number) => boolean;
 };
@@ -29,7 +28,6 @@ export function WishListProvider({ children, userId }: {
         error,
         toggleWishList,
         deleteWishList,
-        clearWishList,
         refetch
     } = useWishList(userId);
 
@@ -45,7 +43,6 @@ export function WishListProvider({ children, userId }: {
             error,
             toggleWishList,
             deleteWishList,
-            clearWishList,
             refetch,
             isInWishList
         }}>
@@ -75,22 +72,16 @@ export const useWishList = (userId: number | null) => {
 
         try {
             setIsLoading(true);
-            const response = await apiFetch(`/api/v1/wish-lists`);
+            setError(null);
 
-            if (response?.data) {
-                setWishLists(response.data);
-            } else {
-                setWishLists([]);
-            }
+            const response = await apiFetch(`/api/v1/wish-lists`);
+            setWishLists(response?.data || []);
         } catch (err:any) {
             console.error('Failed to fetch wish lists:', err);
-            if (err?.resultCode && err?.msg) {
-                setError(`${err.resultCode}: ${err.msg}`);
-            } else if (err instanceof Error) {
-                setError(err.message);
-            } else {
-                setError('Unknown error');
-            }
+            const errorMessage = err?.resultCode && err?.msg
+                ? `${err.resultCode}: ${err.msg}`
+                : err instanceof Error ? err.message : '찜 목록을 불러오는데 실패했습니다.';
+            setError(errorMessage);
             setWishLists([]);
         } finally {
             setIsLoading(false);
@@ -107,26 +98,18 @@ export const useWishList = (userId: number | null) => {
             throw new Error('로그인이 필요합니다.');
         }
 
-        setIsLoading(true);
-        setError(null);
-
         try {
+            setError(null);
+
             const res = await apiFetch('/api/v1/wish-lists/toggle', {
                 method: 'POST',
                 body: JSON.stringify({ productId })
             });
 
-            if (res?.resultCode && !res.resultCode.startsWith('2')) {
-                throw new Error(res.error.msg || '위시리스트 토글 실패');
-            }
-
             await fetchWishLists();
             return res?.data || null;
         } catch (err:any) {
-            const errorMessage = err?.resultCode && err?.msg
-                ? `${err.resultCode}: ${err.msg}`
-                : err instanceof Error ? err.message : 'Unknown error';
-            setError(errorMessage);
+            setError(err?.msg || '찜 변경에 실패했습니다.');
             throw err;
         } finally {
             setIsLoading(false);
@@ -138,10 +121,9 @@ export const useWishList = (userId: number | null) => {
             throw new Error('로그인이 필요합니다.');
         }
         
-        setIsLoading(true);
-        setError(null);
-
         try {
+            setError(null);
+
             const res = await apiFetch(`/api/v1/wish-lists/${productId}`, {
                 method: 'DELETE'
             });
@@ -154,47 +136,11 @@ export const useWishList = (userId: number | null) => {
             setWishLists(prev => prev.filter(item => item.productId !== productId));
             return res?.data || null;
         } catch (err :any) {
-            const errorMessage = err?.resultCode && err?.msg
-                ? `${err.resultCode}: ${err.msg}`
-                : err instanceof Error ? err.message : 'Unknown error';
-            setError(errorMessage);
+            setError(err?.msg || '찜 삭제에 실패했습니다.');
+            await fetchWishLists();
             throw err;
-        } finally {
-            setIsLoading(false);
         }
-
-    }, []);
-
-    // 전체 삭제
-    const clearWishList = useCallback(async () => {
-        if (!userId || userId ===0) {
-            throw new Error('로그인이 필요합니다.');
-        }
-
-        setIsLoading(true);
-        setError(null);
-
-        try{
-            const res = await apiFetch(`/api/v1/wish-lists/clear`, {
-                method: 'DELETE'
-            });
-
-            if(res?.error){
-                throw new Error(res?.error.msg);
-            }
-
-            setWishLists([]);
-            return res?.data || null;
-        } catch (err: any) {
-            const errorMessage = err?.resultCode && err?.msg
-                ? `${err.resultCode}: ${err.msg}`
-                : err instanceof Error ? err.message : 'Unknown error';
-            setError(errorMessage);
-            throw err;
-        } finally {
-            setIsLoading(false);
-        }
-    }, [userId]);
+    }, [userId, fetchWishLists]);
 
     return {
         wishLists,
@@ -203,7 +149,6 @@ export const useWishList = (userId: number | null) => {
         toggleWishList,
         fetchWishLists,
         deleteWishList,
-        clearWishList,
         refetch: fetchWishLists
     };
 };

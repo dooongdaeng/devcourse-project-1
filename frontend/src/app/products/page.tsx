@@ -29,7 +29,6 @@ type Product = components['schemas']['ProductWithImageUrlDto'];
 function ProductCard({ product }: { product: Product }) {
     const userId = getUserId();
     const router = useRouter();
-  //const { favoriteProducts, toggleFavorite } = useProducts();
     const wishListContext = useWishListContext();
 
 
