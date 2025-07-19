@@ -33,10 +33,15 @@ function ProductDetail() {
 
   const { product } = useProductItem(id);
   // const { favoriteProducts, toggleFavorite } = useProducts(); // For favorite button
-  const wishListContext = userId ? useWishListContext() : null;
+  const wishListContext = useWishListContext();
 
   const handleHeartClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
+
+    if(!product) {
+      alert("상품을 불러올 수 없습니다.")
+      return;
+    }
 
     if(!userId) {
         alert("로그인 후 찜 기능을 이용할 수 있습니다.");
@@ -44,14 +49,11 @@ function ProductDetail() {
         return;
     }
 
-    if(wishListContext){
-      try {
-        await wishListContext.toggleWishList(product.id);
-      } catch (error) {
-        console.error('찜 토글 실패:', error);
-      }
+    try {
+      await wishListContext.toggleWishList(product.id);
+    } catch (error) {
+      console.error('찜 토글 실패:', error);
     }
-
   };
 
   if (!product) {
