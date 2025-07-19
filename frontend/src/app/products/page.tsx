@@ -11,17 +11,17 @@ import {useRouter} from "next/navigation";
 export default function ProductsWrapper() {
     const userId =getUserId();
 
-  return (
+    return (
         <ProductsProvider>
             {userId ? (
                 <WishListProvider userId={userId}>
-        <Products />
+                    <Products />
                 </WishListProvider>
             ) : (
                 <Products /> // 위시리스트 기능 없이 상품만 보여줌
             )}
         </ProductsProvider>
-  );
+    );
 }
 
 type Product = components['schemas']['ProductWithImageUrlDto'];
@@ -34,17 +34,17 @@ function ProductCard({ product }: { product: Product }) {
 
 
     const handleHeartClick = async () => {
-      if(!userId){
-        alert("로그인 후 찜 기능을 이용할 수 있습니다.");
-        router.push('/products');
-        return;
-      }
-      
-      try {
-        await wishListContext.toggleWishList(product.id);
-      } catch (error) {
-        console.error('찜 토글 실패:', error);
-      }
+        if(!userId){
+          alert("로그인 후 찜 기능을 이용할 수 있습니다.");
+          router.push('/products');
+          return;
+        }
+        
+        try {
+          await wishListContext.toggleWishList(product.id);
+        } catch (error) {
+          console.error('찜 토글 실패:', error);
+        }
 
     };
   return (
@@ -65,7 +65,6 @@ function ProductCard({ product }: { product: Product }) {
           {product.name}
         </h2>
       </div>
-      
     </Link>
   );
 }
