@@ -8,12 +8,15 @@ import { components } from '@/lib/backend/apiV1/schema';
 import { useCreateOrder, CreateOrderRequest } from '@/context/OrderContext';
 import Link from 'next/link';
 import { useUser } from '@/context/UserContext';
+import {useWishListContext, WishListProvider} from "@/context/WishListContext";
 
 export default function OrderWrapper() {
   return (
-    <ProductsProvider>
-      <Order />
-    </ProductsProvider>
+    <WishListProvider userId={1}>
+      <ProductsProvider>
+        <Order />
+      </ProductsProvider>
+    </WishListProvider>
   );
 }
 
@@ -129,18 +132,21 @@ function ProductItem({cartState, product} : {
 
 function WishList({cartState} : {cartState: ReturnType<typeof useCart>}) {
   const { products } = useProduct();
-
-  const { favoriteProducts } = useProducts(); // 전역 상품 목록과 찜 목록 가져오기
+  const {wishLists, isLoading} = useWishListContext();
 
   if(products == null) return <div>로딩 중...</div>
-  const favoritedProductsList = products?.filter(product => favoriteProducts[product.id]);
+  const favoritedProductsList = wishLists
+      .map(wishItem => products.find(product => product.id === wishItem.productId))
+      .filter(Boolean) as Product[];
 
   return (
     <>
       <div className="mt-8 w-full flex flex-col items-start">
         <h5 className="text-2xl font-bold mb-4">찜목록</h5>
         <ul className="w-full">
-          {favoritedProductsList.length === 0 ? (
+          { isLoading ? (
+            <p className="text-grey-500">로딩 중...</p>
+          ): favoritedProductsList.length === 0 ? (
             <p className="text-gray-500">찜 목록이 비어있습니다.</p>
           ) : (
             favoritedProductsList.map(item => (
