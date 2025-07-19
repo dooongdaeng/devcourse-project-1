@@ -9,10 +9,28 @@ import { useCreateOrder, CreateOrderRequest } from '@/context/OrderContext';
 import Link from 'next/link';
 import { useUser } from '@/context/UserContext';
 import {useWishListContext, WishListProvider} from "@/context/WishListContext";
+import {getUserId} from "@/util/auth";
 
 export default function OrderWrapper() {
+  const router = useRouter();
+  const userId = getUserId();
+
+  useEffect(() => {
+    if (!userId) {
+      router.replace('/order/guest')
+    }
+  }, [userId, router]);
+
+  if(!userId) {
+    return (
+        <div className="flex min-h-screen flex-col items-center justify-center p-24">
+          <div>로딩 중..</div>
+        </div>
+    );
+  }
+
   return (
-    <WishListProvider userId={1}>
+    <WishListProvider userId={userId}>
       <ProductsProvider>
         <Order />
       </ProductsProvider>
