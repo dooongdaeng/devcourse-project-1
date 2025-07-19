@@ -21,14 +21,14 @@ export const parseJwtToken = (token: string): any | null => {
 export const getUserId = (): number | null => {
     if (typeof window === 'undefined') return null;
 
-    // JWT 토큰에서 사용자 ID 추출
+    // 1. JWT 토큰에서 사용자 ID 추출 (현재는 HttpOnly라 접근 불가)
     const accessToken = getCookie('accessToken');
     if (accessToken) {
         const payload = parseJwtToken(accessToken);
         if (payload?.id) return payload.id;
     }
 
-    // 세션 스토리지 (임시 fallback - 나중에 제거 예정)
+    /// 2. sessionStorage에서 사용자 정보 확인 (현재 주 사용 방식)
     const currentUser = sessionStorage.getItem('currentUser');
     if (currentUser) {
         try {
