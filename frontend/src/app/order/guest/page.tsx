@@ -156,7 +156,6 @@ function GuestCheckOut({cartState} : {cartState: ReturnType<typeof useCart>}) {
             return;
         }
 
-        alert('결제 기능은 로그인 후 이용하실 수 있습니다.');
         router.push('/login');
     };
 
@@ -182,7 +181,7 @@ function GuestCheckOut({cartState} : {cartState: ReturnType<typeof useCart>}) {
                     로그인하고 결제하기
                 </button>
                 <button
-                    onClick={() => router.push('/register')}
+                    onClick={() => router.push('/signup')}
                     className="w-full py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 cursor-pointer"
                 >
                     회원가입하기
@@ -210,20 +209,6 @@ export function GuestOrder() {
                                 <p className="text-gray-500 mb-4">
                                     찜 목록 기능은 로그인 후 이용하실 수 있습니다.
                                 </p>
-                                <div className="space-y-2">
-                                    <button
-                                        onClick={() => window.location.href = '/login'}
-                                        className="px-4 py-2 bg-blue-800 text-white rounded hover:bg-blue-950 mr-2"
-                                    >
-                                        로그인
-                                    </button>
-                                    <button
-                                        onClick={() => window.location.href = '/signup'}
-                                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
-                                    >
-                                        회원가입
-                                    </button>
-                                </div>
                             </div>
                         </div>
                     </div>
