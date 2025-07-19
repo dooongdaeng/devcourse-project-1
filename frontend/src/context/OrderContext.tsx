@@ -62,6 +62,25 @@ export interface OrderItemDisplayData {
   totalPrice: number;
 }
 
+// RsData 타입 정의 (client에서 가져올 수 없으므로 여기서 정의)
+interface RsData<T = unknown> {
+    resultCode: string;
+    msg: string;
+    data?: T;
+    error?: {
+        msg: string;
+    };
+}
+
+// 타입 가드 함수들
+const isRsDataFormat = (res: any): res is RsData<any> => {
+    return res && typeof res === 'object' && 'resultCode' in res && 'msg' in res;
+};
+
+const hasError = (res: any): res is { error: { msg: string } } => {
+    return res && typeof res === 'object' && 'error' in res && res.error && 'msg' in res.error;
+};
+
 // 데이터 변환 함수들
 const transformOrderToDisplayData = (
   order: OrderDto, 
@@ -143,13 +162,18 @@ export const useCreateOrder = () => {
             method: 'POST',
             body: JSON.stringify(orderData)
         })
-        .then((res) => {
+        .then((res: any) => {
             setIsLoading(false);
-            if (res.error) {
+            if (hasError(res)) {
                 setError(res.error.msg);
                 throw new Error(res.error.msg);
             }
-            return res.data;
+            
+            // RsData 형식이면 data를 반환, 아니면 res 자체를 반환
+            if (isRsDataFormat(res)) {
+                return res.data;
+            }
+            return res;
         });
     };
 
@@ -158,12 +182,16 @@ export const useCreateOrder = () => {
             method: 'POST',
             body: JSON.stringify(orderItemData)
         })
-        .then((res) => {
-            if (res.error) {
+        .then((res: any) => {
+            if (hasError(res)) {
                 setError(res.error.msg);
                 throw new Error(res.error.msg);
             }
-            return res.data;
+            
+            if (isRsDataFormat(res)) {
+                return res.data;
+            }
+            return res;
         });
     };
 
@@ -176,13 +204,17 @@ export const useCreateOrder = () => {
             method: 'PUT',
             body: JSON.stringify(orderData)
         })
-        .then((res) => {
+        .then((res: any) => {
             setIsLoading(false);
-            if (res.error) {
+            if (hasError(res)) {
                 setError(res.error.msg);
                 throw new Error(res.error.msg);
             }
-            return res.data;
+            
+            if (isRsDataFormat(res)) {
+                return res.data;
+            }
+            return res;
         });
     };
 
@@ -193,13 +225,17 @@ export const useCreateOrder = () => {
         return apiFetch(`/api/v1/adm/orders/${orderId}`, {
             method: 'DELETE'
         })
-        .then((res) => {
+        .then((res: any) => {
             setIsLoading(false);
-            if (res.error) {
+            if (hasError(res)) {
                 setError(res.error.msg);
                 throw new Error(res.error.msg);
             }
-            return res.data;
+            
+            if (isRsDataFormat(res)) {
+                return res.data;
+            }
+            return res;
         });
     };
 
@@ -211,13 +247,17 @@ export const useCreateOrder = () => {
             method: 'PUT',
             body: JSON.stringify(orderItemData)
         })
-        .then((res) => {
+        .then((res: any) => {
             setIsLoading(false);
-            if (res.error) {
+            if (hasError(res)) {
                 setError(res.error.msg);
                 throw new Error(res.error.msg);
             }
-            return res.data;
+            
+            if (isRsDataFormat(res)) {
+                return res.data;
+            }
+            return res;
         });
     };
 
@@ -228,13 +268,17 @@ export const useCreateOrder = () => {
         return apiFetch(`/api/v1/adm/orderItems/${orderItemId}`, {
             method: 'DELETE'
         })
-        .then((res) => {
+        .then((res: any) => {
             setIsLoading(false);
-            if (res.error) {
+            if (hasError(res)) {
                 setError(res.error.msg);
                 throw new Error(res.error.msg);
             }
-            return res.data;
+            
+            if (isRsDataFormat(res)) {
+                return res.data;
+            }
+            return res;
         });
     };
 
@@ -245,16 +289,31 @@ export const useCreateOrder = () => {
         return apiFetch('/api/v1/adm/orders', {
             method: 'GET'
         })
-        .then((res) => {
+        .then((res: any) => {
             setIsLoading(false);
-            if (res.error) {
+            
+            // 배열이면 그대로 사용
+            if (Array.isArray(res)) {
+                setOrders(res);
+                return res;
+            }
+            
+            // 에러 체크
+            if (hasError(res)) {
                 setError(res.error.msg);
                 throw new Error(res.error.msg);
             }
             
-            const ordersData = Array.isArray(res) ? res : res.data || [];
-            setOrders(ordersData);
-            return ordersData;
+            // RsData 형식이면 data 필드 사용
+            if (isRsDataFormat(res) && res.data) {
+                const ordersData = Array.isArray(res.data) ? res.data : [];
+                setOrders(ordersData);
+                return ordersData;
+            }
+            
+            // 그 외의 경우 빈 배열 반환
+            setOrders([]);
+            return [];
         })
         .catch(err => {
             setIsLoading(false);
@@ -290,21 +349,32 @@ export const useCreateOrder = () => {
         return apiFetch('/api/v1/orders/my', {
             method: 'GET'
         })
-        .then((res) => {
+        .then((res: any) => {
             setIsLoading(false);
             console.log('apiFetch 응답:', res);
             
+            // 배열이면 그대로 사용
             if (Array.isArray(res)) {
                 setOrders(res);
                 return res;
             }
             
-            if (res.error) {
+            // 에러 체크
+            if (hasError(res)) {
                 setError(res.error.msg);
                 throw new Error(res.error.msg);
             }
-            setOrders(res.data || []);
-            return res.data;
+            
+            // RsData 형식이면 data 필드 사용
+            if (isRsDataFormat(res) && res.data) {
+                const ordersData = Array.isArray(res.data) ? res.data : [];
+                setOrders(ordersData);
+                return ordersData;
+            }
+            
+            // 그 외의 경우 빈 배열 반환
+            setOrders([]);
+            return [];
         })
         .catch(err => {
             setIsLoading(false);
@@ -324,21 +394,32 @@ export const useCreateOrder = () => {
         return apiFetch(`/api/v1/orderItems/order/${orderId}`, {
             method: 'GET'
         })
-        .then((res) => {
+        .then((res: any) => {
             setIsLoading(false);
             console.log('getOrderItems apiFetch 응답:', res);
             
+            // 배열이면 그대로 사용
             if (Array.isArray(res)) {
                 setOrderItems(res);
                 return res;
             }
             
-            if (res.error) {
+            // 에러 체크
+            if (hasError(res)) {
                 setError(res.error.msg);
                 throw new Error(res.error.msg);
             }
-            setOrderItems(res.data || []);
-            return res.data;
+            
+            // RsData 형식이면 data 필드 사용
+            if (isRsDataFormat(res) && res.data) {
+                const itemsData = Array.isArray(res.data) ? res.data : [];
+                setOrderItems(itemsData);
+                return itemsData;
+            }
+            
+            // 그 외의 경우 빈 배열 반환
+            setOrderItems([]);
+            return [];
         })
         .catch(err => {
             setIsLoading(false);
