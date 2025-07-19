@@ -4,30 +4,24 @@ import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { components } from "@/lib/backend/apiV1/schema";
 import { useProduct, ProductsProvider } from "@/context/ProductsContext";
 import Link from "next/link";
-<<<<<<< HEAD
 import {useWishListContext, WishListProvider} from "@/context/WishListContext";
-<<<<<<< HEAD
 import {getUserId} from "@/util/auth";
 import {useRouter} from "next/navigation";
-=======
-=======
->>>>>>> 6a19250 (feat: imageUrl 추가/삭제 기능)
->>>>>>> a4b0f67 (feat: imageUrl 추가/삭제 기능)
 
 export default function ProductsWrapper() {
     const userId =getUserId();
 
-    return (
+  return (
         <ProductsProvider>
             {userId ? (
                 <WishListProvider userId={userId}>
-                    <Products />
+        <Products />
                 </WishListProvider>
             ) : (
                 <Products /> // 위시리스트 기능 없이 상품만 보여줌
             )}
         </ProductsProvider>
-    );
+  );
 }
 
 type Product = components['schemas']['ProductWithImageUrlDto'];
@@ -40,18 +34,18 @@ function ProductCard({ product }: { product: Product }) {
 
 
     const handleHeartClick = async () => {
-        if(!userId){
-            alert("로그인 후 찜 기능을 이용할 수 있습니다.");
-            router.push('/products');
-            return;
-        }
-        if(wishListContext){
-            try {
+      if(!userId){
+        alert("로그인 후 찜 기능을 이용할 수 있습니다.");
+        router.push('/products');
+        return;
+      }
+      if(wishListContext){
+        try {
                 await wishListContext.toggleWishList(product.id);
-            } catch (error) {
-                console.error('찜 토글 실패:', error);
-            }
+        } catch (error) {
+            console.error('찜 토글 실패:', error);
         }
+      }
 
     };
   return (
@@ -65,23 +59,15 @@ function ProductCard({ product }: { product: Product }) {
           e.preventDefault();
           e.stopPropagation();
           handleHeartClick();
-        }} className="absolute top-46 right-7 p-1 cursor-pointer" disabled={isLoading}>
-            {isInWishList(product.id) ? <FaHeart className="text-red-500 hover:text-red-400" /> : <FaRegHeart className="text-black hover:text-gray-500" />}
+        }} className="absolute top-46 right-7 p-1 cursor-pointer" disabled={wishListContext?.isLoading || false}>
+            {userId && wishListContext?.isInWishList(product.id) ? <FaHeart className="text-red-500 hover:text-red-400" /> : <FaRegHeart className="text-black hover:text-gray-500" />}
         </button>
         <h2 className="mb-3 text-xl font-semibold">
           {product.name}
         </h2>
-<<<<<<< HEAD
-      </Link>
-        <button onClick={handleHeartClick} className="cursor-pointer" disabled={wishListContext?.isLoading || false}>
-            {userId && wishListContext?.isInWishList(product.id) ? <FaHeart color="red" /> : <FaRegHeart />}
-        </button>
-    </div>
-=======
       </div>
       
     </Link>
->>>>>>> f2c06ea (feat: 하트 위치, 화면 폭에 맞게 유연하게 조정)
   );
 }
 
