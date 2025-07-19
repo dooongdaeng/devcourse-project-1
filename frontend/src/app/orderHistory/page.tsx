@@ -47,6 +47,11 @@ export default function OrderHistory() {
   const [editItem, setEditItem] = useState<any>(null);
   const [editItemQuantity, setEditItemQuantity] = useState(1);
 
+  // 현재 선택된 주문의 정보를 가져오는 함수
+  const getCurrentOrder = () => {
+    return orders?.find(order => order.id === selectedOrderId);
+  };
+
   // 컴포넌트 마운트 시 주문 목록 조회
   useEffect(() => {
     getMyOrders();
@@ -306,22 +311,24 @@ export default function OrderHistory() {
                     <p className="text-sm text-gray-500">{order.orderCount ?? 0}개 상품</p>
                   </div>
                 </div>
-                <div className="mt-4 flex space-x-2">
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); handleEditClick(order); }}
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm cursor-pointer"
-                    disabled={!order.id}
-                  >
-                    주문 수정
-                  </button>
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); handleDeleteClick(order.id); }}
-                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm cursor-pointer"
-                    disabled={!order.id}
-                  >
-                    주문 취소
-                  </button>
-                </div>
+                {order.paymentStatus === 'PENDING' && (
+                  <div className="mt-4 flex space-x-2">
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); handleEditClick(order); }}
+                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm cursor-pointer"
+                      disabled={!order.id}
+                    >
+                      주문 수정
+                    </button>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); handleDeleteClick(order.id); }}
+                      className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm cursor-pointer"
+                      disabled={!order.id}
+                    >
+                      주문 취소
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -371,22 +378,25 @@ export default function OrderHistory() {
                         <p className="font-bold text-gray-700">{item.totalPrice?.toLocaleString()}원</p>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2 mt-2">
-                      <button
-                        onClick={() => handleEditItemClick(item)}
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm cursor-pointer"
-                        disabled={!item.id}
-                      >
-                        수정
-                      </button>
-                      <button
-                        onClick={() => handleDeleteItemClick(item.id)}
-                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm cursor-pointer"
-                        disabled={!item.id}
-                      >
-                        삭제
-                      </button>
-                    </div>
+                    {/* 수정된 부분: 현재 주문의 상태를 확인 */}
+                    {getCurrentOrder()?.paymentStatus === 'PENDING' && (
+                      <div className="flex items-center space-x-2 mt-2">
+                        <button
+                          onClick={() => handleEditItemClick(item)}
+                          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm cursor-pointer"
+                          disabled={!item.id}
+                        >
+                          수정
+                        </button>
+                        <button
+                          onClick={() => handleDeleteItemClick(item.id)}
+                          className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-sm cursor-pointer"
+                          disabled={!item.id}
+                        >
+                          삭제
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
                 <div className="pt-4 border-t border-gray-300">
