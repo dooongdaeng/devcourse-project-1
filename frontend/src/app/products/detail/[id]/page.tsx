@@ -3,15 +3,34 @@
 import { useProductItem } from "@/context/ProductsContext";
 import { useParams } from "next/navigation";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
-import { useProducts } from "@/context/ProductContext"; // Assuming this is for favorites
+// import { useProducts } from "@/context/ProductContext"; // Assuming this is for favorites
 import Link from "next/link";
+import {useWishListContext, WishListProvider} from "@/context/WishListContext";
 
-export default function ProductDetail() {
+export default function ProductDetailWrapper() {
+  return (
+      <WishListProvider userId={1}>
+        <ProductDetail />
+      </WishListProvider>
+  );
+}
+
+function ProductDetail() {
   const params = useParams();
   const id = Number(params.id);
 
   const { product } = useProductItem(id);
-  const { favoriteProducts, toggleFavorite } = useProducts(); // For favorite button
+  // const { favoriteProducts, toggleFavorite } = useProducts(); // For favorite button
+  const {toggleWishList, isInWishList, isLoading} = useWishListContext();
+
+  const handleHeartClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await toggleWishList(product.id);
+    } catch (error) {
+      console.error('찜 토글 실패:', error);
+    }
+  };
 
   if (!product) {
     return (
@@ -42,16 +61,14 @@ export default function ProductDetail() {
                   {product.price.toLocaleString()}원
                 </p>
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleFavorite(product.id);
-                  }}
-                  className="ml-4 cursor-pointer text-2xl text-gray-700"
-                >
-                  {favoriteProducts[product.id] ? (
-                    <FaHeart color="red" />
+                  onClick={handleHeartClick}
+                    disabled={isLoading}
+                  className = "ml-4 cursor-pointer text-2xl text-gray-700 disabled:opacity-50"
+                  >
+                  {isInWishList(product.id) ? (
+                      <FaHeart color="red" />
                   ) : (
-                    <FaRegHeart />
+                      <FaRegHeart />
                   )}
                 </button>
               </div>
