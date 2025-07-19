@@ -867,6 +867,11 @@ export interface components {
             address?: string;
             postalCode?: string;
         };
+        RsDataListAdminUserDto: {
+            resultCode?: string;
+            msg?: string;
+            data?: components["schemas"]["AdminUserDto"][];
+        };
         RsDataString: {
             resultCode?: string;
             msg?: string;
@@ -1723,7 +1728,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["AdminUserDto"][];
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataListAdminUserDto"];
                 };
             };
         };
