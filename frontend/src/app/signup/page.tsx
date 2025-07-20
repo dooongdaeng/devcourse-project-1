@@ -106,6 +106,7 @@ export default function Signup() {
                   className="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-700"
                   placeholder="사용자 ID를 입력하세요"
                   required
+                  autoFocus
               />
             </div>
             <div>
