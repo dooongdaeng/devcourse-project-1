@@ -536,6 +536,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+  
     "/api/v1/users/logout": {
         parameters: {
             query?: never;
@@ -1712,6 +1713,7 @@ export interface operations {
             };
         };
     };
+
     logout: {
         parameters: {
             query?: never;
