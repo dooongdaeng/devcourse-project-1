@@ -161,17 +161,17 @@ function OrderCard({ order, onOrderUpdate, onEditOrder, onEditOrderItem }: {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <div>
           <span className="text-sm text-gray-500">결제 방법</span>
-          <p className="font-medium">{order.paymentMethod}</p>
+          <p className="font-medium text-lg text-gray-700">{order.paymentMethod}</p>
         </div>
         <div>
           <span className="text-sm text-gray-500">주문 수량</span>
-          <p className="font-medium">
+          <p className="font-medium text-lg text-gray-700">
             {order.items.reduce((total, item) => total + item.quantity, 0)}개
           </p>
         </div>
         <div>
           <span className="text-sm text-gray-500">총 결제 금액</span>
-          <p className="font-medium text-lg">
+          <p className="font-medium text-lg text-gray-700">
             {order.items.reduce((total, item) => total + item.totalPrice, 0).toLocaleString()}원
           </p>
         </div>
@@ -180,14 +180,14 @@ function OrderCard({ order, onOrderUpdate, onEditOrder, onEditOrderItem }: {
       {/* 배송지 */}
       <div className="mb-4">
         <span className="text-sm text-gray-500">배송지</span>
-        <p className="font-medium">{order.address}</p>
+        <p className="font-medium text-lg text-gray-700">{order.address}</p>
       </div>
 
       {/* 주문 아이템 토글 버튼 */}
       <div className="flex justify-between items-center">
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="text-blue-500 hover:text-blue-700 font-medium text-sm"
+          className="text-blue-500 hover:text-blue-700 font-medium text-sm cursor-pointer"
         >
           주문 상품 {isExpanded ? '숨기기' : '보기'} ({order.items.length}개)
         </button>
