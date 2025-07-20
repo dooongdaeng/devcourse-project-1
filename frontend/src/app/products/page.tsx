@@ -13,13 +13,9 @@ export default function ProductsWrapper() {
 
     return (
         <ProductsProvider>
-            {userId ? (
-                <WishListProvider userId={userId}>
-                    <Products />
-                </WishListProvider>
-            ) : (
-                <Products /> // 위시리스트 기능 없이 상품만 보여줌
-            )}
+            <WishListProvider userId={userId}>
+                <Products />
+            </WishListProvider>
         </ProductsProvider>
     );
 }

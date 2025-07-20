@@ -70,7 +70,7 @@ export default function Login() {
   return (
       // min-h-screen, justify-center, transform -translate-y-20 클래스를 제거했습니다.
       // 이렇게 하면 상단바와의 겹침을 방지하고 레이아웃이 올바르게 작동합니다.
-      <main className="flex flex-col items-center p-4">
+      <main className="flex flex-col items-center p-4" style={{paddingTop: '10rem'}}>
         <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
           <h2 className="text-3xl font-bold text-center text-gray-700 mb-6">로그인</h2>
           <form onSubmit={handleLogin}>
