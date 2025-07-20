@@ -470,8 +470,8 @@ function OrderEditForm({ order, onCancel, onSuccess }: {
           <input 
             type="number" 
             value={formData.orderCount}
-            onChange={(e) => setFormData(prev => ({ ...prev, orderCount: e.target.value }))}
-            className="w-full p-2 border border-gray-300 rounded-md text-gray-900 bg-white"
+            readOnly
+            className="w-full p-2 border border-gray-300 rounded-md text-gray-900 bg-gray-100 cursor-not-allowed"
           />
         </div>
         <div>
