@@ -311,6 +311,11 @@ export default function OrderHistory() {
                     <p className="text-sm text-gray-500">{order.orderCount ?? 0}개 상품</p>
                   </div>
                 </div>
+                {/* 주문 카드 내에서 주문 정보 아래에 배송지(주소) 표시 */}
+                <div className="mb-4">
+                  <span className="text-sm text-gray-500">배송지</span>
+                  <p className="font-medium">{order.address}</p>
+                </div>
                 {order.paymentStatus === 'PENDING' && (
                   <div className="mt-4 flex space-x-2">
                     <button 

@@ -536,23 +536,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/adm/orderItems/product/{productId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 특정 상품의 주문 아이템 목록 조회 */
-        get: operations["getOrderItemsByProductId"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
+  
     "/api/v1/users/logout": {
         parameters: {
             query?: never;
@@ -1729,28 +1713,7 @@ export interface operations {
             };
         };
     };
-    getOrderItemsByProductId: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                productId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": components["schemas"]["OrderItemDto"][];
-                };
-            };
-        };
-    };
+
     logout: {
         parameters: {
             query?: never;

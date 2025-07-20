@@ -4,7 +4,6 @@ package com.back.domain.order.orders.controller;
 import com.back.domain.order.orders.dto.OrderDto;
 import com.back.domain.order.orders.entity.Orders;
 import com.back.domain.order.orders.service.OrderService;
-import com.back.global.exception.ServiceException;
 import com.back.global.rsData.RsData;
 import com.back.global.security.UserSecurityUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -72,9 +71,6 @@ public class ApiV1OrderController {
     @GetMapping("/my")
     @Operation(summary = "내 주문 목록 조회")
     public List<OrderDto> getMyOrders(@AuthenticationPrincipal UserSecurityUser currentUser) {
-        if(currentUser == null) {
-            throw new ServiceException("401-1", "로그인이 필요합니다."); // 현재 사용자가 없으면 빈 리스트 반환
-        }
 
         List<Orders> orders = orderService.findByUserId(currentUser.getId());
         List<OrderDto> orderDtos = orders.stream()

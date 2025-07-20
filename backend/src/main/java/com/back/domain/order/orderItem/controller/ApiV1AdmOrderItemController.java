@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/adm/orderItems")
 @RequiredArgsConstructor
-@Tag(name = "ApiV1OrderController", description = "관리자용 주문 아이템 API 컨트롤러")
+@Tag(name = "ApiV1AdmOrderItemController", description = "관리자용 주문 아이템 API 컨트롤러")
 @SecurityRequirement(name = "bearerAuth")
 public class ApiV1AdmOrderItemController {
     private final OrderItemService orderItemService;
@@ -36,15 +36,6 @@ public class ApiV1AdmOrderItemController {
     @Operation(summary = "주문 아이템 다건 조회")
     public List<OrderItemDto> getOrderItems() {
         List<OrderItem> orderItems = orderItemService.findAll();
-        return orderItems.stream()
-                .map(OrderItemDto::new)
-                .toList();
-    }
-
-    @GetMapping("/product/{productId}")
-    @Operation(summary = "특정 상품의 주문 아이템 목록 조회")
-    public List<OrderItemDto> getOrderItemsByProductId(@PathVariable int productId) {
-        List<OrderItem> orderItems = orderItemService.findByProductId(productId);
         return orderItems.stream()
                 .map(OrderItemDto::new)
                 .toList();
