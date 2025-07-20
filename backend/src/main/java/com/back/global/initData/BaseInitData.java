@@ -44,7 +44,7 @@ public class BaseInitData {
         product1.addProductImage("http://localhost:8080/images/coffee_1.png");
 
         Product product2 = productService.create("Brazil Serra Do Caparaó", 6000, "고소한 브라질 원두입니다.", 150);
-        product2.addProductImage("http://localhost:8080/images/coffee_2.png");
+        product2.addProductImage("http://localhost:8080/images/coffee_2.jpg");
 
         Product product3 = productService.create("Colombia Quindío (White Wine Extended Fermentation)", 6000, "달콤한 에티오피아 원두입니다.", 120);
         product3.addProductImage("http://localhost:8080/images/coffee_3.png");

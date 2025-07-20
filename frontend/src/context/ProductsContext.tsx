@@ -62,10 +62,19 @@ export const useProductItem = (id: number) => {
   const [product, setProduct] = useState<Product | null>(null);
 
   useEffect(() => {
-    apiFetch(`/api/v1/products/${id}`).then(setProduct);
+    if(!id || id === 0) {
+      return;
+    }
+    apiFetch(`/api/v1/products/${id}`).then(setProduct)
+    .catch((error) => {
+      alert(`${error.resultCode} : ${error.msg}`);
+    });
   }, []);
 
   const deleteProduct = (onSuccess: (data: any) => void) => {
+    if(!id || id === 0) {
+      return;
+    }
     apiFetch(`/api/v1/adm/products/${id}`, {
       method: "DELETE"
     }).then(onSuccess)
@@ -82,6 +91,9 @@ export const useProductItem = (id: number) => {
     imageUrl: string,
     onSuccess:(data: any) => void
   }) => {
+    if(!id || id === 0) {
+      return;
+    }
     apiFetch(`/api/v1/adm/products/${id}`, {
       method: "PUT",
       body: JSON.stringify({
@@ -100,8 +112,73 @@ export const useProductImage = (productId: number) => {
   const [productImages, setProductImages] = useState<ProductImage[] | null>(null);
 
   useEffect(() => {
-    apiFetch(`/api/v1/products/${productId}/images`).then(setProductImages);
+    if(!productId || productId === 0) {
+      return;
+    }
+    apiFetch(`/api/v1/products/${productId}/images`).then(setProductImages)
+    .catch((error) => {
+      alert(`${error.resultCode} : ${error.msg}`);
+    });
+  }, [productId]);
+
+  const addProductImage = (url: string, productId: number) => {
+    if(!productId || productId === 0) {
+      return;
+    }
+    apiFetch(`/api/v1/adm/products/${productId}/images`, {
+      method: "POST",
+      body: JSON.stringify({url}),
+    }).then()
+    .catch((error) => {
+      alert(`${error.resultCode} : ${error.msg}`);
+    });
+  }
+
+  const firstImage = productImages?.[0]?.url;
+
+  return { productImages, addProductImage, firstImage };
+}
+
+export const useProductImageItem = (productId: number, id: number) => {
+  const [productImage, setProductImage] = useState<ProductImage>();
+
+  useEffect(() => {
+    if(!productId || productId === 0) {
+      return;
+    }
+    apiFetch(`/api/v1/products/${productId}/images/${id}`).then(setProductImage)
+    .catch((error) => {
+      alert(`${error.resultCode} : ${error.msg}`);
+  });
   }, []);
 
-  return productImages?.[0]?.url;
+  const deleteProductImage = (onSuccess: (data: any) => void) => {
+    if(!productId || productId === 0) {
+      return;
+    }
+    apiFetch(`/api/v1/adm/products/${productId}/images/${id}`, {
+      method: "DELETE"
+    }).then(onSuccess)
+    .catch((error) => {
+      alert(`${error.resultCode} : ${error.msg}`);
+    });
+  };
+
+  const modifyProductImage = ({url, onSuccess}: {
+    url: string,
+    onSuccess:(data: any) => void
+  }) => {
+    if(!productId || productId === 0) {
+      return;
+    }
+    apiFetch(`/api/v1/adm/products/${productId}/images/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({url}),
+    }).then(onSuccess)
+    .catch((error) => {
+      alert(`${error.resultCode} : ${error.msg}`);
+    });
+  }
+
+  return {productImage, deleteProductImage, modifyProductImage};
 }

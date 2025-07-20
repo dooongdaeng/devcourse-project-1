@@ -20,7 +20,7 @@ const WishListContext = createContext<WishListContextType | undefined>(undefined
 
 export function WishListProvider({ children, userId }: {
     children: React.ReactNode;
-    userId: number;
+    userId: number | null;
 }) {
     const {
         wishLists,
@@ -32,6 +32,7 @@ export function WishListProvider({ children, userId }: {
     } = useWishList(userId);
 
     const isInWishList = (productId: number): boolean => {
+        if (!userId) return false;
         return wishLists.some(item => item.productId === productId);
     };
 
@@ -58,7 +59,7 @@ export const useWishListContext = () => {
     return context;
 };
 
-export const useWishList = (userId: number) => {
+export const useWishList = (userId: number | null) => {
     const [wishLists, setWishLists] = useState<WishList[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -117,7 +118,7 @@ export const useWishList = (userId: number) => {
         if (!userId || userId === 0) {
             throw new Error('로그인이 필요합니다.');
         }
-
+      
         try {
             setError(null);
 

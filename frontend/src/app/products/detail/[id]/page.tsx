@@ -1,8 +1,9 @@
 "use client";
 
-import { useProductItem } from "@/context/ProductsContext";
+import { useProductItem, useProductImage } from "@/context/ProductsContext";
 import {useParams, useRouter} from "next/navigation";
-import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { FaHeart, FaRegHeart, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { useState } from "react"
 // import { useProducts } from "@/context/ProductContext"; // Assuming this is for favorites
 import Link from "next/link";
 import {useWishListContext, WishListProvider} from "@/context/WishListContext";
@@ -33,10 +34,17 @@ function ProductDetail() {
 
   const { product } = useProductItem(id);
   // const { favoriteProducts, toggleFavorite } = useProducts(); // For favorite button
-  const wishListContext = userId ? useWishListContext() : null;
+  const wishListContext = useWishListContext();
+  const { productImages } = useProductImage(id);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const handleHeartClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
+
+    if(!product) {
+      alert("상품을 불러올 수 없습니다.")
+      return;
+    }
 
     if(!userId) {
         alert("로그인 후 찜 기능을 이용할 수 있습니다.");
@@ -44,17 +52,14 @@ function ProductDetail() {
         return;
     }
 
-    if(wishListContext){
-      try {
-        await wishListContext.toggleWishList(product.id);
-      } catch (error) {
-        console.error('찜 토글 실패:', error);
-      }
+    try {
+      await wishListContext.toggleWishList(product.id);
+    } catch (error) {
+      console.error('찜 토글 실패:', error);
     }
-
   };
-
-  if (!product) {
+  
+  if (!product || !productImages) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center p-24">
         <div>Loading...</div>
@@ -62,16 +67,71 @@ function ProductDetail() {
     );
   }
 
+  const goToPrevImage = () => {
+    setCurrentImageIndex(prev => 
+      prev === 0 ? productImages.length - 1 : prev - 1
+    );
+  };
+
+  const goToNextImage = () => {
+    setCurrentImageIndex(prev => 
+      prev === productImages.length - 1 ? 0 : prev + 1
+    );
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center p-4 md:p-24">
       <div className="w-full max-w-4xl rounded-lg border bg-white p-8 shadow-lg dark:border-neutral-700">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-          <div>
-            <img
-              src={product.imageUrl}
-              alt={product.name}
-              className="h-auto w-full rounded-lg object-cover shadow-md text-gray-700"
-            />
+          <div className="relative">
+            {productImages.length > 0 && (
+              <>
+                <img
+                  src={productImages[currentImageIndex].url}
+                  alt={`${product.name} - 이미지 ${currentImageIndex + 1}`}
+                  className="h-auto w-full rounded-lg object-cover shadow-md text-gray-700"
+                />
+                
+                {/* 이미지가 2개 이상일 때만 네비게이션 버튼 표시 */}
+                {productImages.length > 1 && (
+                  <>
+                    {/* 이전 버튼 */}
+                    <button
+                      onClick={goToPrevImage}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors cursor-pointer"
+                      aria-label="이전 이미지"
+                    >
+                      <FaChevronLeft size={16} />
+                    </button>
+                    
+                    {/* 다음 버튼 */}
+                    <button
+                      onClick={goToNextImage}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors cursor-pointer"
+                      aria-label="다음 이미지"
+                    >
+                      <FaChevronRight size={16} />
+                    </button>
+                    
+                    {/* 이미지 인디케이터 */}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                      {productImages.map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setCurrentImageIndex(index)}
+                          className={`w-2 h-2 rounded-full transition-colors ${
+                            index === currentImageIndex 
+                              ? 'bg-white' 
+                              : 'bg-white/50 hover:bg-white/75'
+                          }`}
+                          aria-label={`이미지 ${index + 1}로 이동`}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </>
+            )}
           </div>
           <div className="flex flex-col justify-between">
             <div>
