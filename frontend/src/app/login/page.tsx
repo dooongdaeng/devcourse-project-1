@@ -76,12 +76,13 @@ export default function Login() {
           <form onSubmit={handleLogin}>
             <div className="mb-4">
               <label htmlFor="username" className="block text-gray-700 text-lg font-bold mb-2">
-                사용자 이름:
+                사용자 ID:
               </label>
               <input
                   type="text"
                   id="username"
                   className="border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 w-full py-2 px-3 text-gray-700 text-lg"
+                  placeholder="사용자 ID를 입력하세요"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
@@ -96,6 +97,7 @@ export default function Login() {
                   type="password"
                   id="password"
                   className="border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 w-full py-2 px-3 text-gray-700 text-lg"
+                  placeholder="비밀번호를 입력하세요"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
