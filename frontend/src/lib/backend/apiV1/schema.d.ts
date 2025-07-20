@@ -114,30 +114,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/wish-lists": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * 위시리스트 전체 조회
-         * @description 현재 사용자의 모든 위시리스트를 조회합니다.
-         */
-        get: operations["getAllWishLists"];
-        put?: never;
-        /**
-         * 위시리스트에 상품 추가
-         * @description 특정 상품을 위시리스트에 추가합니다.
-         */
-        post: operations["addWishList"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/wish-lists/toggle": {
         parameters: {
             query?: never;
@@ -148,7 +124,7 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 위시리스트 토글
+         * 위시리스트 토글(추가/삭제)
          * @description 특정 상품을 위시리스트에 추가하거나 삭제합니다. (있으면 삭제, 없으면 추가)
          */
         post: operations["toggleWishList"];
@@ -277,6 +253,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/wish-lists": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 위시리스트 전체 조회
+         * @description 현재 사용자의 모든 위시리스트를 조회합니다.
+         */
+        get: operations["getAllWishLists"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/wish-lists/{productId}": {
         parameters: {
             query?: never;
@@ -296,26 +292,6 @@ export interface paths {
          * @description 특정 상품을 위시리스트에서 삭제합니다.
          */
         delete: operations["removeWishList"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/wish-lists/count": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * 찜한 상품 개수 조회
-         * @description 현재 사용자가 찜한 상품의 총 개수를 조회합니다.
-         */
-        get: operations["getWishListItemsCount"];
-        put?: never;
-        post?: never;
-        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -560,43 +536,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/adm/orderItems/product/{productId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 특정 상품의 주문 아이템 목록 조회 */
-        get: operations["getOrderItemsByProductId"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/wish-lists/clear": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /**
-         * 위시리스트 전체 삭제
-         * @description 현재 사용자의 모든 위시리스트를 삭제합니다.
-         */
-        delete: operations["clearWishList"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/users/logout": {
         parameters: {
             query?: never;
@@ -694,14 +633,10 @@ export interface components {
             msg?: string;
             data?: components["schemas"]["ProductDto"];
         };
-        /** @description 위시리스트 추가 요청  */
-        WishListAddReqBody: {
+        /** @description 위시리스트 토글 요청 */
+        WishListToggleReqBody: {
             /** Format: int32 */
             productId?: number;
-            /** Format: int32 */
-            quantity?: number;
-            /** Format: int32 */
-            quantityOrDefault?: number;
         };
         RsDataWishListDto: {
             resultCode?: string;
@@ -717,11 +652,6 @@ export interface components {
             productPrice?: number;
             /** Format: int32 */
             quantity?: number;
-        };
-        /** @description 위시리스트 토글 요청 */
-        WishListToggleReqBody: {
-            /** Format: int32 */
-            productId?: number;
         };
         RsDataUserDto: {
             resultCode?: string;
@@ -832,12 +762,6 @@ export interface components {
             msg?: string;
             data?: boolean;
         };
-        RsDataInteger: {
-            resultCode?: string;
-            msg?: string;
-            /** Format: int32 */
-            data?: number;
-        };
         ProductWithImageUrlDto: {
             /** Format: int32 */
             id: number;
@@ -871,11 +795,6 @@ export interface components {
             resultCode?: string;
             msg?: string;
             data?: components["schemas"]["AdminUserDto"][];
-        };
-        RsDataString: {
-            resultCode?: string;
-            msg?: string;
-            data?: string;
         };
     };
     responses: never;
@@ -1220,50 +1139,6 @@ export interface operations {
             };
         };
     };
-    getAllWishLists: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataListWishListDto"];
-                };
-            };
-        };
-    };
-    addWishList: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["WishListAddReqBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataWishListDto"];
-                };
-            };
-        };
-    };
     toggleWishList: {
         parameters: {
             query?: never;
@@ -1456,6 +1331,26 @@ export interface operations {
             };
         };
     };
+    getAllWishLists: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataListWishListDto"];
+                };
+            };
+        };
+    };
     checkWishListExists: {
         parameters: {
             query?: never;
@@ -1496,26 +1391,6 @@ export interface operations {
                 };
                 content: {
                     "application/json;charset=UTF-8": components["schemas"]["RsDataWishListDto"];
-                };
-            };
-        };
-    };
-    getWishListItemsCount: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataInteger"];
                 };
             };
         };
@@ -1833,48 +1708,6 @@ export interface operations {
                 };
                 content: {
                     "application/json;charset=UTF-8": components["schemas"]["OrderItemDto"][];
-                };
-            };
-        };
-    };
-    getOrderItemsByProductId: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                productId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": components["schemas"]["OrderItemDto"][];
-                };
-            };
-        };
-    };
-    clearWishList: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataString"];
                 };
             };
         };

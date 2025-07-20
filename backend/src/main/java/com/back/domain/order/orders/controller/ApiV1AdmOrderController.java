@@ -17,7 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/adm/orders")
 @RequiredArgsConstructor
-@Tag(name = "ApiV1OrderController", description = "관리자용 주문 API 컨트롤러")
+@Tag(name = "ApiV1AdmOrderController", description = "관리자용 주문 API 컨트롤러")
 @SecurityRequirement(name = "bearerAuth")
 public class ApiV1AdmOrderController {
     private final OrderService orderService;
