@@ -14,13 +14,9 @@ export default function ProductDetailWrapper() {
 
   return (
       <>
-        {userId ? (
-            <WishListProvider userId={userId}>
-              <ProductDetail />
-            </WishListProvider>
-        ) : (
-            <ProductDetail />
-        )}
+        <WishListProvider userId={userId}>
+          <ProductDetail />
+        </WishListProvider>
       </>
 
   );
